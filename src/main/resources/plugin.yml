@@ -1,0 +1,4 @@
+name: tierblockv2
+version: '${project.version}'
+main: kiul.tierblockv2.Tierblockv2
+api-version: 1.19
