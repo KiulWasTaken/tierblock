@@ -9,6 +9,8 @@ public final class Tierblockv2 extends JavaPlugin {
         // Plugin startup logic
         // omg it works
 
+        //ffat
+
     }
 
     @Override
