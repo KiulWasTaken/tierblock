@@ -48,8 +48,43 @@ public class globalEXP {
     public static void levelUp (Player p) {
 
         Integer globalLevel = (Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel");
-        userData.get().set(p.getUniqueId().toString() + ".globalExp", globalLevel+1);
+        userData.get().set(p.getUniqueId().toString() + ".globalLevel", globalLevel+1);
         userData.save();
+        switch ((Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel")) {
+            case 10:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.05);
+                break;
+            case 20:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.06);
+                break;
+            case 30:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.07);
+                break;
+            case 40:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.08);
+                break;
+            case 50:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.09);
+                break;
+            case 60:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.10);
+                break;
+            case 70:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.11);
+                break;
+            case 80:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.12);
+                break;
+            case 90:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.13);
+                break;
+            case 100:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.14);
+                break;
+            case 110:
+                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.15);
+                break;
+        }
         // Add some messages here for notifying the player when they level up, not too intrusive
         // as it will happen often.
     }
