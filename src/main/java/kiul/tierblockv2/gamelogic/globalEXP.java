@@ -1,19 +1,37 @@
 package kiul.tierblockv2.gamelogic;
 
 import kiul.tierblockv2.userData;
+import net.md_5.bungee.api.ChatMessageType;
+import net.md_5.bungee.api.chat.TextComponent;
+import org.bukkit.ChatColor;
 import org.bukkit.entity.Player;
 
 public class globalEXP {
 
 
-    public static void add (Player p, Integer amount) {
+    public static void add (Player p, double amount) {
 
-        Integer globalExp = (Integer) userData.get().get(p.getUniqueId().toString() + ".globalExp");
+        double globalExp = userData.get().getDouble(p.getUniqueId().toString() + ".globalExp");
         userData.get().set(p.getUniqueId().toString() + ".globalExp", globalExp + amount);
-        checkForLevelUp(p);
         userData.save();
-        // Make a graphic show in actionbar telling the player how much XP they just gained.
-        // Perhaps a bar showing how close they are to their goal? - looking at you pat.
+
+
+        if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") <= 10) {
+
+            double current = userData.get().getInt(p.getUniqueId().toString() + ".globalExp") / 2.5;
+
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat((int) current) + ChatColor.RED + String.valueOf("|").repeat(40 - (int) current)));
+
+        } else if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") >10) {
+
+            int current = userData.get().getInt(p.getUniqueId().toString() + ".globalExp") / 25;
+
+            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat(current) + ChatColor.RED + String.valueOf("|").repeat(40 - current)));
+
+        }
+
+        checkForLevelUp(p);
+
     }
 
     public static void setupExpData (Player p) {
@@ -34,12 +52,12 @@ public class globalEXP {
 
     public static void checkForLevelUp (Player p) {
 
-        if ((Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel") <= 10) {
-            if ((Integer) userData.get().get(p.getUniqueId().toString() + ".globalExp") <=100) {
+        if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") <= 10) {
+            if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalExp") >= 100) {
                 levelUp(p);
             }
-        } else if ((Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel") >10) {
-            if ((Integer) userData.get().get(p.getUniqueId().toString() + ".globalExp") <=1000) {
+        } else if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") > 10) {
+            if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalExp") >= 1000) {
                 levelUp(p);
             }
         }
@@ -49,6 +67,7 @@ public class globalEXP {
 
         Integer globalLevel = (Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel");
         userData.get().set(p.getUniqueId().toString() + ".globalLevel", globalLevel+1);
+        userData.get().set(p.getUniqueId().toString() + ".globalExp", 0);
         userData.save();
         switch ((Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel")) {
             case 10:
@@ -85,7 +104,8 @@ public class globalEXP {
                 userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.15);
                 break;
         }
-        // Add some messages here for notifying the player when they level up, not too intrusive
-        // as it will happen often.
+
+        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
+                "&6&lLevel Up! &2" + globalLevel + " &3-> &6" + (globalLevel + 1))));
     }
 }

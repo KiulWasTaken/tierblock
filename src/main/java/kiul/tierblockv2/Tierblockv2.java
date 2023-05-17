@@ -1,5 +1,6 @@
 package kiul.tierblockv2;
 
+import kiul.tierblockv2.gamelogic.listeners.ForagingListeners;
 import kiul.tierblockv2.gamelogic.listeners.fishingListeners;
 import kiul.tierblockv2.gamelogic.listeners.newPlayerListener;
 import org.bukkit.Bukkit;
@@ -9,15 +10,23 @@ public final class Tierblockv2 extends JavaPlugin {
 
     @Override
     public void onEnable() {
-        // Plugin startup logic
+
+        saveDefaultConfig();
+
+        userData.setup();
+        userData.save();
+
         Bukkit.getPluginManager().registerEvents(new userData(),this);
         Bukkit.getPluginManager().registerEvents(new newPlayerListener(), this);
         Bukkit.getPluginManager().registerEvents(new fishingListeners(), this);
+        Bukkit.getPluginManager().registerEvents(new ForagingListeners(), this);
 
     }
 
     @Override
     public void onDisable() {
-        // Plugin shutdown logic
+
+
+
     }
 }

@@ -1,0 +1,23 @@
+#- Foraging -
+
+#GEXP per
+Oak: 1
+Birch: 1.25
+Acacia: 1.5
+Dark_Oak: 1.8
+Spruce: 2.2
+Jungle: 3
+Crimson: 4
+Warped: 6
+
+#Required amount for teir
+Oak>Birch: 250
+Birch>Acacia: 500
+Acacia>Dark_Oak: 1000
+Dark_Oak>Spruce: 2000
+Spruce>Jungle: 4000
+Jungle>Flight: 10000
+Crimson>Warped: 5000
+
+
+#- Farming -

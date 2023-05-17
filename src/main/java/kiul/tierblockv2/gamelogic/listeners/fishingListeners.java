@@ -44,22 +44,22 @@ public class fishingListeners implements Listener {
             userData.save();
             switch (e.getEntityType()) {
                 case SQUID:
-                    globalEXP.add(p,12);
+                    globalEXP.add(p,(double) 12);
                     break;
                 case GLOW_SQUID:
-                    globalEXP.add(p,16);
+                    globalEXP.add(p,(double) 16);
                     break;
                 case PUFFERFISH:
-                    globalEXP.add(p,20);
+                    globalEXP.add(p,(double) 20);
                     break;
                 case DROWNED:
-                    globalEXP.add(p,50);
+                    globalEXP.add(p,(double) 50);
                     break;
                 case GUARDIAN:
-                    globalEXP.add(p,80);
+                    globalEXP.add(p,(double) 80);
                     break;
                 case ELDER_GUARDIAN:
-                    globalEXP.add(p,600);
+                    globalEXP.add(p,(double) 600);
                     break;
             }
         }
