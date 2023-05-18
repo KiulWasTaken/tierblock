@@ -11,20 +11,20 @@ public class globalEXP {
 
     public static void add (Player p, double amount) {
 
-        double globalExp = userData.get().getDouble(p.getUniqueId().toString() + ".globalExp");
-        userData.get().set(p.getUniqueId().toString() + ".globalExp", globalExp + amount);
+        double globalExp = userData.get().getDouble(p.getUniqueId() + ".globalExp");
+        userData.get().set(p.getUniqueId() + ".globalExp", globalExp + amount);
         userData.save();
 
 
-        if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") <= 10) {
+        if ( userData.get().getDouble(p.getUniqueId() + ".globalLevel") <= 10) {
 
-            double current = userData.get().getInt(p.getUniqueId().toString() + ".globalExp") / 2.5;
+            double current = userData.get().getInt(p.getUniqueId() + ".globalExp") / 2.5;
 
             p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat((int) current) + ChatColor.RED + String.valueOf("|").repeat(40 - (int) current)));
 
-        } else if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") >10) {
+        } else if ( userData.get().getDouble(p.getUniqueId() + ".globalLevel") >10) {
 
-            int current = userData.get().getInt(p.getUniqueId().toString() + ".globalExp") / 25;
+            int current = userData.get().getInt(p.getUniqueId() + ".globalExp") / 25;
 
             p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat(current) + ChatColor.RED + String.valueOf("|").repeat(40 - current)));
 
@@ -36,28 +36,28 @@ public class globalEXP {
 
     public static void setupExpData (Player p) {
 
-        if (userData.get().get(p.getUniqueId().toString() + ".globalExp") == null) {
-            userData.get().set(p.getUniqueId().toString() + ".globalExp", 0);
+        if (userData.get().get(p.getUniqueId() + ".globalExp") == null) {
+            userData.get().set(p.getUniqueId() + ".globalExp", 0);
             userData.save();
         }
     }
 
     public static void setupLevelData (Player p) {
 
-        if (userData.get().get(p.getUniqueId().toString() + ".globalLevel") == null) {
-            userData.get().set(p.getUniqueId().toString() + ".globalLevel", 1);
+        if (userData.get().get(p.getUniqueId() + ".globalLevel") == null) {
+            userData.get().set(p.getUniqueId() + ".globalLevel", 1);
             userData.save();
         }
     }
 
     public static void checkForLevelUp (Player p) {
 
-        if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") <= 10) {
-            if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalExp") >= 100) {
+        if ( userData.get().getInt(p.getUniqueId() + ".globalLevel") <= 10) {
+            if ( userData.get().getDouble(p.getUniqueId() + ".globalExp") >= 100) {
                 levelUp(p);
             }
-        } else if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalLevel") > 10) {
-            if ( userData.get().getDouble(p.getUniqueId().toString() + ".globalExp") >= 1000) {
+        } else if ( userData.get().getInt(p.getUniqueId() + ".globalLevel") > 10) {
+            if ( userData.get().getDouble(p.getUniqueId() + ".globalExp") >= 1000) {
                 levelUp(p);
             }
         }
@@ -65,43 +65,43 @@ public class globalEXP {
 
     public static void levelUp (Player p) {
 
-        Integer globalLevel = (Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel");
-        userData.get().set(p.getUniqueId().toString() + ".globalLevel", globalLevel+1);
-        userData.get().set(p.getUniqueId().toString() + ".globalExp", 0);
+        Integer globalLevel = (Integer) userData.get().get(p.getUniqueId() + ".globalLevel");
+        userData.get().set(p.getUniqueId() + ".globalLevel", globalLevel+1);
+        userData.get().set(p.getUniqueId() + ".globalExp", 0);
         userData.save();
-        switch ((Integer) userData.get().get(p.getUniqueId().toString() + ".globalLevel")) {
+        switch ((Integer) userData.get().get(p.getUniqueId() + ".globalLevel")) {
             case 10:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.05);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.05);
                 break;
             case 20:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.06);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.06);
                 break;
             case 30:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.07);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.07);
                 break;
             case 40:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.08);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.08);
                 break;
             case 50:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.09);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.09);
                 break;
             case 60:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.10);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.10);
                 break;
             case 70:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.11);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.11);
                 break;
             case 80:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.12);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.12);
                 break;
             case 90:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.13);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.13);
                 break;
             case 100:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.14);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.14);
                 break;
             case 110:
-                userData.get().set(p.getUniqueId().toString() + ".seaCreatureChance", 0.15);
+                userData.get().set(p.getUniqueId() + ".fishing.seaCreatureChance", 0.15);
                 break;
         }
 
