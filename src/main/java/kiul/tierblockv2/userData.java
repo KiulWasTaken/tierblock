@@ -10,7 +10,7 @@ import org.bukkit.plugin.Plugin;
 import java.io.File;
 import java.io.IOException;
 
-public class userData implements Listener {
+public class userData {
 
     public Plugin plugin = Tierblockv2.getPlugin(Tierblockv2.class);
 

@@ -15,6 +15,7 @@ public class fishingXP {
 
     public static void addFishingXP (Player p, double amount) {
 
+
         if ((int)userData.get().get(p.getUniqueId() + ".fishing.level") != 6) {
             double fishingXP = (double) userData.get().get(p.getUniqueId() + ".fishing.xp");
             userData.get().set(p.getUniqueId() + ".fishing.xp", fishingXP + amount);

@@ -2,3 +2,6 @@ name: tierblockv2
 version: '${project.version}'
 main: kiul.tierblockv2.Tierblockv2
 api-version: 1.19
+commands:
+  givexp:
+    description: gives global XP to the user that runs the command.
