@@ -21,6 +21,15 @@ public class Commands implements CommandExecutor,Listener {
             } else {
                 p.sendMessage(ChatColor.RED+"Insufficient Permissions");
             }
+        } else if (label.equalsIgnoreCase("modifyvalue")) {
+            if (p.isOp()) {
+                String toModify = args[0];
+                Integer value = Integer.parseInt(args[1]);
+
+                userData.get().set(p.getUniqueId() + "." + toModify, value);
+                userData.save();
+                p.sendMessage(ChatColor.GREEN + "Successfully saved" + ChatColor.YELLOW + p.getUniqueId() + "." + toModify + " as " + ChatColor.WHITE + value);
+            }
         }
         return false;
     }

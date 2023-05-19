@@ -15,14 +15,14 @@ import java.util.Random;
 
 public class fishingListeners implements Listener {
     
-    static double fishingVelocity = 0.3;
+    static double fishingVelocity = 1;
 
     @EventHandler
     public void SeaCreatureCatch (PlayerFishEvent e) {
         Player p = e.getPlayer();
         Random random = new Random();
         if ((int) userData.get().get(p.getUniqueId() + ".global.level") >= 10) {
-            if (e.getCaught() != null) {
+            if (e.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
                 if (random.nextDouble(0, 1) < (Double) userData.get().get(p.getUniqueId() + ".fishing.seaCreatureChance")) {
                     // Sea Creature Fishup Code Here
 
@@ -41,16 +41,16 @@ public class fishingListeners implements Listener {
                             switch (random.nextInt(1, 3)) {
                                 case 1:
                                     if (random.nextInt(1, 11) == 2) {
-                                        GlowSquid seaCreature = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        GlowSquid glowSquid = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
+                                        glowSquid.setVelocity(glowSquid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     } else {
-                                        Squid seaCreature = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        Squid squid = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
+                                        squid.setVelocity(squid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     }
                                     break;
                                 case 2:
-                                    PufferFish seaCreature = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
-                                    seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                    PufferFish pufferFish = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
+                                    pufferFish.setVelocity(pufferFish.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     break;
                             }
                             break;
@@ -58,16 +58,16 @@ public class fishingListeners implements Listener {
                             switch (random.nextInt(1, 4)) {
                                 case 1:
                                     if (random.nextInt(1, 11) == 2) {
-                                        GlowSquid seaCreature = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        GlowSquid glowSquid = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
+                                        glowSquid.setVelocity(glowSquid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     } else {
-                                        Squid seaCreature = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        Squid squid = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
+                                        squid.setVelocity(squid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     }
                                     break;
                                 case 2:
-                                    PufferFish seaCreature = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
-                                    seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                    PufferFish pufferFish = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
+                                    pufferFish.setVelocity(pufferFish.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     break;
                                 case 3:
                                     Turtle turtle = (Turtle) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.TURTLE);
@@ -78,16 +78,16 @@ public class fishingListeners implements Listener {
                             switch (random.nextInt(1, 5)) {
                                 case 1:
                                     if (random.nextInt(1, 11) == 2) {
-                                        GlowSquid seaCreature = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        GlowSquid glowSquid = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
+                                        glowSquid.setVelocity(glowSquid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     } else {
-                                        Squid seaCreature = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        Squid squid = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
+                                        squid.setVelocity(squid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     }
                                     break;
                                 case 2:
-                                    PufferFish seaCreature = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
-                                    seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                    PufferFish pufferFish = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
+                                    pufferFish.setVelocity(pufferFish.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     break;
                                 case 3:
                                     Turtle turtle = (Turtle) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.TURTLE);
@@ -103,16 +103,16 @@ public class fishingListeners implements Listener {
                             switch (random.nextInt(1, 5)) {
                                 case 1:
                                     if (random.nextInt(1, 11) == 2) {
-                                        GlowSquid seaCreature = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        GlowSquid glowSquid = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
+                                        glowSquid.setVelocity(glowSquid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     } else {
-                                        Squid seaCreature = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        Squid squid = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
+                                        squid.setVelocity(squid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     }
                                     break;
                                 case 2:
-                                    PufferFish seaCreature = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
-                                    seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                    PufferFish pufferFish = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
+                                    pufferFish.setVelocity(pufferFish.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     break;
                                 case 3:
                                     Turtle turtle = (Turtle) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.TURTLE);
@@ -131,16 +131,16 @@ public class fishingListeners implements Listener {
                             switch (random.nextInt(1, 5)) {
                                 case 1:
                                     if (random.nextInt(1, 11) == 2) {
-                                        GlowSquid seaCreature = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        GlowSquid glowSquid = (GlowSquid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.GLOW_SQUID);
+                                        glowSquid.setVelocity(glowSquid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     } else {
-                                        Squid seaCreature = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
-                                        seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                        Squid squid = (Squid) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.SQUID);
+                                        squid.setVelocity(squid.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     }
                                     break;
                                 case 2:
-                                    PufferFish seaCreature = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
-                                    seaCreature.setVelocity(seaCreature.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
+                                    PufferFish pufferFish = (PufferFish) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.PUFFERFISH);
+                                    pufferFish.setVelocity(pufferFish.getLocation().toVector().subtract(p.getLocation().toVector()).clone().normalize().multiply(fishingVelocity));
                                     break;
                                 case 3:
                                     Turtle turtle = (Turtle) p.getWorld().spawnEntity(e.getHook().getLocation(), EntityType.TURTLE);

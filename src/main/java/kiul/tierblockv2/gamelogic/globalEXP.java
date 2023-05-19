@@ -72,7 +72,7 @@ public class globalEXP {
                 return true;
             }
         }
-    return false;
+        return false;
     }
 
     public static void levelUp (Player p) {
