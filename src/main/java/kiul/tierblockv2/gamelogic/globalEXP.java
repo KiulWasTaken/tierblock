@@ -9,8 +9,11 @@ import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.Plugin;
 
 public class globalEXP {
+
+
 
 
     public static void add (Player p, double amount) {
@@ -21,23 +24,23 @@ public class globalEXP {
         checkForLevelUp(p);
 
         // green and red only look good like this if you're colourblind, pat..
-        if ( userData.get().getDouble(p.getUniqueId() + ".global.level") <= 10) {
+        if (!checkForLevelUp(p) == true) {
+            if (userData.get().getDouble(p.getUniqueId() + ".global.level") <= 10) {
 
-            double current = userData.get().getDouble(p.getUniqueId() + ".global.xp") / 2.5;
-            int rounded = ((int) current);
 
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat( rounded) + ChatColor.RED + String.valueOf("|").repeat(40 - rounded)));
+                double current = userData.get().getDouble(p.getUniqueId() + ".global.xp") / 2.5;
+                int rounded = ((int) current);
 
-        } else if ( userData.get().getDouble(p.getUniqueId() + ".global.level") >10) {
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat(rounded) + ChatColor.RED + String.valueOf("|").repeat(40 - rounded)));
 
-            double current = userData.get().getDouble(p.getUniqueId() + ".global.xp") / 25;
-            int rounded = ((int) current);
-            p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat(rounded) + ChatColor.RED + String.valueOf("|").repeat(40 - rounded)));
+            } else if (userData.get().getDouble(p.getUniqueId() + ".global.level") > 10) {
 
+                double current = userData.get().getDouble(p.getUniqueId() + ".global.xp") / 25;
+                int rounded = ((int) current);
+                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.GOLD + "+ " + amount + " " + ChatColor.DARK_GREEN + "G-EXP " + ChatColor.DARK_AQUA + "- " + ChatColor.GREEN + String.valueOf("|").repeat(rounded) + ChatColor.RED + String.valueOf("|").repeat(40 - rounded)));
+
+            }
         }
-
-
-
     }
 
     public static void setupExpData (Player p) {
@@ -56,33 +59,31 @@ public class globalEXP {
         }
     }
 
-    public static void checkForLevelUp (Player p) {
+    public static boolean checkForLevelUp (Player p) {
 
         if ( userData.get().getInt(p.getUniqueId() + ".global.level") <= 10) {
             if ( userData.get().getDouble(p.getUniqueId() + ".global.xp") >= 100) {
                 levelUp(p);
+                return true;
             }
         } else if ( userData.get().getInt(p.getUniqueId() + ".global.level") > 10) {
             if ( userData.get().getDouble(p.getUniqueId() + ".global.xp") >= 1000) {
                 levelUp(p);
+                return true;
             }
         }
+    return false;
     }
 
     public static void levelUp (Player p) {
 
         Integer globalLevel = (Integer) userData.get().get(p.getUniqueId() + ".global.level");
-        userData.get().set(p.getUniqueId() + ".global.level", globalLevel+1);
+        userData.get().set(p.getUniqueId() + ".global.level", globalLevel + 1);
         userData.get().set(p.getUniqueId() + ".global.xp", 0);
-        fishingLevelUp(p,(int)userData.get().get(p.getUniqueId() + ".global.level"));
-        Bukkit.getScheduler().scheduleSyncDelayedTask(Tierblockv2.plugin, new Runnable() {
-            @Override
-            public void run() {
-                p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                        "&f&lLevel Up! &b" + globalLevel + " &7-> &3" + (globalLevel + 1))));
-            }
-        },  10);
-
+        fishingLevelUp(p, (int) userData.get().get(p.getUniqueId() + ".global.level"));
+        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
+                "&f&lLevel Up! &3" + globalLevel + " &7-> &b" + (globalLevel + 1))));
+        userData.save();
     }
 
 

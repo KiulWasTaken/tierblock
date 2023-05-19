@@ -10,7 +10,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 public final class Tierblockv2 extends JavaPlugin {
 
-    public static Plugin plugin = Tierblockv2.getPlugin(Tierblockv2.class);
+
 
     @Override
     public void onEnable() {
