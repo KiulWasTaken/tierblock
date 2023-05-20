@@ -1,23 +1,26 @@
-#- Foraging -
-
-#GEXP per
-Oak: 1
-Birch: 1.25
-Acacia: 1.5
-Dark_Oak: 1.8
-Spruce: 2.2
-Jungle: 3
-Crimson: 4
-Warped: 6
-
-#Required amount for teir
-Oak>Birch: 250
-Birch>Acacia: 500
-Acacia>Dark_Oak: 1000
-Dark_Oak>Spruce: 2000
-Spruce>Jungle: 4000
-Jungle>Flight: 10000
-Crimson>Warped: 5000
-
-
-#- Farming -
+# level_up is the required amount of blocks to break to level up
+foraging:
+  oak:
+    xp_reward: 1
+    level_up: 250
+  birch:
+    xp_reward: 1.25
+    level_up: 500
+  acacia:
+    xp_reward: 1.5
+    level_up: 1000
+  dark_oak:
+    xp_reward: 1.8
+    level_up: 2000
+  spruce:
+    xp_reward: 2.2
+    level_up: 4000
+  jungle:
+    xp_reward: 3
+    level_up: 10000
+  crimson:
+    xp_reward: 4
+    level_up: 5000
+  warped:
+    xp_reward: 6
+    level_up: 0

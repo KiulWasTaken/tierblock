@@ -1,9 +1,7 @@
-name: tierblockv2
+name: Tierblock
 version: '${project.version}'
-main: kiul.tierblockv2.Tierblockv2
+main: kiul.tierblock.Main
 api-version: 1.19
 commands:
-  givexp:
-    description: gives global XP to the user that runs the command.
-  modifyvalue:
-    description: modifies the value of the given config entry
+  devtools:
+    description: Developer tools to help test & debug.
