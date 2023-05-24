@@ -1,7 +1,7 @@
 # Latest changes:
 
 - Farming mostly implemented. (Bee functionality, and other stuff not implemented, yet.)
-- Improved configuration system implemented, and ported Kiul's and PatriciaChips' to the system.
+- Improved configuration system implemented, and ported Kiul's and PatriciaChips' listeners to the system.
 - Added a ``User``, and a ``UserManager`` to increase productivity and provide easier access to the player's stats.
 
 # Deprecation (devs):
