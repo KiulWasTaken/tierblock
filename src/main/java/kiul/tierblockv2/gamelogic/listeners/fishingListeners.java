@@ -15,7 +15,7 @@ import java.util.Random;
 
 public class fishingListeners implements Listener {
     
-    static double fishingVelocity = 1;
+    static double fishingVelocity = -0.3;
 
     @EventHandler
     public void SeaCreatureCatch (PlayerFishEvent e) {
