@@ -5,11 +5,11 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>kiul</groupId>
-    <artifactId>tierblockv2</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>Tierblock</artifactId>
+    <version>2.0-SNAPSHOT</version>
     <packaging>jar</packaging>
 
-    <name>tierblockv2</name>
+    <name>Tierblock</name>
 
     <properties>
         <java.version>1.8</java.version>
@@ -43,6 +43,11 @@
                     </execution>
                 </executions>
             </plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-resources-plugin</artifactId>
+				<version>3.1.0</version>
+			</plugin>       
         </plugins>
         <resources>
             <resource>
@@ -68,6 +73,12 @@
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
             <version>1.19.4-R0.1-SNAPSHOT</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.26</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>

@@ -1,4 +1,4 @@
-package kiul.tierblockv2.gamelogic.commands;
+package kiul.tierblock.commands;
 
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
@@ -6,29 +6,33 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.event.Listener;
-import kiul.tierblockv2.userData;
-import kiul.tierblockv2.gamelogic.globalEXP;
+
+import kiul.tierblock.user.User;
+import kiul.tierblock.user.UserManager;
+import kiul.tierblock.user.skill.SkillType;
 
 public class Commands implements CommandExecutor,Listener {
 
     @Override
     public boolean onCommand(CommandSender sender, Command cmd, String label, String[] args) {
-        Player p = (Player) sender;
+        if(!(sender instanceof Player)) return false;
+
+        User user = UserManager.getInstance().getUser((Player)sender);
+
         if (label.equalsIgnoreCase("givexp")) {
-            if (p.isOp()) {
+            if (user.isOp()) {
                 double num = Double.parseDouble(args[0]);
-                globalEXP.add(p, num);
+                user.addExperience(SkillType.GLOBAL, num);
             } else {
-                p.sendMessage(ChatColor.RED+"Insufficient Permissions");
+                user.sendMessage(ChatColor.RED+"Insufficient Permissions");
             }
         } else if (label.equalsIgnoreCase("modifyvalue")) {
-            if (p.isOp()) {
+            if (user.isOp()) {
                 String toModify = args[0];
                 Integer value = Integer.parseInt(args[1]);
 
-                userData.get().set(p.getUniqueId() + "." + toModify, value);
-                userData.save();
-                p.sendMessage(ChatColor.GREEN + "Successfully saved" + ChatColor.YELLOW + p.getUniqueId() + "." + toModify + " as " + ChatColor.WHITE + value);
+                user.getStats().setNumber(toModify, value);
+                user.sendMessage(ChatColor.GREEN + "Successfully saved" + ChatColor.YELLOW + toModify + " as " + ChatColor.WHITE + value);
             }
         }
         return false;

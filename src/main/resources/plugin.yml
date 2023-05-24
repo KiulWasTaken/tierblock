@@ -1,6 +1,6 @@
-name: tierblockv2
+name: Tierblock
 version: '${project.version}'
-main: kiul.tierblockv2.Tierblockv2
+main: kiul.tierblock.Main
 api-version: 1.19
 commands:
   givexp:

@@ -1,23 +1,56 @@
-#- Foraging -
+# level_up is the amount of blocks you need to break for level up
+foraging:
+  oak:
+    xp_reward: 1.0
+    level_up: 250
+  birch:
+    xp_reward: 1.25
+    level_up: 500
+  acacia:
+    xp_reward: 1.5
+    level_up: 1000
+  dark_oak:
+    xp_reward: 1.8
+    level_up: 2000
+  spruce:
+    xp_reward: 2.2
+    level_up: 4000
+  jungle:
+    xp_reward: 3.0
+    level_up: 10000
+  crimson:
+    global_level_requirement: 40
+    xp_reward: 4.0
+    level_up: 5000
+  warped:
+    global_level_requirement: 40
+    xp_reward: 6.0
 
-#GEXP per
-Oak: 1
-Birch: 1.25
-Acacia: 1.5
-Dark_Oak: 1.8
-Spruce: 2.2
-Jungle: 3
-Crimson: 4
-Warped: 6
-
-#Required amount for teir
-Oak>Birch: 250
-Birch>Acacia: 500
-Acacia>Dark_Oak: 1000
-Dark_Oak>Spruce: 2000
-Spruce>Jungle: 4000
-Jungle>Flight: 10000
-Crimson>Warped: 5000
-
-
-#- Farming -
+farming:
+  wheat:
+    xp_reward: 1.0
+    level_up: 50
+  beetroot:
+    xp_reward: 1.1
+    level_up: 150
+  carrot:
+    xp_reward: 1.2
+    level_up: 500
+  potato:
+    xp_reward: 1.3
+    level_up: 1000
+  sugar_cane:
+    xp_reward: 1.35
+    level_up: 2500
+  melon:
+    xp_reward: 1.4
+    level_up: 5000
+  pumpkin:
+    xp_reward: 1.5
+    level_up: 10000
+  netherwart:
+    global_level_requirement: 40
+    xp_reward: 2.5
+  chorus_fruit:
+    global_level_requirement: 90
+    xp_reward: 4
