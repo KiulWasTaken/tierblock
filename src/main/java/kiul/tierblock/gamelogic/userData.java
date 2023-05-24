@@ -7,7 +7,8 @@ import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
 
 /**
- * @deprecated only exists for pat's code to work
+ * @deprecated use {@link User}
+ * <p>only exists for pat's code to work
  */
 @Deprecated
 public class userData {

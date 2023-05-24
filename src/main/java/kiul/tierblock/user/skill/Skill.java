@@ -2,6 +2,7 @@ package kiul.tierblock.user.skill;
 
 import kiul.tierblock.user.User;
 
+// NOT DONE! - DO NOT USE
 public abstract class Skill {
     
     String name;

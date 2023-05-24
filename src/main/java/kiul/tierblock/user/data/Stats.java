@@ -17,6 +17,7 @@ import lombok.NonNull;
 @Getter
 public class Stats {
 
+    // moved from main.
     private final File USER_DATA_FOLDER = new File(Main.getInstance().getDataFolder() + "/userdata");
 
     private final File userFile;

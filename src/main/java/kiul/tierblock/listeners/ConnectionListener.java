@@ -12,7 +12,7 @@ public class ConnectionListener implements Listener {
     
     @EventHandler
     public void playerJoinListener(PlayerJoinEvent event) {
-        User user = new User(event.getPlayer()); // Needed to add to online players.
+        User user = new User(event.getPlayer());
         UserManager.getInstance().getOnlineUsers().add(user); // DO NOT DELETE! will fuck up User & UserManager if deleted.
 
         if(user.getPlayer().hasPlayedBefore()) { // TODO: negate boolean ( ! ) when your testing purposes are over.
@@ -23,6 +23,6 @@ public class ConnectionListener implements Listener {
     @EventHandler
     public void playerQuitListener(PlayerQuitEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
-        UserManager.getInstance().getOnlineUsers().remove(user); // prevent a massive doo doo
+        UserManager.getInstance().getOnlineUsers().remove(user); // prevent a massive doo doo.
     }
 }

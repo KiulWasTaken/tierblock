@@ -28,7 +28,7 @@ public class User {
      */
     
     private Player player; 
-    private Stats stats; // stats instance.
+    private Stats stats;
 
     public User(Player player) {
         this.player = player;

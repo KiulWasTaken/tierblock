@@ -14,7 +14,7 @@ import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillType;
 import kiul.tierblock.utils.enums.CropType;
 
-// literally copied my ForagingListener and replaced everything related to wood to crops except for placing plants
+// literally copied my ForagingListener and replaced everything related to wood to crops except for placing plants xd
 public class FarmingListener implements Listener{
 
     private final Map<CropType, Double> FARMING_REWARDS = Map.of(

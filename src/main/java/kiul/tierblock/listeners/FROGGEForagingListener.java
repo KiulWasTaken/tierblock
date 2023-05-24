@@ -15,6 +15,7 @@ import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillType;
 import kiul.tierblock.utils.enums.WoodType;
 
+// only the coolest
 public class FROGGEForagingListener implements Listener {
 
     // could just do it in a for loop, but it doesn't affect performance as it's one instance anyway

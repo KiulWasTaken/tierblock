@@ -7,3 +7,4 @@ commands:
     description: gives global XP to the user that runs the command.
   modifyvalue:
     description: modifies the value of the given config entry
+# sus

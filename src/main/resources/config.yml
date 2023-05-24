@@ -1,4 +1,4 @@
-# level_up is the amount of blocks you need to break for level up
+# level_up is the amount of blocks you need to break for level up.
 foraging:
   oak:
     xp_reward: 1.0

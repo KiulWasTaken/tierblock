@@ -7,7 +7,8 @@ import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillType;
 
 /**
- * literally only exists to make pat's code work
+ * @deprecated use {@link User} 
+ * <p>literally only exists to make pat's code work
  */
 @Deprecated
 public class globalEXP {

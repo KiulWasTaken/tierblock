@@ -41,6 +41,7 @@ public final class Main extends JavaPlugin {
 
         saveDefaultConfig();
 
+        // should just put them in one command
         getCommand("givexp").setExecutor(new Commands());
         getCommand("modifyvalue").setExecutor(new Commands());
 

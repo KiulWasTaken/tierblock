@@ -9,7 +9,8 @@ import kiul.tierblock.user.exceptions.InstanceAlreadyExistsException;
 import lombok.Getter;
 
 public class UserManager {
-
+    
+    //one instance only
     private static UserManager instance;
 
     public UserManager() {

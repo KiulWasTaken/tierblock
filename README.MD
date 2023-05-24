@@ -36,7 +36,7 @@ Usage requires a ``UserManager`` instance to be made (Already done in the Main c
 @EventHandler
 public void listen(PlayerJoinEvent event) {
     /*
-     * UserManager contains three methods, currently:
+     * UserManager contains 3 methods, currently:
      * - getUser(Player player) - Gets a User from a Bukkit Player Object
      * - getUser(String name) - Gets a User from a username.
      * - getOnlineUsers() - Gets a collection of all the online players in-game.

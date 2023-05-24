@@ -18,6 +18,7 @@ import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillType;
 
+// only the coolest
 public class FROGGEFishingListener implements Listener{
 
     private final double FISHING_VELOCITY_MULTIPLIER = 0.13;

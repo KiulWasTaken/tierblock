@@ -18,7 +18,7 @@ import kiul.tierblock.user.skill.SkillType;
 
 /**
  * @themightyfrogge says:
- * not efficient, i urge you to figure out how mine works and use it.
+ * not efficient, i urge you to figure out how mine works and use it!
  */
 public class FishingListeners implements Listener {
     

@@ -11,6 +11,7 @@ import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillType;
 
+// split into different classes
 public class Commands implements CommandExecutor,Listener {
 
     @Override
