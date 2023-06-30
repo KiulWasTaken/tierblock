@@ -14,12 +14,19 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
+import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
+import kiul.tierblock.user.skill.SkillManager;
 import kiul.tierblock.user.skill.SkillType;
+import kiul.tierblock.user.skill.impl.FishingSkill;
 
 // only the coolest
-public class FROGGEFishingListener implements Listener{
+public class FROGGEFishingListener implements Listener {
+
+    public FROGGEFishingListener() {
+        SkillManager.getInstance().registerSkill(new FishingSkill());
+    }
 
     private final double FISHING_VELOCITY_MULTIPLIER = 0.13;
 
@@ -38,7 +45,8 @@ public class FROGGEFishingListener implements Listener{
     public void creatureCatchListener(PlayerFishEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
 
-        if(user.getLevel(SkillType.GLOBAL) < 10) return; // stops here if fishing level is less than 10.
+        if(!user.hasIsland()) return;
+        if(user.getGlobalLevel() < 10) return; // stops here if fishing level is less than 10.
 
         // now that the player has a high enough level we check if something was caught or not:
         if(event.getState() != PlayerFishEvent.State.CAUGHT_FISH) return; // nothing caught, stopping here.
@@ -53,7 +61,7 @@ public class FROGGEFishingListener implements Listener{
         boolean isGlowSquid = random == 2;
         EntityType entityType = EntityType.SQUID; // if fishing level isn't 1-6, it'll always spawn a squid.
 
-        switch(user.getLevel(SkillType.FISHING)) { 
+        switch(user.getLevel(SkillType.FISHING, false)) { 
             case 1:
                 entityType = isGlowSquid ? EntityType.GLOW_SQUID : EntityType.SQUID;
                 break;
@@ -144,13 +152,22 @@ public class FROGGEFishingListener implements Listener{
         if(! (FISHING_REWARD_ENTITIES.containsKey(entityType)) ) return; // not in the fishing creatures hash map
         
         User user = UserManager.getInstance().getUser(event.getEntity().getKiller());
-        user.addExperience(SkillType.FISHING, 1);
-        user.addExperience(SkillType.GLOBAL, FISHING_REWARD_ENTITIES.get(entityType)); // adds gxp reward from the hash map
+
+        String unfinishedEntityName = new String(
+            entityType.toString().substring(0, 1).toUpperCase() +
+            entityType.toString().substring(1)
+        ).replace("_", " ");
+
+        // capitalise first letter.
+        String finishedEntityName = 
+            unfinishedEntityName.split(" ")[1].substring(0, 1).toUpperCase() 
+            + unfinishedEntityName.split(" ")[1].substring(1).toLowerCase();
 
         user.sendActionBar(
-            String.format("&eGlobal: &2+&a%sxp &8| &eFishing: &2+&a1xp &8(&b%s&8)", 
-                FISHING_REWARD_ENTITIES.get(entityType),
-                entityType.toString().toLowerCase().replace("_", " ") // too lazy to capitalise first char
+            String.format("&eGlobal: &2+&a%sxp &8| &eFishing: &2+&a%sxp &8(&b%s&8)", 
+                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(FISHING_REWARD_ENTITIES.get(entityType))),
+                Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FISHING, 1.0, false)),
+                finishedEntityName
             )
         );
     }

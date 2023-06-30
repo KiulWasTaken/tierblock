@@ -1,38 +1,61 @@
 package kiul.tierblock.user;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.UUID;
+import java.util.function.Predicate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
 
 import com.google.errorprone.annotations.DoNotCall;
 
+import fr.mrmicky.fastboard.FastBoard;
 import kiul.tierblock.Main;
 import kiul.tierblock.user.data.Stats;
+import kiul.tierblock.user.skill.SkillManager;
 import kiul.tierblock.user.skill.SkillType;
-import kiul.tierblock.utils.enums.CropType;
-import kiul.tierblock.utils.enums.WoodType;
 import lombok.Getter;
+import lombok.Setter;
 import net.md_5.bungee.api.ChatMessageType;
 import net.md_5.bungee.api.chat.TextComponent;
+import world.bentobox.bentobox.BentoBox;
+import world.bentobox.bentobox.api.metadata.MetaDataValue;
+import world.bentobox.bentobox.database.objects.Island;
+import world.bentobox.bentobox.managers.IslandsManager;
+import world.bentobox.bentobox.managers.RanksManager;
 
 @Getter
 public class User {
 
     /*
      * Do NOT use any of the check-for-levelup methods inside of set level / xp methods.
-     * If used, it'll call itself recursively, and consequently cause a massive error.
+     * If used, it'll call itself recursively, and consequently cause a shitstorm.
      */
     
     private Player player; 
     private Stats stats;
+    @Setter private FastBoard debugBoard;
+    private SkillType lastSkill;
 
     public User(Player player) {
         this.player = player;
         this.stats = new Stats(this);
+    }
+
+    public void setLastSkill(SkillType skillType) {
+        lastSkill = skillType;
+        if(getDebugBoard() == null) return;
+        
+		getDebugBoard().updateLine(1, ChatColor.translateAlternateColorCodes('&', " &8- &aLVL&8, &aXP&8: &8(&a" + getGlobalLevel() + "&f, &a" + Main.DECIMAL_FORMAT.format(getGlobalExperience()) + "&8)"));
+        getDebugBoard().updateLine(9, ChatColor.translateAlternateColorCodes('&', "&2" + skillType + "&8:"));
+		getDebugBoard().updateLine(10, ChatColor.translateAlternateColorCodes('&', " &8- &aLevel&8: &f" + getLevel(skillType, false)));
+		getDebugBoard().updateLine(11, ChatColor.translateAlternateColorCodes('&', " &8- &aExperience&8: &f" + Main.DECIMAL_FORMAT.format(getExperience(skillType, false))));
     }
 
     public void sendMessage(String message) {
@@ -57,6 +80,180 @@ public class User {
         this.player.sendTitle(t, st, 20, stayInSeconds * 20, 20);
     }
 
+
+    /**
+     * @return The user's island (Where user is either a member or the owner of said island)
+     */
+    public Island getIsland() {
+        if(!hasIsland()) return null;
+
+        IslandsManager islandsManager = BentoBox.getInstance().getIslands();
+        Island userIsland;
+
+        Predicate<Island> containsPlayer = island -> { 
+            if(!island.getMembers().containsKey(getUUID())) return false;
+
+            int rank = island.getMembers().get(getUUID());
+            if(rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK) return false;
+            
+            return true;
+        };
+        
+        List<Island> islandsContainingPlayer = islandsManager.getIslands(Main.getBSkyBlockWorld()).stream().filter(containsPlayer).toList();
+
+        for(Island island : islandsContainingPlayer) userIsland = island; // breaks if user is somehow a member in more than one island...
+
+        userIsland = islandsManager.getIsland(Main.getBSkyBlockWorld(), getUUID());
+        
+        return userIsland;
+    }
+
+    /**
+     * @return Island members that fit the predicate: <p><code>rank >= MEMBER_RANK && rank <= OWNER_RANK</code>
+     */
+    public List<User> getIslandMembers() {
+        List<User> userList = new ArrayList<>();
+
+        getIsland().getMembers().forEach((uuid, rank) -> {
+            if(rank >= RanksManager.MEMBER_RANK && rank <= RanksManager.OWNER_RANK) {
+                userList.add(
+                    UserManager.getInstance().getUser(uuid)
+                );
+            }
+        });
+
+        return userList;
+    }
+
+    /**
+     * @return Whether the play is a member of an island (even if not owner) or not.
+     */
+    public boolean hasIsland() {
+        return getStats().getBoolean("has_island");
+    }
+
+    public void setHasIsland(boolean bool) {
+        getStats().setBoolean("has_island", bool);
+    }
+
+    /**
+     * @return Whether the user is with-in any island (Not strictly the user's island)
+     */
+    public boolean isWithinAnyIsland() {
+		if(!getLocation().getWorld().getName().startsWith("bskyblock")) return false;
+        if(BentoBox.getInstance().getIslandsManager().getIslandAt(getLocation()) == null) return false;
+        return true;
+    }
+
+    /**
+     * @return Whether the user is with-in own island
+     */
+    public boolean isWithinOwnIsland() {
+        if(!hasIsland()) return false;
+        if(!getIsland().inIslandSpace(getLocation())) return false;
+        return true;
+    }
+
+    /**
+     * @return The beehive block. (Returns null if not island owner!)
+     */
+    public Block getBeehive() {
+        if(!hasIsland()) return null;
+        if(getIslandRank() != RanksManager.OWNER_RANK) return null; // only owners
+        if(!getStats().getBoolean("farming.beehive.placed")) return null;
+
+        Location location = new Location(
+            Main.getBSkyBlockWorld(), 
+            getStats().getDouble("farming.beehive.x"), 
+            getStats().getDouble("farming.beehive.y"), 
+            getStats().getDouble("farming.beehive.z")
+        );
+
+        return location.getBlock();
+    }
+
+    public void setBeehive(Block block) {
+        Location location = block.getLocation();
+        getStats().setNumber("farming.beehive.x", location.getX());
+        getStats().setNumber("farming.beehive.y", location.getY());
+        getStats().setNumber("farming.beehive.z", location.getZ());
+        getStats().setBoolean("farming.beehive.placed", true);
+    }
+
+    /**
+     * Shouldda just named this isIslandOwner
+     * @return Whether the player can place a beehive or not
+     */
+    public boolean canPlaceBeeHive() {
+        if(getIsland().getRank(getUUID()) != RanksManager.OWNER_RANK) return false;
+        return true;
+    }
+
+    public void activateBooster() {
+		getIsland().getMembers().forEach((uuid, rank) -> {
+			if (rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK) return;
+
+			User user = UserManager.getInstance().getUser(uuid);
+			if (user == null) return;
+
+			int[] durations = {30, 60, 120};
+			int randomIndex = new Random().nextInt(durations.length);
+			int selectedDuration = durations[randomIndex];
+			long boosterEnd = System.currentTimeMillis() + 60000 * selectedDuration;
+
+			user.setBooster(boosterEnd);
+			user.setBoosterMultiplier(Main.BOOSTER_MULTIPLIER);
+
+			UserManager.getBoostedUsers().add(user);
+
+			long timeLeftHrs = (user.getBooster() - System.currentTimeMillis()) / 3600000;
+			long timeLeftMins = (user.getBooster() - System.currentTimeMillis() - timeLeftHrs * 3600000) / 60000;
+
+            player.playSound(getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 1);
+            user.sendMessage("&a&lISLAND BOOSTER ACTIVATED!");
+
+			user.sendMessage(
+					String.format("&aYou have a x%s booster for &e%s hrs&a, and &e%s mins",
+					user.getBoosterMultiplier(),
+                    timeLeftHrs,
+                    timeLeftMins
+                )
+			);
+		});
+	}
+
+    public void deActivateBooster() {
+        Island island = getIsland();
+
+        if(island == null) return;
+        
+        island.getMembers().forEach((uuid, rank) -> {
+            if(rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK) return;
+
+            User user = UserManager.getInstance().getUser(uuid);
+            
+            if(user == null) return;
+
+            UserManager.getBoostedUsers().remove(user);
+            user.setBooster(0);
+            user.setBoosterMultiplier(1.0);
+            user.sendMessage("&c&lISLAND BOOSTER DEACTIVATED!");
+            player.playSound(getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
+        });
+    }
+
+    /**
+     * @return The user's rank with-in the island, and <i><b>not</b></i> the Island ranking on other islands.
+     */
+    public int getIslandRank() {
+        return getIsland().getRank(getUUID());
+    }
+
+    public boolean isBeehiveBoosterActive() {
+        if(!Main.activeHives.contains(getBeehive())) return false;
+        return true;
+    }
+    
     public boolean isOp() {
         return this.player.isOp();
     }
@@ -90,70 +287,171 @@ public class User {
     @Deprecated
     @DoNotCall
     public void levelUp(SkillType skill) {
-        // @themightyfrogge TODO: Make this work 
     }
 
     // COMPLETE:
 
-    public int getLevel(SkillType skillType) {
-        return getStats().getInt(skillType.toString().toLowerCase() + ".level");
+    public void setBooster(long timeInMilliseconds) {
+        getStats().setNumber("booster", timeInMilliseconds);
     }
 
-    public double getExperience(SkillType skillType) {
-        return getStats().getDouble(skillType.toString().toLowerCase() + ".xp");
+    public void setBoosterMultiplier(double multiplier) {
+        getStats().setNumber("booster_multiplier", multiplier);
     }
 
-    public void setLevel(SkillType skillType, int levels) {
-        getStats().setNumber(skillType.toString().toLowerCase() + ".level", levels);
-    }
-    
-    public void setExperience(SkillType skillType, double experience) {
-        getStats().setNumber(skillType.toString().toLowerCase() + ".xp", experience);
-    }
-
-    public void addLevels(SkillType skillType, int levels) {
-        getStats().addInt(skillType.toString().toLowerCase() + ".level", levels);
-    }
-    
-    public void addExperience(SkillType skillType, double experience) {
-        getStats().addDouble(skillType.toString().toLowerCase() + ".xp", experience);
-		checkGlobalLevelUp();
-		checkFishingLevelUp();
-    }
-   
-    // FISHING
-    
-    /**
-     * 
-     * @return Whether the user is eligible for a fishing level-up.
-     */
-	public boolean checkFishingLevelUp() {
-		int fishingLevel = getLevel(SkillType.FISHING);
-		double requirement = fishingLevel < 6 ? Main.FISHING_LEVEL_REQUIREMENTS.get(fishingLevel+1) : getExperience(SkillType.FISHING)+1.0;
-		if(getExperience(SkillType.FISHING) >= requirement) {
-			setExperience(SkillType.FISHING, getExperience(SkillType.FISHING) - requirement); // excess xp
-			addLevels(SkillType.FISHING, 1);
-			return true; // returns true, and stops here.
-		}
-		return false; // else, returns false.
+	public String formatBoosterTime() {
+		long timeLeftHrs = (getBooster() - System.currentTimeMillis()) / 3600000;
+		long timeLeftMins = (getBooster() - System.currentTimeMillis() - timeLeftHrs * 3600000) / 60000;
+		
+		return getBooster() > 0L ? "&e" + timeLeftHrs + " &ahrs, &e" + timeLeftMins + " &amins" : "&cNo booster found!";
 	}
 
+    public long getBooster() {
+        if(getStats().isNull("booster")) return 0;
+        return getStats().getLong("booster");
+    }
+
+    public double getBoosterMultiplier() {
+        return getStats().getDouble("booster_multiplier");
+    }
+
+    public void setGlobalLevel(int globalLevel) {
+        getIsland().putMetaData("level", new MetaDataValue(globalLevel));
+    }
+    
+    public void addGlobalLevel(int rightHandSide) {
+        setGlobalLevel(getGlobalLevel() + rightHandSide);
+    }
+
+    public int getGlobalLevel() {
+        return getIsland().getMetaData("level").get().asInt();
+    }
+
+    public void setGlobalExperience(double experience) {
+        getIsland().putMetaData("xp", new MetaDataValue(experience));
+    }
+
+    public double addGlobalExperience(double rightHandSide) {
+        setGlobalExperience(getGlobalExperience() + (rightHandSide * getBoosterMultiplier()));
+        return rightHandSide * getBoosterMultiplier();
+    }
+
+    public double getGlobalExperience() {
+        return getIsland().getMetaData("xp").get().asDouble();
+    }
+
+    public int getLevel(SkillType skillType, boolean nether) {
+        String extra = nether ? ".nether." : "";
+        return getStats().getInt(skillType.toString().toLowerCase() + extra + ".level");
+    }
+    
+    public double getExperience(SkillType skillType, boolean nether) {
+        String extra = nether ? ".nether." : "";
+        return getStats().getDouble(skillType.toString().toLowerCase() + extra + ".xp");
+    }
+
+
+    public void setLevel(SkillType skillType, int levels, boolean nether) {
+        String extra = nether ? ".nether." : "";
+        getStats().setNumber(skillType.toString().toLowerCase() + extra + ".level", levels);
+    }
+    
+    public void setExperience(SkillType skillType, double experience, boolean nether) {
+        String extra = nether ? ".nether." : "";
+        getStats().setNumber(skillType.toString().toLowerCase() + extra + ".xp", experience);
+    }
+
+    public void addLevels(SkillType skillType, int levels, boolean nether) {
+        String extra = nether ? ".nether." : "";
+        getStats().addInt(skillType.toString().toLowerCase() + extra + ".level", levels);
+    }
+    
+    public double addExperience(SkillType skillType, double experience, boolean nether) {
+        String extra = nether ? ".nether." : "";
+        
+        getStats().addDouble(skillType.toString().toLowerCase() + extra + ".xp", experience * getBoosterMultiplier());
+		checkGlobalLevelUp();
+		SkillManager.getSkill(skillType).checkForLevelUp(this, nether);
+		setLastSkill(skillType);
+		
+		return experience;
+    }
+   
+    public boolean isAllowedToFly() {
+        return getStats().getBoolean("flight");
+    }
+
+    public void setFlight(boolean flight) {
+        getStats().setBoolean("flight", flight);
+    }
+
+    // FISHING
+    
     /**
      * Changes the user's sea_creature_chance according to their global level automatically!
      */
     public void adjustSeaCreatureChance() {
-        if(getLevel(SkillType.GLOBAL) >= 10 && getLevel(SkillType.GLOBAL) <= 110) {
-            double chance = (getLevel(SkillType.GLOBAL) == 10) ? 0.05 : 0.04 + (getLevel(SkillType.GLOBAL) * 0.001); // DO NOT TOUCH the formula.
+        if(getGlobalLevel() >= 10 && getGlobalLevel() <= 110) {
+            // level == 10? yes: 0.05, no: calculate chance.
+            double chance = (getGlobalLevel() == 10) ? 0.05 : 0.04 + (getGlobalLevel() * 0.001); // DO NOT TOUCH the formula.
             setSeaCreatureChance(chance);
         }
     }
 
+    public int getSeaCreatureKills() {
+        return getStats().getInt("fishing.sc_kills");
+    }
+
+    public void addSeaCreatureKills(int rightHandSide) {
+        getStats().addInt("fishing.sc_kills", rightHandSide);
+    }
+
+    public void setSeaCreatureKills(int rightHandSide) {
+        getStats().setNumber("fishing.sc_kills", rightHandSide);
+    }
+
     public double getSeaCreatureChance() {
-        return getStats().getDouble("fishing.sea_creature_chance");
+        return getStats().getDouble("fishing.sc_chance");
     }
 
     public void setSeaCreatureChance(double chance) {
-        getStats().setNumber("fishing.sea_creature_chance", chance);
+        getStats().setNumber("fishing.sc_chance", chance);
+    }
+
+    public double getPillagerSpawnChance() {
+        return getStats().getDouble("combat.pillager_spawn_chance");
+    }
+
+    public void addPillagerSpawnChance(double rightHandSide) {
+        getStats().addDouble("combat.pillager_spawn_chance", rightHandSide);
+    }
+
+    public void setPillagerSpawnChance(double chance) {
+        getStats().setNumber("combat.pillager_spawn_chance", chance);
+    }
+
+    public int getMonsterKills() {
+        return getStats().getInt("combat.monsters_killed");
+    }
+
+    public void addMonsterKills(int rightHandSide) {
+        getStats().addInt("combat.monsters_killed", rightHandSide);
+    }
+    
+    public void setMonsterKills(int rightHandSide) {
+        getStats().setNumber("combat.monsters_killed", rightHandSide);
+    }
+
+    public int getPillagerKills() {
+        return getStats().getInt("combat.pillagers_killed");
+    }
+
+    public void addPillagerKills(int rightHandSide) {
+        getStats().addInt("combat.pillagers_killed", rightHandSide);
+    }
+    
+    public void setPillagerKills(int rightHandSide) {
+        getStats().setNumber("combat.pillagers_killed", rightHandSide);
     }
 
     // GLOBAL
@@ -162,17 +460,17 @@ public class User {
      * @param excessXp (excess xp given to the player after consumption by the level-up process)
      */
     public void globalLevelUp(double excessXp) {
-        addLevels(SkillType.GLOBAL, 1);
-        setExperience(SkillType.GLOBAL, excessXp);
+        addGlobalLevel(1);
+        setGlobalExperience(excessXp);
         adjustSeaCreatureChance();
         this.player.playSound(getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
-        sendTitle(
-			"&2&lGLOBAL LEVEL UP&2!",
-            String.format("&a%s &2-> &a%s&2!",
-                getLevel(SkillType.GLOBAL)-1,
-                getLevel(SkillType.GLOBAL)
-            ),
-			5
+        sendMessage(
+            String.format(
+                "&a&lGLOBAL &2&lLEVEL-UP&2&l!\n" +
+                "&a%s &8-> &a%s&2!",
+                getGlobalLevel() - 1,
+                getGlobalLevel()
+            )
         );
     }
 
@@ -180,53 +478,18 @@ public class User {
      * @return Wheter user is eligible for a global level-up, or not.
      */
     public boolean checkGlobalLevelUp() {
-        if(getLevel(SkillType.GLOBAL) < 10) {
+        if(getGlobalLevel() < 10) {
             
-            if(getExperience(SkillType.GLOBAL) < 100) return false;
+            if(getGlobalExperience() < 100.0) return false;
 
-            globalLevelUp(getExperience(SkillType.GLOBAL) - 100);
+            globalLevelUp(getGlobalExperience() - 100.0);
             return true;
         }
 
-        if(getExperience(SkillType.GLOBAL) < 1000) return false;
+        if(getGlobalExperience() < 1000) return false;
 
-        globalLevelUp(getExperience(SkillType.GLOBAL) - 1000);
+        globalLevelUp(getGlobalExperience() - 1000);
         return true;
     }
     
-    /**
-     * literally made an enum for this
-     * @param woodType (Use WoodType and NOT Material)
-     * @return the amount of wood blocks the player destroyed
-     */
-    public int getCollectedWood(WoodType woodType) {
-        return getStats().getInt("foraging." + woodType.toString().toLowerCase() + ".collected");
-    }
-
-    /**
-     * Increments the collected amount of the specified wood type.
-     * @param woodType (the wood type that was broken)
-     * @param leftHandSide (amount-to-be-incremented)
-     */
-    public void addForaging(WoodType woodType, int leftHandSide) {
-        getStats().addInt("foraging." + woodType.toString() + ".collected", leftHandSide);
-    }
-
-    /**
-     * @param cropType (no need to explain)
-     * @return The collected amount of the specified crop type.
-     */
-    public int getCollectedCrops(CropType cropType) {
-        return getStats().getInt("farming." + cropType.toString().toLowerCase() + ".collected");
-    }
-
-    /**
-     * Increments the collected amount of the specified crop type.
-     * @param cropType (the crop that was farmed)
-     * @param leftHandSide (amount-to-be-incremented)
-     */
-    public void addFarming(CropType cropType, int leftHandSide) {
-        getStats().addInt("farming." + cropType.toString() + ".collected", leftHandSide);
-    }
-
 }

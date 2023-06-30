@@ -2,33 +2,60 @@ package kiul.tierblock.listeners;
 
 import java.util.Map;
 
+import org.bukkit.Material;
+import org.bukkit.Sound;
 import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Beehive;
 import org.bukkit.block.data.Ageable;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.EntityEnterBlockEvent;
+import org.bukkit.event.block.Action;
+import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.ItemStack;
 
 import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
+import kiul.tierblock.user.skill.SkillManager;
 import kiul.tierblock.user.skill.SkillType;
+import kiul.tierblock.user.skill.impl.FarmingSkill;
 import kiul.tierblock.utils.enums.CropType;
+import world.bentobox.bentobox.api.metadata.MetaDataValue;
+import world.bentobox.bentobox.managers.RanksManager;
 
-// literally copied my ForagingListener and replaced everything related to wood to crops except for placing plants xd
-public class FarmingListener implements Listener{
 
-    private final Map<CropType, Double> FARMING_REWARDS = Map.of(
-        CropType.WHEAT, Main.getXPReward("farming.wheat"),
-        CropType.BEETROOT, Main.getXPReward("farming.beetroot"),
-        CropType.CARROT, Main.getXPReward("farming.carrot"),
-        CropType.POTATO, Main.getXPReward("farming.potato"),
-        CropType.SUGAR_CANE, Main.getXPReward("farming.sugar_cane"),
-        CropType.MELON, Main.getXPReward("farming.melon"),
-        CropType.PUMPKIN, Main.getXPReward("farming.pumpkin"),
-        CropType.NETHER_WART, Main.getXPReward("farming.nether_wart"),
-        CropType.CHORUS_FRUIT, Main.getXPReward("farming.chorus_fruit")
-    ); 
-    
+/*
+ * ------------------------------ NOT NECESSARY TO READ, BUT IT'S HERE ANYWAYS. ------------------------------
+ * 
+ * Don't mind all the comments, I write them so I don't get lost xd.
+ * 
+ * How the Beehive works:
+ * 
+ * NOTE: Placing, breaking, activating/deactivating boosters, all require the island owner, and not any member.
+ *  + User#deactivateBooster() & User#activateBooster() will do its job for all the island members, and not exclusively the island owner.
+ * 
+ * The beehive depends on the island's metadata (persistent through server restarts, don't worry), and the user's (owner) data file.
+ * Beehive's variables in the user data are:
+ * - booster_active (bool): self-explanatory.
+ * - booster_available (bool): self-explanatory.
+ * - next_refill (long): a timestamp in milliseconds, once surpassed, the booster will be deactivated. (While the player is on, or when the player joins) 
+ * 
+ * - Only island owners can place beehives.
+ * - Only one beehive can be placed in an island.
+ * - Beehives must only be placed at the owner's island.
+ * - Beehives take exactly 24 hours to be "ready-for-harvest".
+ * 
+ */
+
+public class FarmingListener implements Listener {
+
+    public FarmingListener() {
+        SkillManager.getInstance().registerSkill(new FarmingSkill());
+    }
+	
     @EventHandler
     public void cropBreakListener(BlockBreakEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
@@ -36,64 +63,208 @@ public class FarmingListener implements Listener{
         CropType type = CropType.fromMaterial(block.getType());
         
 		if(type == null) return; // not a crop, stopping here.
+        if(!user.hasIsland()) return;
 		
 		Ageable crop = (Ageable) block.getState().getBlockData();
 		
 		if(crop.getAge() < crop.getMaximumAge()) return; // plant not fully grown
+		
+        event.setDropItems(false);
+        int blockLevelRequirement = Main.getGlobalLevelRequirement("farming." + type.label);
 
-        event.setDropItems(false); // just incase you can't mine it
-        int blockLevelRequirement = Main.getGlobalLevelRequirement("farming." + type.toString().toLowerCase());
+		if(type.isNether && !user.getStats().getBoolean("farming.nether.unlocked")) {
+			user.sendActionBar("&cYou need to &emax farming &cto unlock nether/end content!");
+			return;
+		}
 
         if(
             // We check if the broken block has a level requirement:
             blockLevelRequirement != 0
             // and also check if the player doesn't have the required level...
-            && user.getLevel(SkillType.GLOBAL) < blockLevelRequirement)
+            && user.getGlobalLevel() < blockLevelRequirement)
         {
-            user.sendActionBar("&cYou need to have &elevel " + blockLevelRequirement + " or above&c to break this!");
+            user.sendActionBar("&cYou need to have &eisland level " + blockLevelRequirement + " or above &cto collect this!");
             return;
         }
+		
+		if(user.getLevel(SkillType.FARMING, type.isNether) < type.levelRequirement) {
+            // show progress, if the block is unlockable in the next level (In other words: block level = user level + 1)
+            // if not tell them the level requirement:
+			if(type == CropType.CHORUS_FRUIT) return; // no progress checks for chorus fruits, no farming goal found.
+            boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.FARMING, type.isNether);
+            if(progress) {
+                user.sendActionBar(
+                    String.format(
+                        "&cYou need to farm &e%s &cmore &e%s&c to collect this!", 
+                        (int)(type.levelUp - user.getExperience(SkillType.FARMING, type.isNether)),
+                        CropType.values()[type.ordinal() - 1].formatName()
+                    )
+                );
+                return;
+            }
 
-        /**
-         * is the type of crop you need to break before you break this type...
-         * if you were breaking beetroot (and not supposed to), this will be equal to WHEAT
-         */
-        CropType requiredType = CropType.fromInt(type.toInt()-1);
-
-		int levelUpRequirement = Main.getInstance().getConfig().getInt("farming." + requiredType + ".level_up");
+            user.sendActionBar("&cYou need to be level &e" + type.levelRequirement + " &cto farm this!");
+            return;
+        }
         
-        // if isn't wheat & hasn't reached the crop type, we tell him to fuck off.
-        if(!(type == CropType.WHEAT) && user.getCollectedCrops(requiredType) < levelUpRequirement) {
-
-            // C/C++ like-ish enums. for easier work...
-            CropType nextCropType = CropType.fromInt(type.toInt()+1); // CropType + 1
-
-            user.sendActionBar(
-                String.format("&cYou need to farm &e%s &c%s to be able to mine %s!",
-                    (levelUpRequirement - user.getCollectedCrops(requiredType)), 
-                    requiredType.formatName(),
-                    nextCropType.formatName()
-                )
-            );
-            
-            return;
-        }
-
         event.setDropItems(true);
-
-        double reward = FARMING_REWARDS.get(type);
-
+		
         user.sendActionBar(
             String.format(
-                "&eGlobal: &2+&a%sxp &8| &eFarming &2+&a1xp &8(&b%s&8)",
-                reward,
+                "&eGlobal: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFarming &2+&a%sxp &8(&b%s&8)",
+                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward)),
+                Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FARMING, 1.0, type.isNether)),
                 type.formatName()
             )
         );
 
-        user.addFarming(type, 1);
-        user.addExperience(SkillType.FARMING, 1.0);
-        user.addExperience(SkillType.GLOBAL, reward);
+        
+    }
+
+    @EventHandler
+    public void blockPlaceEvent(BlockPlaceEvent event) {
+        User user = UserManager.getInstance().getUser(event.getPlayer());
+        Block block = event.getBlock();
+		
+        if(block.getType() != Material.BEEHIVE) return;
+        if(user.getIsland() == null) return;
+		
+		event.setCancelled(true);
+
+        Map<String, MetaDataValue> islandMetaData = user.getIsland().getMetaData().get();
+
+        if(!user.isWithinOwnIsland()) {
+            user.sendMessage("&cYou can only place this in &eyour island&c!");
+            return;
+        }
+
+        if(user.getIsland().getMetaData().get().get("hasBeeHive").asBoolean() == true) {
+            user.sendMessage("&cYou can only place &eone&c bee hive in your island!");
+            return;
+        }
+
+        event.setCancelled(false);
+
+        long nextRefill = ((Beehive)block.getBlockData()).getHoneyLevel() != 5 ? System.currentTimeMillis() + 86400000 : 0;
+
+        islandMetaData.put("hasBeeHive", new MetaDataValue(true));
+
+        user.getStats().setNumber("farming.beehive.next_refill", nextRefill);
+        user.getStats().setBoolean("farming.beehive.booster_active", false);
+        user.getStats().setBoolean("farming.beehive.booster_available", false);
+        user.setBeehive(block);
+        user.getPlayer().playSound(user.getLocation(), Sound.ENTITY_ILLUSIONER_CAST_SPELL, 1, 1);
+    }
+
+    @EventHandler
+    public void harvestBeeHive(PlayerInteractEvent event) {
+        User user = UserManager.getInstance().getUser(event.getPlayer());
+        Block block = event.getClickedBlock();
+
+		if(!user.isWithinOwnIsland()) return;
+		if(block == null) return;
+        if(block.getType() != Material.BEEHIVE) {
+			if(event.getAction() == Action.PHYSICAL && block.getType() == Material.FARMLAND) {
+				Block above = block.getLocation().getWorld().getBlockAt(block.getLocation().add(0, 1, 0));
+				CropType type = CropType.fromMaterial(above.getType());
+				
+				if(type == null) return; // make sure it's a plant above.
+				
+				if(user.getLevel(SkillType.FARMING, type.isNether) < type.levelRequirement) {
+					// show progress, if the block is unlockable in the next level (In other words: block level = user level + 1)
+					// if not tell them the level requirement:
+					event.setCancelled(true);
+					String message = "&cYou need to be level &e" + type.levelRequirement + " &cto farm this!";
+					boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.FARMING, type.isNether);
+					if(progress) {
+						message = String.format(
+							"&cYou need to farm &e%s &cmore &e%s&c to collect this!", 
+							(int)(type.levelUp - user.getExperience(SkillType.FARMING, type.isNether)),
+							CropType.values()[type.ordinal() - 1].formatName()
+						);
+					}
+					
+					user.sendActionBar(message);
+					above.getLocation().getWorld().playSound(above.getLocation(), Sound.BLOCK_CROP_BREAK, 1, 1);
+					
+					// user.sendMessage(above.getDrops().size() + above.getDrops().toString()); DEBUG
+					Material lastItem = null; // to prevent duplicates no touchies
+                    for(ItemStack itemStack : above.getDrops()) {
+						if(lastItem != itemStack.getType()) {
+							itemStack.setAmount(1);
+							above.getLocation().getWorld().dropItem(above.getLocation().add(0, 1, 0), itemStack);
+							lastItem = itemStack.getType();
+						}							
+                    }
+					above.setType(Material.AIR);
+					block.setType(Material.DIRT);
+					user.getPlayer().teleport(user.getLocation().add(0, 0.00251, 0)); // to prevent user from phasing through block
+					return;
+				}
+			}
+			return;
+		}
+		
+		Beehive data = (Beehive) block.getBlockData();
+		if(event.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        if(event.getItem() == null || event.getItem().getType() != Material.GLASS_BOTTLE) return;
+		if(data.getHoneyLevel() != data.getMaximumHoneyLevel()) return;
+		
+		event.setCancelled(true);
+		
+		if(user.getStats().getBoolean("farming.beehive.booster_active") || user.getBooster() > 1) {
+			user.sendMessage("&cYou're already boosted");
+			return;
+		}
+
+        if(!user.getStats().getBoolean("farming.beehive.booster_available")) {
+            user.sendMessage("&cBeehive isn't ready to harvest!");
+            return;
+        }
+		
+		event.setCancelled(false);
+        
+        // user.sendMessage("currentTimeMillis: " + System.currentTimeMillis());
+        
+        long nextRefill = System.currentTimeMillis() + 24L * 3600000L; // (Unix-Timestamp + (24 * 1hr) <- simplification
+
+        user.getStats().setNumber("farming.beehive.next_refill", nextRefill);
+        user.getStats().setBoolean("farming.beehive.booster_active", true);
+        user.getStats().setBoolean("farming.beehive.booster_available", false);
+        Main.activeHives.add(user.getBeehive());
+		user.activateBooster(); // this does it for all the island members & above
+    }
+
+    @EventHandler
+    public void breakBeeHive(BlockBreakEvent event) {
+        User user = UserManager.getInstance().getUser(event.getPlayer());
+        Block block = event.getBlock();
+
+        if(!user.isWithinOwnIsland()) return;
+        if(block.getType() != Material.BEEHIVE) return;
+        if(!user.canPlaceBeeHive()) return;
+        if(user.getIslandRank() != RanksManager.OWNER_RANK) return;
+
+        Map<String, MetaDataValue> islandMetaData = user.getIsland().getMetaData().get();
+
+        if(islandMetaData.get("hasBeeHive").asBoolean()) {
+            islandMetaData.put("hasBeeHive", new MetaDataValue(false));
+            user.getStats().getConfiguration().set("farming.beehive.placed", false);
+            if(!user.getStats().getBoolean("farming.beehive.booster_active")) return;
+            user.getStats().setBoolean("farming.beehive.booster_active", false);
+            Main.activeHives.remove(block);
+
+            // idk why that was here in the first place
+            // user.deActivateBooster(); // for all members and not just owner
+        }
+    }
+
+    @EventHandler
+    public void honeyLevelChange(EntityEnterBlockEvent event) {
+        if(event.getBlock().getType() != Material.BEEHIVE) return;
+
+        Beehive data = (Beehive) event.getBlock().getBlockData();
+        if(data.getHoneyLevel() != 0) data.setHoneyLevel(0); 
     }
 
 }

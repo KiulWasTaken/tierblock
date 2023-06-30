@@ -1,10 +1,24 @@
 name: Tierblock
 version: '${project.version}'
 main: kiul.tierblock.Main
+depend: [BentoBox]
 api-version: 1.19
 commands:
   givexp:
     description: gives global XP to the user that runs the command.
-  modifyvalue:
+  modifyint:
     description: modifies the value of the given config entry
-# sus
+  test:
+  modifydouble:
+  leaderboard:
+    aliases:
+      - lb
+      - leaderb
+      - lboard
+      - leaderousboardous
+  stats:
+    aliases:
+      - statistics
+      - stat
+      - statisticus
+      - je_mange_un_chat

@@ -39,6 +39,12 @@
                         </goals>
                         <configuration>
                             <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <relocations>
+                                <relocation>
+                                    <pattern>fr.mrmicky.fastboard</pattern>
+                                    <shadedPattern>kiul.tierblock.fastboard</shadedPattern>
+                                </relocation>
+                            </relocations>
                         </configuration>
                     </execution>
                 </executions>
@@ -69,10 +75,14 @@
             <url>https://oss.sonatype.org/content/groups/public/</url>
         </repository>
 
+        <repository>
+            <id>codemc-repo</id>
+            <url>https://repo.codemc.org/repository/maven-public/</url>
+        </repository>
     </repositories>
 
     <dependencies>
-    
+
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
@@ -85,6 +95,19 @@
             <artifactId>lombok</artifactId>
             <version>1.18.26</version>
             <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>world.bentobox</groupId>
+            <artifactId>bentobox</artifactId>
+            <version>1.23.1</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>fr.mrmicky</groupId>
+            <artifactId>fastboard</artifactId>
+            <version>2.0.0</version>
         </dependency>
 
     </dependencies>

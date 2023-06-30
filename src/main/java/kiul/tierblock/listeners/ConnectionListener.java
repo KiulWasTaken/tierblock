@@ -13,16 +13,25 @@ public class ConnectionListener implements Listener {
     @EventHandler
     public void playerJoinListener(PlayerJoinEvent event) {
         User user = new User(event.getPlayer());
-        UserManager.getInstance().getOnlineUsers().add(user); // DO NOT DELETE! will fuck up User & UserManager if deleted.
+        UserManager.getOnlineUsers().add(user); // delete this and i'll delete you fish head
 
-        if(user.getPlayer().hasPlayedBefore()) { // TODO: negate boolean ( ! ) when your testing purposes are over.
-            user.getStats().copyDefaults(); // resets stats.
+        if(!user.getPlayer().hasPlayedBefore()) {
+            user.getStats().copyDefaults();
+            return;
+        }
+
+        if(user.getBooster() != 0 && user.getBooster() > System.currentTimeMillis()) {
+            UserManager.getBoostedUsers().add(user);
+        }else if(user.getBooster() > 0 && user.getBooster() < System.currentTimeMillis()) {
+            user.setBooster(0);
+            user.setBoosterMultiplier(1.0);
         }
     }
 
     @EventHandler
     public void playerQuitListener(PlayerQuitEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
-        UserManager.getInstance().getOnlineUsers().remove(user); // prevent a massive doo doo.
+        UserManager.getOnlineUsers().remove(user); // prevent a massive doo doo.
+        UserManager.getBoostedUsers().remove(user);
     }
 }

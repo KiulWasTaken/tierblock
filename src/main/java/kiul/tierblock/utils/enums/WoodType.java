@@ -2,28 +2,37 @@ package kiul.tierblock.utils.enums;
 
 import org.bukkit.Material;
 
-// hello
+import kiul.tierblock.Main;
+
+/* Note: toInt() removed, use the already provided Java method Enum#ordinal() */
 public enum WoodType {
 
-    OAK("oak", 0), 
-    BIRCH("birch", 1), 
-    ACACIA("acacia", 2), 
-    DARK_OAK("dark_oak", 3), 
-    SPRUCE("spruce", 4), 
-    JUNGLE("jungle", 5), 
-    CRIMSON("crimson", 6), 
-    WARPED("warped", 7);
+    OAK(0, false), 
+    BIRCH(2, false), 
+    ACACIA(3, false), 
+    DARK_OAK(4, false), 
+    SPRUCE(5, false), 
+    JUNGLE(6, false),
 
-    private String label;
-    private int index;
+    // nether stuff:
 
-    private WoodType(String label, int index) {
-        this.label = label;
-        this.index = index;
-    }
+    CRIMSON(1, true), 
+    WARPED(2, true);
 
-    public String toString() {
-        return this.label;
+    public final String label;
+    public final int levelRequirement;
+    
+    public final double xpReward;
+    public final double levelUp;
+
+    public final boolean isNether;
+
+    private WoodType(int levelRequirement, boolean isNether) {
+        this.isNether = isNether;
+        this.levelRequirement = levelRequirement;
+        this.label = toString().toLowerCase();
+        this.xpReward = Main.getInstance().getConfig().getDouble("foraging." + label + ".xp_reward");
+        this.levelUp = Main.getInstance().getConfig().getDouble("foraging." + label + ".level_up");
     }
 
     /**
@@ -31,28 +40,18 @@ public enum WoodType {
      * @return formatted name.
      */
     public String formatName() {
-        String finished = new String(
-            toString().substring(0, 1).toUpperCase() + toString().substring(1)
+        String first = new String(
+            label.substring(0, 1).toUpperCase() + label.substring(1)
         ).replace("_", " ");
+		
+        String finished =
+            first.contains(" ") ? 
+			first.split(" ")[0] + " "
+            + first.split(" ")[1].substring(0, 1).toUpperCase()
+            + first.split(" ")[1].substring(1).toLowerCase()
+            : first;
+			
         return finished;
-    }
-
-    public int toInt() {
-        return this.index;
-    }
-
-    public static WoodType fromInt(int number){
-        switch(number) {
-            case 0: return OAK;
-            case 1: return BIRCH;
-            case 2: return ACACIA;
-            case 3: return DARK_OAK;
-            case 4: return SPRUCE;
-            case 5: return JUNGLE;
-            case 6: return CRIMSON;
-            case 7: return WARPED;
-            default: return null;
-        }
     }
 
     public static WoodType fromMaterial(Material material) {
@@ -68,4 +67,5 @@ public enum WoodType {
             default: return null;
         }
     }
+
 }

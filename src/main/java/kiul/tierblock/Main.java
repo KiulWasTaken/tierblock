@@ -1,18 +1,36 @@
 package kiul.tierblock;
 
-import java.util.Map;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Sound;
+import org.bukkit.World;
+import org.bukkit.block.Block;
+import org.bukkit.block.data.type.Beehive;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import kiul.tierblock.commands.Commands;
+import kiul.tierblock.commands.LeaderboardCommand;
+import kiul.tierblock.commands.StatsCommand;
+import kiul.tierblock.commands.TestCommand;
+import kiul.tierblock.listeners.CombatListener;
 import kiul.tierblock.listeners.ConnectionListener;
 import kiul.tierblock.listeners.FarmingListener;
 import kiul.tierblock.listeners.FishingListeners;
 import kiul.tierblock.listeners.ForagingListeners;
+import kiul.tierblock.listeners.IslandCreationListener;
+import kiul.tierblock.listeners.MenuClickListener;
+import kiul.tierblock.listeners.MiningListener;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
+import kiul.tierblock.user.skill.SkillManager;
+import kiul.tierblock.utils.menu.MenuManager;
+import net.md_5.bungee.api.ChatColor;
+import world.bentobox.bentobox.managers.RanksManager;
 
 /*
  * Put constants in the class they're gonna be used in.
@@ -21,40 +39,99 @@ import kiul.tierblock.user.UserManager;
 public final class Main extends JavaPlugin {
 
     private static Main instance;
-    private UserManager userManager; // don't access from Main, instead use: UserManager.getInstance().getUser(name or Player object);
+    private static World bSkyBlockWorld;
 
-	public static final Map<Integer, Double> FISHING_LEVEL_REQUIREMENTS = Map.of( // level, requirement... (indent if you want to)
-		2, 25.0, 3, 50.0, 4, 100.0, 5, 200.0, 6, 500.0
-	);
+    public static final double BOOSTER_MULTIPLIER = 3.0;
+	public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("0.00");
+    public static List<Block> activeHives = new ArrayList<>();
 
     @Override
     public void onEnable() {
         instance = this;
+        
+		DECIMAL_FORMAT.setRoundingMode(RoundingMode.UP);
+		bSkyBlockWorld = Bukkit.getWorld("bskyblock_world");
 
-        userManager = new UserManager();
+        new UserManager();
+		new MenuManager();
+        new SkillManager(); // skills registered in each skill listener's constructor.
 
         // Prevents massive shit show after plugin reloads.
         for(Player player : Bukkit.getOnlinePlayers()) {
             User user = new User(player);
-            userManager.getOnlineUsers().add(user);
+            UserManager.getOnlineUsers().add(user);
+
+            if(user.getBooster() != 0) UserManager.getBoostedUsers().add(user);
         }
 
         saveDefaultConfig();
 
         // should just put them in one command
         getCommand("givexp").setExecutor(new Commands());
-        getCommand("modifyvalue").setExecutor(new Commands());
+		getCommand("modifydouble").setExecutor(new Commands());
+        getCommand("modifyint").setExecutor(new Commands());
+        getCommand("test").setExecutor(new TestCommand());
+        getCommand("leaderboard").setExecutor(new LeaderboardCommand());
+        getCommand("stats").setExecutor(new StatsCommand());
 
+        Bukkit.getPluginManager().registerEvents(new MenuClickListener(), this);
+        Bukkit.getPluginManager().registerEvents(new IslandCreationListener(), this);
         Bukkit.getPluginManager().registerEvents(new FarmingListener(), this);
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
+        Bukkit.getPluginManager().registerEvents(new CombatListener(), this);
+        Bukkit.getPluginManager().registerEvents(new MiningListener(), this);
         Bukkit.getPluginManager().registerEvents(new FishingListeners(), this); // kiul's listener
         Bukkit.getPluginManager().registerEvents(new ForagingListeners(), this); // pat's listener
+
+        // checks player boosters & refill beehives if possible
+        Bukkit.getScheduler().runTaskTimer(this, () -> {
+            UserManager.getBoostedUsers().forEach(user -> {
+                if(user.getBooster() <= System.currentTimeMillis()) {
+                    user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_BEACON_DEACTIVATE, 1, 1);
+                    user.sendMessage("&c&lBooster is over!");
+                    user.setBooster(0);
+                    user.setBoosterMultiplier(1.0);
+                    UserManager.getBoostedUsers().remove(user);
+
+                    if(user.getBeehive() != null) { 
+                        user.getStats().setBoolean("farming.beehive.booster_active", false);
+                        activeHives.remove(user.getBeehive());
+                    }
+                }
+
+                if(user.getIsland().getRank(user.getUUID()) == RanksManager.OWNER_RANK) {
+                    if(user.getBeehive() == null) return;
+                    
+                    long nextRefill = user.getStats().getLong("farming.beehive.next_refill");
+                    if(nextRefill <= System.currentTimeMillis() && nextRefill != 0L) {
+                        Beehive data = (Beehive)user.getBeehive().getBlockData();
+                        data.setHoneyLevel(5);
+                        user.getStats().setBoolean("farming.beehive.booster_available", true);;
+                        user.getStats().setNumber("farming.beehive.next_refill", 0L);
+                        user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_BEACON_POWER_SELECT, 2, 1);
+                        user.sendMessage("&a&lYour beehive is ready to harvest!");
+                    }
+                }
+
+                if(user.getDebugBoard() != null) {
+                    user.getDebugBoard().updateLine(5, ChatColor.translateAlternateColorCodes('&', " &8- &aTime left&8: " + user.formatBoosterTime()));
+                    user.getDebugBoard().updateLine(7, ChatColor.translateAlternateColorCodes('&', " &8- &aMultiplier&8: &fx" + user.getBoosterMultiplier()));
+                }
+            });
+        }, 0L, 1200L); // every minute
     }
 
     @Override
     public void onDisable() {
-        userManager.getOnlineUsers().clear();
-        userManager = null;
+
+        UserManager.getOnlineUsers().forEach(user -> {
+            if(user.getDebugBoard() != null) {
+                user.getDebugBoard().delete();
+                user.setDebugBoard(null);
+            }
+        });
+
+        UserManager.getOnlineUsers().clear();
     }
 
     public static Main getInstance() {
@@ -71,13 +148,8 @@ public final class Main extends JavaPlugin {
             getInstance().getConfig().getInt(path + ".global_level_requirement") : 0; // no: return 0
     } 
 
-    public static int getLevelUpRequirement(String path) {
-        return getInstance().getConfig().contains(path + ".level_up") ?
-            getInstance().getConfig().getInt(path + ".level_up") : 0;
+    public static World getBSkyBlockWorld() {
+        return bSkyBlockWorld;
     }
-
-    public static double getXPReward(String path) {
-        return getInstance().getConfig().contains(path + ".xp_reward") ?
-            getInstance().getConfig().getDouble(path + ".xp_reward") : 0.0;
-    }
+    
 }

@@ -9,8 +9,6 @@ import org.bukkit.configuration.file.YamlConfiguration;
 
 import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
-import kiul.tierblock.utils.enums.CropType;
-import kiul.tierblock.utils.enums.WoodType;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -60,31 +58,46 @@ public class Stats {
      */
     public void copyDefaults() {
 
-        configuration.set("global.level", 1);
-        configuration.set("global.xp", 0.0);
-
+        configuration.set("booster", 0);
+        configuration.set("booster_multiplier", 1.0);
+        configuration.set("flight", false);
+        configuration.set("has_island", false);
+        
         configuration.set("fishing.level", 1);
         configuration.set("fishing.xp", 0.0);
-        configuration.set("fishing.sea_creature_chance", 0.0);
+        configuration.set("fishing.sc_chance", 0.0);
+        configuration.set("fishing.sc_kills", 0);
 		
         configuration.set("combat.level", 1);
         configuration.set("combat.xp", 0.0);
+        configuration.set("combat.monsters_killed", 0);
+        configuration.set("combat.pillagers_killed", 0);
 
 		configuration.set("mining.level", 1);
 		configuration.set("mining.xp", 0.0);
+        configuration.set("mining.nether.unlocked", false);
+        configuration.set("mining.nether.level", 1);
+        configuration.set("mining.nether.xp", 0.0);
 		
 		configuration.set("farming.level", 1);
 		configuration.set("farming.xp", 0.0);
-        for (CropType cropType : CropType.values()) {
-            configuration.set("farming." + cropType.toString().toLowerCase() + ".collected", 0);
-        }
+        configuration.set("farming.nether.unlocked", false);
+        configuration.set("farming.nether.level", 1);
+        configuration.set("farming.nether.xp", 0.0);
+        configuration.set("farming.beehive.placed", false);
+        configuration.set("farming.beehive.booster_active", false);
+        configuration.set("farming.beehive.booster_available", false);
+        configuration.set("farming.beehive.next_refill", 0L);
+        configuration.set("farming.beehive.x", 0);
+        configuration.set("farming.beehive.y", 0);
+        configuration.set("farming.beehive.z", 0);
         
 		configuration.set("foraging.level", 1);
 		configuration.set("foraging.xp", 0.0);
-        for (WoodType woodType : WoodType.values()) {
-            configuration.set("foraging." + woodType.toString().toLowerCase() + ".collected", 0);
-        }
-        
+        configuration.set("foraging.nether.unlocked", false);
+        configuration.set("foraging.nether.level", 1);
+        configuration.set("foraging.nether.xp", 0.0);
+
 		saveChanges();
     }
 
@@ -101,6 +114,10 @@ public class Stats {
         return configuration.get(path);
     }
 
+    public boolean isNull(String path) {
+        return configuration.get(path) == null;
+    }
+
     public int getInt(String path) {
         return configuration.getInt(path);
     }
@@ -109,10 +126,22 @@ public class Stats {
         return configuration.getDouble(path);
     }
 
+    public boolean getBoolean(String path) {
+        return configuration.getBoolean(path);
+    }
+
+    public long getLong(String path) {
+        return configuration.getLong(path);
+    }
+
     public String getString(String path) {
         return configuration.getString(path);
     }
     
+    public void setBoolean(String path, boolean bool) {
+        configuration.set(path, bool);
+    }
+
     /**
      * Set a value of {@code path} to string.
      * @param path (I.E. The path of the string in the user's data file)
@@ -136,24 +165,24 @@ public class Stats {
     /**
      * Adds two integers together.
      * @param path (I.E. The path of the number in the user's data file)
-     * @param leftHandSide
+     * @param rightHandSide
      */
-    public void addInt(String path, int leftHandSide) {
+    public void addInt(String path, int rightHandSide) {
         if(!(configuration.get(path) instanceof Integer)) 
             throw new ArithmeticException("Can't add an integer with something that's not a integer!");
-        configuration.set(path, (configuration.getInt(path) + leftHandSide));
+        configuration.set(path, (configuration.getInt(path) + rightHandSide));
 		saveChanges();
     }
 
     /**
      * Adds two doubles together.
      * @param path (I.E. The path of the number in the user's data file)
-     * @param leftHandSide
+     * @param rightHandSide
      */
-    public void addDouble(String path, double leftHandSide) {
+    public void addDouble(String path, double rightHandSide) {
         if(!(configuration.get(path) instanceof Double))
             throw new ArithmeticException("Can't add a double with something that's not a double!");
-        configuration.set(path, (configuration.getDouble(path) + leftHandSide));
+        configuration.set(path, (configuration.getDouble(path) + rightHandSide));
 		saveChanges();
     }
 

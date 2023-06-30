@@ -2,29 +2,38 @@ package kiul.tierblock.utils.enums;
 
 import org.bukkit.Material;
 
-// a
+import kiul.tierblock.Main;
+
 public enum CropType {
 
-    WHEAT("wheat", 0), 
-    BEETROOT("beetroot", 1), 
-    CARROT("carrot", 2), 
-    POTATO("potato", 3), 
-    SUGAR_CANE("sugar_cane", 4), 
-    MELON("melon", 5), 
-    PUMPKIN("pumpkin", 6), 
-    NETHER_WART("nether_wart", 7),
-    CHORUS_FRUIT("chorus_fruit", 8);
+    WHEAT(0, false), 
+    BEETROOT(2, false), 
+    CARROT(3, false), 
+    POTATO(4, false), 
+    SUGAR_CANE(5, false), 
+    MELON(6, false), 
+    PUMPKIN(7, false), 
+    
+    // nether stuff:
 
-    private String label;
-    private int index;
+    NETHER_WART(1, true),
+    CHORUS_FRUIT(2, true);
 
-    private CropType(String label, int index) {
-        this.label = label;
-        this.index = index;
-    }
+    public final String label;
 
-    public String toString() {
-        return this.label;
+    public final int levelRequirement;
+
+    public final boolean isNether;
+
+    public final double levelUp;
+    public final double xpReward;
+
+    private CropType(int levelRequirement, boolean isNether) {
+        this.levelRequirement = levelRequirement;
+        this.isNether = isNether;
+        this.label = toString().toLowerCase();
+        this.xpReward = Main.getInstance().getConfig().getDouble("farming." + label + ".xp_reward");
+        this.levelUp = Main.getInstance().getConfig().getDouble("farming." + label + ".level_up");
     }
 
     /**
@@ -32,29 +41,18 @@ public enum CropType {
      * @return formatted name.
      */
     public String formatName() {
-        String finished = new String(
-            toString().substring(0, 1).toUpperCase() + toString().substring(1)
+        String first = new String(
+            label.substring(0, 1).toUpperCase() + label.substring(1)
         ).replace("_", " ");
+		
+        String finished =
+            first.contains(" ") ? 
+			first.split(" ")[0] + " "
+            + first.split(" ")[1].substring(0, 1).toUpperCase()
+            + first.split(" ")[1].substring(1).toLowerCase()
+            : first;
+			
         return finished;
-    }
-
-    public int toInt() {
-        return this.index;
-    }
-
-    public static CropType fromInt(int number){
-        switch(number) {
-            case 0: return WHEAT;
-            case 1: return BEETROOT;
-            case 2: return CARROT;
-            case 3: return POTATO;
-            case 4: return SUGAR_CANE;
-            case 5: return MELON;
-            case 6: return PUMPKIN;
-            case 7: return NETHER_WART;
-            case 8: return CHORUS_FRUIT;
-            default: return null;
-        }
     }
 
     public static CropType fromMaterial(Material material) {
@@ -71,4 +69,5 @@ public enum CropType {
             default: return null;
         }
     }
+    
 }

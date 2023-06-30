@@ -10,11 +10,15 @@ import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.util.Vector;
 
-import java.util.ArrayList;
+import java.util.Map;
 import java.util.Random;
+
+import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
+import kiul.tierblock.user.skill.SkillManager;
 import kiul.tierblock.user.skill.SkillType;
+import kiul.tierblock.user.skill.impl.FishingSkill;
 
 /**
  * @themightyfrogge says:
@@ -22,22 +26,37 @@ import kiul.tierblock.user.skill.SkillType;
  */
 public class FishingListeners implements Listener {
     
-    // fishing level up checks done automatically in User class.
+    public FishingListeners() {
+        SkillManager.getInstance().registerSkill(new FishingSkill());
+    }
 
+    // fishing level up checks done automatically in User class.
     private final double FISHING_VELOCITY_MULTIPLIER = 0.13;
+
+    // from my listener, to make actionbars hot
+    private final Map<EntityType, Double> FISHING_REWARD_ENTITIES = Map.of(  // EntityType, XP Reward...
+        EntityType.SQUID, 12.0, 
+        EntityType.GLOW_SQUID, 16.0,
+        EntityType.PUFFERFISH, 20.0,
+        EntityType.TURTLE, 30.0,
+        EntityType.DROWNED, 50.0,
+        EntityType.GUARDIAN, 80.0, 
+        EntityType.ELDER_GUARDIAN, 600.0
+    );
 
     @EventHandler
     public void SeaCreatureCatch (PlayerFishEvent e) {
         User user = UserManager.getInstance().getUser(e.getPlayer());
         Location hookLocation = e.getHook().getLocation();
         Random random = new Random();
-        if (user.getLevel(SkillType.GLOBAL) >= 10) {
+        if(!user.hasIsland()) return;
+        if (user.getGlobalLevel() >= 10) {
             if (e.getState() == PlayerFishEvent.State.CAUGHT_FISH) {
                 if (random.nextDouble(0, 1) < user.getSeaCreatureChance()) {
                     e.setCancelled(true);
                     
                     // HOT and SEXY, switch statement
-                    switch (user.getLevel(SkillType.FISHING)) {
+                    switch (user.getLevel(SkillType.FISHING, false)) {
                         case 1:
                             if (random.nextInt(1, 11) == 2) {
                                 spawnAndFling(EntityType.GLOW_SQUID, hookLocation, user.getLocation());
@@ -75,6 +94,7 @@ public class FishingListeners implements Listener {
                                     spawnAndFling(EntityType.TURTLE, hookLocation, user.getLocation());    
                                     break;
                             }
+							break;
                         case 4:
                             switch (random.nextInt(1, 5)) {
                                     case 1:
@@ -117,6 +137,7 @@ public class FishingListeners implements Listener {
                                     spawnAndFling(EntityType.GUARDIAN, hookLocation, user.getLocation());
                                     break;
                             }
+							break;
                         case 6:
                             switch (random.nextInt(1, 5)) {
                                 case 1:
@@ -152,41 +173,30 @@ public class FishingListeners implements Listener {
 
     @EventHandler
     public void SeaCreatureKill (EntityDeathEvent e) {
-        // ??? could be a final value at the start of the class instead of being made & removed every single time an entity is killed.
-        ArrayList<EntityType> fishingRewardEntities = new ArrayList<>(); 
-
-        fishingRewardEntities.add(EntityType.DROWNED); 
-        fishingRewardEntities.add(EntityType.SQUID);
-        fishingRewardEntities.add(EntityType.GLOW_SQUID);
-        fishingRewardEntities.add(EntityType.GUARDIAN);
-        fishingRewardEntities.add(EntityType.ELDER_GUARDIAN);
-        fishingRewardEntities.add(EntityType.PUFFERFISH);
-        if (fishingRewardEntities.contains(e.getEntityType()) && e.getEntity().getKiller() instanceof Player) {
+        // don't check if killer is instanceof Player, it returns Player regardless. (it'll be null if killer is not a player, will cause an error.)
+        if (FISHING_REWARD_ENTITIES.containsKey(e.getEntityType()) && e.getEntity().getKiller() != null) {
             User user = UserManager.getInstance().getUser(e.getEntity().getKiller());
-            // removed user xp null check. won't happen.
-            user.addExperience(SkillType.FISHING, 1.0);
-            switch (e.getEntityType()) {
-                case SQUID:
-                    user.addExperience(SkillType.GLOBAL, 12);
-                    break;
-                case GLOW_SQUID:
-                    user.addExperience(SkillType.GLOBAL, 16);
-                    break;
-                case PUFFERFISH:
-                    user.addExperience(SkillType.GLOBAL, 20);
-                    break;
-                case DROWNED:
-                    user.addExperience(SkillType.GLOBAL, 50);
-                    break;
-                case GUARDIAN:
-                    user.addExperience(SkillType.GLOBAL, 80);
-                    break;
-                case ELDER_GUARDIAN:
-                    user.addExperience(SkillType.GLOBAL, 600);
-                    break;
-                default: // default was missing & that cause almost 105 warnings...
-                    break; 
-            }
+
+            String unfinishedEntityName = new String(
+                e.getEntityType().toString().substring(0, 1).toUpperCase() +
+                e.getEntityType().toString().substring(1).toLowerCase()
+            ).replace("_", " ");
+    
+            // capitalise first letter.
+            String finishedEntityName = unfinishedEntityName.contains(" ") ?
+                unfinishedEntityName.split(" ")[1].substring(0, 1).toUpperCase() 
+                + unfinishedEntityName.split(" ")[1].substring(1).toLowerCase() : unfinishedEntityName;
+
+            user.sendActionBar(
+				String.format(
+					"&eIsland Level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFishing &2+&a%sxp &8(&b%s&8)",
+					Main.DECIMAL_FORMAT.format(user.addGlobalExperience(FISHING_REWARD_ENTITIES.get(e.getEntityType()))),
+                    Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FISHING, 1.0, false)),
+					finishedEntityName
+				)
+			);
+
+            user.addSeaCreatureKills(1);
             // userData.save(); all work is done with the user's Stats instance. (automatically saves changes)
         }
 

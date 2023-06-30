@@ -4,7 +4,7 @@ public class InstanceAlreadyExistsException extends RuntimeException {
 
     public InstanceAlreadyExistsException(Class<?> clazz) {        
         super(
-            String.format("An instance of %s already exists!",
+            String.format("An instance of %s already exists in Main!",
                 clazz.getSimpleName())
             );
     }

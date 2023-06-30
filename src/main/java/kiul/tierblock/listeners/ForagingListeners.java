@@ -1,193 +1,156 @@
 package kiul.tierblock.listeners;
 
-import net.md_5.bungee.api.ChatMessageType;
-import net.md_5.bungee.api.chat.TextComponent;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.plugin.Plugin;
 
 import kiul.tierblock.Main;
-import kiul.tierblock.gamelogic.globalEXP;
-import kiul.tierblock.gamelogic.userData;
 
+import kiul.tierblock.user.User;
+import kiul.tierblock.user.UserManager;
+import kiul.tierblock.user.skill.SkillManager;
+import kiul.tierblock.user.skill.SkillType;
+import kiul.tierblock.user.skill.impl.ForagingSkill;
+import kiul.tierblock.utils.enums.WoodType;
 
 // if making spaghetti code is considered a war crime, this class would be the second biggest war crime ever committed 
 // grrr
-@SuppressWarnings("deprecation") // Remove this when you stop using userData instead of user.getCollectedWood() & other shit
 public class ForagingListeners implements Listener {
 
     // pat i can't be bothered properly implementing user data
     // so please, remove gamelogic & all of its files, and use the User class (which provides easier access)
     // i'll teach you how to use it if you want! (or just look into the class)
 
+    public ForagingListeners() {
+        SkillManager.getInstance().registerSkill(new ForagingSkill());
+    }
+
     Plugin plugin = (Plugin) Main.getPlugin(Main.class);
+
+    double getLevelUpRequirement(String path) {
+        return Main.getInstance().getConfig().contains(path + ".level_up") ?
+            Main.getInstance().getConfig().getDouble(path + ".level_up") : 0;
+    }
 
     @EventHandler
     public void WoodBroken (BlockBreakEvent e) {
-        Player p = e.getPlayer();
+        User user = UserManager.getInstance().getUser(e.getPlayer());
+        WoodType type = WoodType.fromMaterial(e.getBlock().getType());
+		
+		// removed rewards, done automatically by WoodType.xpReward...
 
-        double oak = Main.getXPReward("foraging.oak");
-        double birch = Main.getXPReward("foraging.birch");
-        double acacia = Main.getXPReward("foraging.acacia");
-        double darkoak = Main.getXPReward("foraging.dark_oak");
-        double spruce = Main.getXPReward("foraging.spruce");
-        double jungle = Main.getXPReward("foraging.jungle");
-        double crimson = Main.getXPReward("foraging.crimson");
-        double warped = Main.getXPReward("foraging.warped");
-
-        if (!e.getBlock().hasMetadata("null")) {
+        // player-placed...
+        if(!user.hasIsland()) return;
+        if (!e.getBlock().hasMetadata("pp")) {
 
             switch (e.getBlock().getType()) {
                 case OAK_LOG:
-                    globalEXP.add(p, oak);
-                    userData.add(p, "foraging.oak.collected", 1);
+                    user.addExperience(SkillType.FORAGING, 1.0, false);
                     break;
                 case BIRCH_LOG:
-                    if (userData.get(p).getInt("foraging.oak") >= Main.getLevelUpRequirement("foraging.oak")) {
-                        globalEXP.add(p, birch);
-                        userData.add(p, "foraging.birch.collected", 1);
+                    if (user.getExperience(SkillType.FORAGING, false) >= getLevelUpRequirement("foraging.oak")) {
+                        user.addExperience(SkillType.FORAGING, 1.0, false);
                     } else {
                         e.setDropItems(false);
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                                "&cYou have to mine &l" + (Main.getLevelUpRequirement("foraging.oak") - userData.get(p).getInt("foraging.oak.collected")) + " &cmore oak to mine this!")));
+                        user.sendActionBar(
+                                "&cYou have to mine &e" + (int)(getLevelUpRequirement("foraging.oak") - user.getExperience(SkillType.FORAGING, false)) + " &cmore oak to collect this!");
                     }
                     break;
                 case ACACIA_LOG:
-                    if (userData.get(p).getInt("foraging.birch.collected") >= Main.getLevelUpRequirement("foraging.birch")) {
-                        globalEXP.add(p, acacia);
-                        userData.add(p, "foraging.acacia.collected", 1);
+                    if (user.getExperience(SkillType.FORAGING, false) >= getLevelUpRequirement("foraging.birch")) {
+                        user.addExperience(SkillType.FORAGING, 1.0, false);
                     } else {
                         e.setDropItems(false);
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                                "&cYou have to mine &l" + (Main.getLevelUpRequirement("foraging.birch") - userData.get(p).getInt("foraging.birch.collected")) + " &cmore birch to mine this!")));
+                        user.sendActionBar(
+                                "&cYou have to mine &e" + (int)(getLevelUpRequirement("foraging.birch") - user.getExperience(SkillType.FORAGING, false)) + " &cmore birch to collect this!");
                     }
                     break;
                 case DARK_OAK_LOG:
-                    if (userData.get(p).getInt("foraging.acacia.collected") >= Main.getLevelUpRequirement("foraging.acacia")) {
-                        globalEXP.add(p, darkoak);
-                        userData.add(p, "foraging.dark_oak.collected", 1);
+                    if (user.getExperience(SkillType.FORAGING, false) >= getLevelUpRequirement("foraging.acacia")) {
+                        user.addExperience(SkillType.FORAGING, 1.0, false);
                     } else {
                         e.setDropItems(false);
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                                "&cYou have to mine &l" + (Main.getLevelUpRequirement("foraging.acacia") - userData.get(p).getInt("foraging.acacia.collected")) + " &cmore acacia to mine this!")));
+                        user.sendActionBar(
+                                "&cYou have to mine &e" + (int)(getLevelUpRequirement("foraging.acacia") - user.getExperience(SkillType.FORAGING, false)) + " &cmore acacia to collect this!");
                     }
                     break;
                 case SPRUCE_LOG:
-                    if (userData.get(p).getInt("foraging.dark_oak.collected") >= Main.getLevelUpRequirement("foraging.dark_oak")) {
-                        globalEXP.add(p, spruce);
-                        userData.add(p, "foraging.spruce.collected", 1);
+                    if (user.getExperience(SkillType.FORAGING, false) >= getLevelUpRequirement("foraging.dark_oak")) {
+                        user.addExperience(SkillType.FORAGING, 1.0, false);
                     } else {
                         e.setDropItems(false);
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                                "&cYou have to mine &l" + (Main.getLevelUpRequirement("foraging.dark_oak") - userData.get(p).getInt("foraging.dark_oak.collected")) + " &cmore dark oak to mine this!")));
+                        user.sendActionBar(
+                                "&cYou have to mine &e" + (int)(getLevelUpRequirement("foraging.dark_oak") - user.getExperience(SkillType.FORAGING, false)) + " &cmore dark oak to collect this!");
                     }
                     break;
                 case JUNGLE_LOG:
-                    if (userData.get(p).getInt("foraging.spruce.collected") >= Main.getLevelUpRequirement("foraging.spruce")) {
-                        globalEXP.add(p, jungle);
-                        userData.add(p, "foraging.jungle.collected", 1);
+                    if (user.getExperience(SkillType.FORAGING, false) >= getLevelUpRequirement("foraging.spruce")) {
+                        user.addExperience(SkillType.FORAGING, 1.0, false);
                     } else {
                         e.setDropItems(false);
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                                "&cYou have to mine &l" + (Main.getLevelUpRequirement("foraging.spruce") - userData.get(p).getInt("foraging.spruce.collected")) + " &cmore spruce to mine this!")));
+                        user.sendActionBar(
+                                "&cYou have to mine &e" + (int)(getLevelUpRequirement("foraging.spruce") - user.getExperience(SkillType.FORAGING, false)) + " &cmore spruce to collect this!");
                     }
                     break;
                 case CRIMSON_STEM:
-                    if (userData.get(p).getInt("global.level") >= 40) {
-                        globalEXP.add(p, crimson);
-                        userData.add(p, "foraging.crimson.collected", 1);
+                    if(!user.getStats().getBoolean("foraging.nether.unlocked")) {
+                        user.sendActionBar("&cYou need to &emax foraging &cto unlock nether content!");
+                        return;
+                    }
+                    if (user.getGlobalLevel() >= 40) {
+                        user.addExperience(SkillType.FORAGING, 1.0, true);
                     } else {
                         e.setDropItems(false);
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                                "&cYou have to be level &l40&c or above to mine this!")));
+                        user.sendActionBar("&cYou need island level &e40 &cto collect this!");
                     }
                     break;
                 case WARPED_STEM:
-                    if (userData.get(p).getInt("foraging.crimson.collected") >= Main.getLevelUpRequirement("foraging.crimson")) {
-                        globalEXP.add(p, warped);
-                        userData.add(p, "foraging.warped.collected", 1);
+                    if(!user.getStats().getBoolean("foraging.nether.unlocked")) {
+                        user.sendActionBar("&cYou need to &emax foraging &cto unlock nether content!");
+                        return;
+                    }
+                    if (user.getExperience(SkillType.FORAGING, true) >= getLevelUpRequirement("foraging.crimson")) {
+                        user.addExperience(SkillType.FORAGING, 1.0, true);
                     } else {
                         e.setDropItems(false);
-                        p.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(ChatColor.translateAlternateColorCodes('&',
-                                "&cYou have to mine &l" + (Main.getLevelUpRequirement("foraging.crimson") - userData.get(p).getInt("foraging.crimson.collected")) + " &cmore crimson to mine this!")));
+                        user.sendActionBar(
+                                "&cYou have to mine &e" + (int)(getLevelUpRequirement("foraging.crimson") - user.getExperience(SkillType.FORAGING, false)) + " &cmore crimson to collect this!");
                     }
                     break;
                 default:
-
+					break;
             }
+			
+			
+			// actionbar message, thank me later, pat.
+			if(type != null) {
+                // user.setLastSkill(SkillType.FORAGING);
+				user.sendActionBar(
+					String.format(
+						"&eIsland Level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eForaging &2+&a1.0xp &8(&b%s&8)",
+						Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward)),
+						type.formatName()
+					)
+				);
+			}
 
-            //LEVEL-UP
+            // LEVEL-UPS ARE DONE AUTOMATICALLY VIA USER CLASS!
 
-            switch (e.getBlock().getType()) {
-                case OAK_LOG:
-                    if (userData.get(p).getInt("foraging.oak.collected") == Main.getLevelUpRequirement("foraging.oak")) {
-                        break;
-                    }
-                case BIRCH_LOG:
-                    if (userData.get(p).getInt("foraging.birch.collected") >= Main.getLevelUpRequirement("foraging.birch")) {
-                        break;
-                    }
-                case ACACIA_LOG:
-                    if (userData.get(p).getInt("foraging.acacia.collected") >= Main.getLevelUpRequirement("foraging.acacia")) {
-                        break;
-                    }
-                case DARK_OAK_LOG:
-                    if (userData.get(p).getInt("foraging.dark_oak.collected") >= Main.getLevelUpRequirement("foraging.dark_oak")) {
-                    }
-                    break;
-                case SPRUCE_LOG:
-                    if (userData.get(p).getInt("foraging.spruce.collected") >= Main.getLevelUpRequirement("foraging.spruce")) {
-                    }
-                    break;
-                case JUNGLE_LOG:
-                    if (userData.get(p).getInt("foraging.jungle.collected") >= Main.getLevelUpRequirement("foraging.jungle")) {
-                    }
-                    break;
-                case CRIMSON_STEM:
-                    if (userData.get(p).getInt("foraging.crimson.collected") >= Main.getLevelUpRequirement("foraging.crimson")) {
-                    }
-                    break;
-                default:
-            }
         }
 
     }
+	
+	@EventHandler
+	public void blockPlace(BlockPlaceEvent event) {
+		WoodType type = WoodType.fromMaterial(event.getBlock().getType());
+		
+		if(type == null) return; // not wood :(.
+		// if wood, do:
+		// i hate this; it's not persistent, but I assume the server is gonna barely restart, and not a lot of people would really care/notice. it feels wrong, ok?
+		event.getBlock().setMetadata("pp", new FixedMetadataValue(Main.getInstance(), "f"));
+	}
 
-    @EventHandler
-    public void WoodPlaced (BlockPlaceEvent e) {
-        switch (e.getBlock().getType()) {
-            case OAK_LOG:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            case BIRCH_LOG:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            case ACACIA_LOG:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            case DARK_OAK_LOG:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            case SPRUCE_LOG:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            case JUNGLE_LOG:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            case CRIMSON_STEM:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            case WARPED_STEM:
-                e.getBlock().setMetadata("null", new FixedMetadataValue(plugin, "uwu"));
-                break;
-            default:
-                break;
-        }
-
-    }
 }
