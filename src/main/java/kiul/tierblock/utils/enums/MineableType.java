@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import kiul.tierblock.Main;
 
-public enum MineableType {
+public enum MineableType implements SkillCollectible {
     
     STONE(0, false),
     COAL(2, false),
@@ -94,6 +94,11 @@ public enum MineableType {
             case SOUL_SOIL: return groupWithSetMaterial(material, SOUL_GROUP);
             default: return null;
         }
+    }
+
+    @Override
+    public double levelUp() {
+        return levelUp;
     }
 
 }

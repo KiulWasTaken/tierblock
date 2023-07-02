@@ -2,9 +2,9 @@ package kiul.tierblock.user.skill;
 
 public enum SkillType {
     
-    FORAGING(7, 2),
+    FORAGING(6, 2),
     MINING(8, 5),
-    FARMING(8, 2),
+    FARMING(7, 2),
     FISHING(6),
     COMBAT(0); // completely based on island-level.
 

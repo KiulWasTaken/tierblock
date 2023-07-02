@@ -5,7 +5,7 @@ import org.bukkit.Material;
 import kiul.tierblock.Main;
 
 /* Note: toInt() removed, use the already provided Java method Enum#ordinal() */
-public enum WoodType {
+public enum WoodType implements SkillCollectible {
 
     OAK(0, false), 
     BIRCH(2, false), 
@@ -66,6 +66,11 @@ public enum WoodType {
             case WARPED_STEM: return WARPED;
             default: return null;
         }
+    }
+
+    @Override
+    public double levelUp() {
+        return levelUp;
     }
 
 }

@@ -32,6 +32,11 @@ public class TestCommand implements CommandExecutor {
         
         User user = UserManager.getInstance().getUser((Player)sender);
         
+        if(!user.isOp()) {
+            user.sendMessage("&cInsufficient permissions");
+            return false;
+        }
+
         if(args.length < 1) {
             user.sendMessage("&cInsufficient arguments");
             return false;
@@ -48,8 +53,7 @@ public class TestCommand implements CommandExecutor {
             IslandsManager manager = BentoBox.getInstance().getIslandsManager();
             Island island = manager.getIslandAt(location).get();
             
-            StringBuilder keys = new StringBuilder();
-            keys.append("[");
+            StringBuilder keys = new StringBuilder().append("[");
 
             List<String> list = List.copyOf(island.getMetaData().get().keySet());
 
@@ -97,6 +101,7 @@ public class TestCommand implements CommandExecutor {
 
 		if("copydefaults".equalsIgnoreCase(args[0])) {
 			user.getStats().copyDefaults();
+			user.setHasIsland(true);
 		}
 
         if("readyuphive".equalsIgnoreCase(args[0])) {

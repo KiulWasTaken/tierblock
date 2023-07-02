@@ -159,6 +159,8 @@ public class CombatListener implements Listener {
                 type.formatName()
             )
         );
+		
+		user.addMonsterKills(1);
     }
 
     private void spawnPillagerRaidCaptain(Location location) {

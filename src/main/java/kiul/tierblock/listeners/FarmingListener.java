@@ -1,6 +1,7 @@
 package kiul.tierblock.listeners;
 
 import java.util.Map;
+import java.util.List;
 
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -52,6 +53,14 @@ import world.bentobox.bentobox.managers.RanksManager;
 
 public class FarmingListener implements Listener {
 
+	private final List<Material> allowedDrops = List.of(
+		Material.POTATO,
+		Material.CARROT,
+		Material.BEETROOT_SEEDS,
+		Material.PUMPKIN_SEEDS,
+		Material.MELON_SEEDS
+	);
+
     public FarmingListener() {
         SkillManager.getInstance().registerSkill(new FarmingSkill());
     }
@@ -87,10 +96,10 @@ public class FarmingListener implements Listener {
             return;
         }
 		
-		if(user.getLevel(SkillType.FARMING, type.isNether) < type.levelRequirement) {
+		if(user.getLevel(SkillType.FARMING, false) < type.levelRequirement) {
             // show progress, if the block is unlockable in the next level (In other words: block level = user level + 1)
             // if not tell them the level requirement:
-			if(type == CropType.CHORUS_FRUIT) return; // no progress checks for chorus fruits, no farming goal found.
+			if(type == CropType.CHORUS_FLOWER || type == CropType.NETHER_WART) return; // no progress checks for chorus fruits, no farming goal found.
             boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.FARMING, type.isNether);
             if(progress) {
                 user.sendActionBar(
@@ -190,11 +199,11 @@ public class FarmingListener implements Listener {
 					// user.sendMessage(above.getDrops().size() + above.getDrops().toString()); DEBUG
 					Material lastItem = null; // to prevent duplicates no touchies
                     for(ItemStack itemStack : above.getDrops()) {
-						if(lastItem != itemStack.getType()) {
+						if(lastItem != itemStack.getType() && allowedDrops.contains(itemStack.getType())) {
 							itemStack.setAmount(1);
 							above.getLocation().getWorld().dropItem(above.getLocation().add(0, 1, 0), itemStack);
 							lastItem = itemStack.getType();
-						}							
+						}
                     }
 					above.setType(Material.AIR);
 					block.setType(Material.DIRT);

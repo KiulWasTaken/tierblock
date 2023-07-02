@@ -54,7 +54,7 @@ farming:
   nether_wart:
     global_level_requirement: 40
     xp_reward: 2.5
-  chorus_fruit:
+  chorus_flower:
     global_level_requirement: 90
     xp_reward: 4
 

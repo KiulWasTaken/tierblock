@@ -1,4 +1,21 @@
+# Bug fixes:
+- Player flight removed after player changes gamemode to creative/spectator.
+- After the reimplementation of global levels, the plugin didn't check for global levelups.
+- getIsland() used to return inconsistent results after server restarts, causing most of the plugin to not work.
+- Island Metadata seems to not be saved after server reloads, only working after server restarts.
+- User data value ``has_island`` couldn't be changed due to ``Stats#setBoolean()`` not saving changes to user data file (dum dum).
+- SkillType max level mistakes:
+  - Farming max level was 8 instead of 7
+  - Foraging max level was 7 instead of 6
+- Fixed dropping beetroot & other crops (while the player doesn't fit the level requirement) when trampled.
+
 # Latest changes:
+
+- Sorta despaghettified ``UserStatsMenu``.
+- Added nether/end sub-skill stats to ``UserStatsMenu`` (Only for the skills that have it).
+- Minor combat changes:
+  - User data value ``pillager_kills`` renamed to ``pillagers_killed``.
+  - Added new user data value ``monsters_killed``.
 
 - All skills are now managed with the new ``SkillManager`` class.
 - Fully implemented Farming (With beehive boosters).

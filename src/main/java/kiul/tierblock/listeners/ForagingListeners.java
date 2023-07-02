@@ -127,7 +127,7 @@ public class ForagingListeners implements Listener {
 			
 			// actionbar message, thank me later, pat.
 			if(type != null) {
-                // user.setLastSkill(SkillType.FORAGING);
+                // user.setLastSkill(SkillType.FORAGING); done automatically now
 				user.sendActionBar(
 					String.format(
 						"&eIsland Level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eForaging &2+&a1.0xp &8(&b%s&8)",

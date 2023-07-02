@@ -86,24 +86,24 @@ public class User {
      */
     public Island getIsland() {
         if(!hasIsland()) return null;
-
+		
         IslandsManager islandsManager = BentoBox.getInstance().getIslands();
-        Island userIsland;
+        Island userIsland = null;
 
-        Predicate<Island> containsPlayer = island -> { 
+		Predicate<Island> containsPlayer = island -> { 
             if(!island.getMembers().containsKey(getUUID())) return false;
-
             int rank = island.getMembers().get(getUUID());
-            if(rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK) return false;
             
-            return true;
+            return (rank >= RanksManager.MEMBER_RANK || rank <= RanksManager.OWNER_RANK);
         };
         
-        List<Island> islandsContainingPlayer = islandsManager.getIslands(Main.getBSkyBlockWorld()).stream().filter(containsPlayer).toList();
+        List<Island> islandsContainingPlayer = islandsManager.getIslands().stream().filter(containsPlayer).toList();
 
-        for(Island island : islandsContainingPlayer) userIsland = island; // breaks if user is somehow a member in more than one island...
-
-        userIsland = islandsManager.getIsland(Main.getBSkyBlockWorld(), getUUID());
+        for(Island island : islandsContainingPlayer) {
+			userIsland = island; // breaks if user is somehow a member in more than one island...
+		}
+		
+        //userIsland = islandsManager.getIsland(Main.getBSkyBlockWorld(), getUUID());
         
         return userIsland;
     }
@@ -232,7 +232,7 @@ public class User {
 
             User user = UserManager.getInstance().getUser(uuid);
             
-            if(user == null) return;
+            if(user == null || user.getBooster() <= 0L) return;
 
             UserManager.getBoostedUsers().remove(user);
             user.setBooster(0);
@@ -333,6 +333,7 @@ public class User {
 
     public double addGlobalExperience(double rightHandSide) {
         setGlobalExperience(getGlobalExperience() + (rightHandSide * getBoosterMultiplier()));
+		checkGlobalLevelUp();
         return rightHandSide * getBoosterMultiplier();
     }
 
@@ -370,7 +371,6 @@ public class User {
         String extra = nether ? ".nether." : "";
         
         getStats().addDouble(skillType.toString().toLowerCase() + extra + ".xp", experience * getBoosterMultiplier());
-		checkGlobalLevelUp();
 		SkillManager.getSkill(skillType).checkForLevelUp(this, nether);
 		setLastSkill(skillType);
 		
@@ -461,7 +461,7 @@ public class User {
      */
     public void globalLevelUp(double excessXp) {
         addGlobalLevel(1);
-        setGlobalExperience(excessXp);
+		setGlobalExperience(excessXp);
         adjustSeaCreatureChance();
         this.player.playSound(getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
         sendMessage(
@@ -479,15 +479,12 @@ public class User {
      */
     public boolean checkGlobalLevelUp() {
         if(getGlobalLevel() < 10) {
-            
             if(getGlobalExperience() < 100.0) return false;
-
             globalLevelUp(getGlobalExperience() - 100.0);
             return true;
         }
-
+		
         if(getGlobalExperience() < 1000) return false;
-
         globalLevelUp(getGlobalExperience() - 1000);
         return true;
     }

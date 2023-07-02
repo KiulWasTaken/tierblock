@@ -140,6 +140,7 @@ public class Stats {
     
     public void setBoolean(String path, boolean bool) {
         configuration.set(path, bool);
+		saveChanges();
     }
 
     /**

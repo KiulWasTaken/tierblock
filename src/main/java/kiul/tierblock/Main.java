@@ -22,7 +22,7 @@ import kiul.tierblock.listeners.ConnectionListener;
 import kiul.tierblock.listeners.FarmingListener;
 import kiul.tierblock.listeners.FishingListeners;
 import kiul.tierblock.listeners.ForagingListeners;
-import kiul.tierblock.listeners.IslandCreationListener;
+import kiul.tierblock.listeners.IslandListener;
 import kiul.tierblock.listeners.MenuClickListener;
 import kiul.tierblock.listeners.MiningListener;
 import kiul.tierblock.user.User;
@@ -31,6 +31,7 @@ import kiul.tierblock.user.skill.SkillManager;
 import kiul.tierblock.utils.menu.MenuManager;
 import net.md_5.bungee.api.ChatColor;
 import world.bentobox.bentobox.managers.RanksManager;
+import world.bentobox.bentobox.BentoBox;
 
 /*
  * Put constants in the class they're gonna be used in.
@@ -75,13 +76,17 @@ public final class Main extends JavaPlugin {
         getCommand("stats").setExecutor(new StatsCommand());
 
         Bukkit.getPluginManager().registerEvents(new MenuClickListener(), this);
-        Bukkit.getPluginManager().registerEvents(new IslandCreationListener(), this);
+        Bukkit.getPluginManager().registerEvents(new IslandListener(), this);
         Bukkit.getPluginManager().registerEvents(new FarmingListener(), this);
         Bukkit.getPluginManager().registerEvents(new ConnectionListener(), this);
         Bukkit.getPluginManager().registerEvents(new CombatListener(), this);
         Bukkit.getPluginManager().registerEvents(new MiningListener(), this);
         Bukkit.getPluginManager().registerEvents(new FishingListeners(), this); // kiul's listener
         Bukkit.getPluginManager().registerEvents(new ForagingListeners(), this); // pat's listener
+
+		BentoBox.getInstance().getIslands().getIslands().forEach(island -> {
+			BentoBox.getInstance().getIslands().save(island);
+		});
 
         // checks player boosters & refill beehives if possible
         Bukkit.getScheduler().runTaskTimer(this, () -> {
@@ -130,6 +135,10 @@ public final class Main extends JavaPlugin {
                 user.setDebugBoard(null);
             }
         });
+		
+		BentoBox.getInstance().getIslands().getIslands().forEach(island -> {
+			BentoBox.getInstance().getIslands().save(island);
+		});
 
         UserManager.getOnlineUsers().clear();
     }

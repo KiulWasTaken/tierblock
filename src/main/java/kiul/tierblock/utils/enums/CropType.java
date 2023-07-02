@@ -4,7 +4,7 @@ import org.bukkit.Material;
 
 import kiul.tierblock.Main;
 
-public enum CropType {
+public enum CropType implements SkillCollectible {
 
     WHEAT(0, false), 
     BEETROOT(2, false), 
@@ -17,7 +17,7 @@ public enum CropType {
     // nether stuff:
 
     NETHER_WART(1, true),
-    CHORUS_FRUIT(2, true);
+    CHORUS_FLOWER(2, true);
 
     public final String label;
 
@@ -65,9 +65,14 @@ public enum CropType {
             case MELON: return MELON;
             case PUMPKIN: return PUMPKIN;
             case NETHER_WART: return NETHER_WART;
-            case CHORUS_FLOWER: return CHORUS_FRUIT;
+            case CHORUS_FLOWER: return CHORUS_FLOWER;
             default: return null;
         }
+    }
+
+    @Override
+    public double levelUp() {
+        return levelUp;
     }
     
 }

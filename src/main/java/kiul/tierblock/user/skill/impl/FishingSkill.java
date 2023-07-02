@@ -31,7 +31,7 @@ public class FishingSkill extends Skill {
     public boolean checkForLevelUp(User user, boolean isNether) {
         if(user.getLevel(getSkillType(), isNether) >= MAX_LEVEL) return false;
 
-        double requirement = FISHING_LEVEL_REQUIREMENTS.get(user.getLevel(getSkillType(), isNether));
+        double requirement = FISHING_LEVEL_REQUIREMENTS.get(user.getLevel(getSkillType(), isNether)+1);
         if(user.getExperience(getSkillType(), isNether) < requirement) return false;
 
         double excess = user.getExperience(getSkillType(), isNether) - requirement;
@@ -40,7 +40,7 @@ public class FishingSkill extends Skill {
     }
 
     public static double getRequirement(User user) {
-        return FISHING_LEVEL_REQUIREMENTS.get(user.getLevel(SkillType.FISHING, false));
+        return FISHING_LEVEL_REQUIREMENTS.get(user.getLevel(SkillType.FISHING, false)+1);
     }
     
 }

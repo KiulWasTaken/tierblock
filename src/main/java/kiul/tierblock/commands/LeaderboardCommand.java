@@ -57,11 +57,7 @@ public class LeaderboardCommand implements CommandExecutor {
             // ^ Remove this, if you want a GUI
             // Make ItemStack, add to GUI.
         });
-
-        // --> Open GUI here! <--
-        // via: user.getPlayer().openInventory(/*Inventory object you just made.*/);
         // off to warthunder i go!
-
         return false;
     }
     
