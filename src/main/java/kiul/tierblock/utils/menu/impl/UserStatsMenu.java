@@ -100,8 +100,7 @@ public class UserStatsMenu extends Menu {
             ).build(), 13
         );
 		
-        // COMBAT
-
+        // ALL SKILLS
         double fishingRequirement = FishingSkill.getRequirement(user);
         int startingIndex = 20;
         for(SkillType skillType : SkillType.values()) {
