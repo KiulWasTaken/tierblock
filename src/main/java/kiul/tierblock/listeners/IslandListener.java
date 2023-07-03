@@ -1,10 +1,12 @@
 package kiul.tierblock.listeners;
 
+import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.PlayerGameModeChangeEvent;
 
+import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
 import world.bentobox.bentobox.api.events.island.IslandCreateEvent;
@@ -60,7 +62,9 @@ public class IslandListener implements Listener {
         User user = UserManager.getInstance().getUser(event.getPlayer());
 
         if(event.getNewGameMode() == GameMode.SURVIVAL && user.isWithinOwnIsland()) {
-            user.getPlayer().setAllowFlight(true);
+            Bukkit.getServer().getScheduler().runTaskLater(Main.getInstance(), () -> {
+				user.getPlayer().setAllowFlight(true);
+			}, 10);
         }
     }
 
