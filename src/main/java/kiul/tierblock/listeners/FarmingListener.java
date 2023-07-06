@@ -79,13 +79,13 @@ public class FarmingListener implements Listener {
 		if(crop.getAge() < crop.getMaximumAge()) return; // plant not fully grown
 		
         event.setDropItems(false);
-        int blockLevelRequirement = Main.getGlobalLevelRequirement("farming." + type.label);
 
 		if(type.isNether && !user.getStats().getBoolean("farming.nether.unlocked")) {
 			user.sendActionBar("&cYou need to &emax farming &cto unlock nether/end content!");
 			return;
 		}
 
+        int blockLevelRequirement = Main.getGlobalLevelRequirement("farming." + type.label);
         if(
             // We check if the broken block has a level requirement:
             blockLevelRequirement != 0
@@ -112,21 +112,27 @@ public class FarmingListener implements Listener {
                 return;
             }
 
-            user.sendActionBar("&cYou need to be level &e" + type.levelRequirement + " &cto farm this!");
+            user.sendActionBar("&cYou need to have &efarming level " + type.levelRequirement + " &cto farm this!");
             return;
         }
         
         event.setDropItems(true);
 		
-        user.sendActionBar(
-            String.format(
-                "&eGlobal: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFarming &2+&a%sxp &8(&b%s&8)",
-                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward)),
-                Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FARMING, 1.0, type.isNether)),
-                type.formatName()
-            )
-        );
+        double xpReward = 0.0;
 
+        if(type.levelRequirement == user.getLevel(SkillType.FARMING, type.isNether)
+            || (type.levelRequirement == 0 && user.getLevel(SkillType.FARMING, true) == 1)) {
+            xpReward = user.addExperience(SkillType.FARMING, 1.0, type.isNether);
+        }
+
+        user.sendActionBar(
+            new StringBuilder(String.format(
+                "&eIsland level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : ""),
+                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward))
+            )).append(
+                (xpReward <= 0 ? "" : String.format("&8| &eFarming: &2+&a%sxp &8(&b%s&8)", Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))
+            ).toString()
+        );
         
     }
 

@@ -1,6 +1,7 @@
 package kiul.tierblock.user.skill.impl;
 
 import org.bukkit.Sound;
+import org.bukkit.inventory.ItemStack;
 
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.skill.Skill;
@@ -19,6 +20,10 @@ public class ForagingSkill extends Skill {
     public void levelUp(User user, double excessXp, boolean isNether) {
         user.addLevels(getSkillType(), 1, isNether);
         user.setExperience(getSkillType(), excessXp, isNether);
+
+        int addition = 0 + (isNether ? 6 : 0);
+        ItemStack itemStack = new ItemStack(WoodType.toSapling(WoodType.values()[user.getLevel(getSkillType(), isNether) + addition - 1]));
+        user.getPlayer().getInventory().addItem(itemStack);
 
         // user is max-level, now able to mine beyond max-level blocks.
         if(user.getLevel(getSkillType(), isNether) >= MAX_LEVEL) {

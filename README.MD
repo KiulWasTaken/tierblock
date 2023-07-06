@@ -1,23 +1,32 @@
 # Bug fixes:
-- Sub-skills in stats menu used to display user's (non-nether/end) experience as progress percentage.
-- Player flight removed after player changes gamemode to creative/spectator.
-- After the reimplementation of global levels, the plugin didn't check for global levelups.
-- getIsland() used to return inconsistent results after server restarts, causing most of the plugin to not work.
-- Island Metadata seems to not be saved after server reloads, only working after server restarts.
-- User data value ``has_island`` couldn't be changed due to ``Stats#setBoolean()`` not saving changes to user data file (dum dum).
-- SkillType max level mistakes:
-  - Farming max level was 8 instead of 7
-  - Foraging max level was 7 instead of 6
-- Fixed dropping beetroot & other crops (while the player doesn't fit the level requirement) when trampled.
+
+- ## Latest commit:
+  - User no longer gets xp (from Farming, Foraging, and Mining) from previous-level blocks.
+  - User stat ``has_island`` isn't changed when user becomes an island member.
+  - User stats sometimes don't get fully wiped.
+
+- ## Recent:
+  - Sub-skills in stats menu used to display user's (non-nether/end) experience as progress percentage.
+  - Player flight removed after player changes gamemode to creative/spectator.
+  - After the reimplementation of global levels, the plugin didn't check for global levelups.
+  - getIsland() used to return inconsistent results after server restarts, causing most of the plugin to not work.
+  - Island Metadata seems to not be saved after server reloads, only working after server restarts.
+  - User data value ``has_island`` couldn't be changed due to ``Stats#setBoolean()`` not saving changes to user data file (dum dum).
+  - SkillType max level mistakes:
+    - Farming max level was 8 instead of 7
+    - Foraging max level was 7 instead of 6
+  - Fixed dropping beetroot & other crops (while the player doesn't fit the level requirement) when trampled.
 
 # Latest changes:
 
 - ## Latest commit:
+  - User now gets seeds, and saplings when levelling up in farming and foraging.
+  - Stopped using PatriciaChips' foraging listener; it's very hard to work with.
+
+- ## Recent:
   - ``IslandCreationListener`` renamed to ``IslandListener``.
   - Booster time left (or whether you have a booster or not) is added to the stats menu.
   - User stats menu doesn't show a maxed skill's progress bar, instead just says "MAXED".
-
-- ## Recent:    
   - Sorta despaghettified ``UserStatsMenu``.
   - Added nether/end sub-skill stats to ``UserStatsMenu`` (Only for the skills that have it).
   - Minor combat changes:

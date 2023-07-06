@@ -189,7 +189,7 @@ public class FishingListeners implements Listener {
 
             user.sendActionBar(
 				String.format(
-					"&eIsland Level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFishing &2+&a%sxp &8(&b%s&8)",
+					"&eIsland Level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFishing: &2+&a%sxp &8(&b%s&8)",
 					Main.DECIMAL_FORMAT.format(user.addGlobalExperience(FISHING_REWARD_ENTITIES.get(e.getEntityType()))),
                     Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FISHING, 1.0, false)),
 					finishedEntityName

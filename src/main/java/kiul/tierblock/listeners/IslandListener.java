@@ -13,6 +13,8 @@ import world.bentobox.bentobox.api.events.island.IslandCreateEvent;
 import world.bentobox.bentobox.api.events.island.IslandEnterEvent;
 import world.bentobox.bentobox.api.events.island.IslandExitEvent;
 import world.bentobox.bentobox.api.events.island.IslandResetEvent;
+import world.bentobox.bentobox.api.events.team.TeamJoinEvent;
+import world.bentobox.bentobox.api.events.team.TeamLeaveEvent;
 import world.bentobox.bentobox.api.metadata.MetaDataValue;
 import world.bentobox.bentobox.database.objects.Island;
 
@@ -55,6 +57,17 @@ public class IslandListener implements Listener {
     public void islandEnter(IslandEnterEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayerUUID());
         if(user.isAllowedToFly()) user.getPlayer().setAllowFlight(true);
+    }
+
+    @EventHandler
+    public void islandJoin(TeamJoinEvent event) {
+        User user = UserManager.getInstance().getUser(event.getPlayerUUID());
+        user.setHasIsland(true);
+    }
+
+    public void islandLeave(TeamLeaveEvent event) {
+        User user = UserManager.getInstance().getUser(event.getPlayerUUID());
+        user.getStats().copyDefaults();
     }
 
     @EventHandler

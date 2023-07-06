@@ -62,11 +62,28 @@ public enum CropType implements SkillCollectible {
             case CARROTS: return CARROT;
             case POTATOES: return POTATO;
             case SUGAR_CANE: return SUGAR_CANE;
+            case MELON_STEM:
             case MELON: return MELON;
+            case PUMPKIN_STEM:
             case PUMPKIN: return PUMPKIN;
             case NETHER_WART: return NETHER_WART;
             case CHORUS_FLOWER: return CHORUS_FLOWER;
             default: return null;
+        }
+    }
+
+    public static Material toSeed(CropType cropType) {
+        switch(cropType) {
+            case BEETROOT: return Material.BEETROOT_SEEDS;
+            case CARROT: return Material.CARROT;
+            case CHORUS_FLOWER: return Material.CHORUS_FLOWER;
+            case MELON: return Material.MELON_SEEDS;
+            case NETHER_WART: return Material.NETHER_WART;
+            case POTATO: return Material.POTATO;
+            case PUMPKIN: return Material.PUMPKIN_SEEDS;
+            case SUGAR_CANE: return Material.SUGAR_CANE;
+            case WHEAT: return Material.WHEAT_SEEDS; // i don't see how that's gonna happen but i put it here.
+            default: return Material.AIR;
         }
     }
 

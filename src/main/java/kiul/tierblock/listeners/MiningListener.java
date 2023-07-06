@@ -40,7 +40,7 @@ public class MiningListener implements Listener {
 		int globalReq = Main.getGlobalLevelRequirement("mining." + type.label);
 
         if(user.getGlobalLevel() < globalReq) {
-            user.sendActionBar("&cYou need island level &e" + globalReq + " &cto collect this!");
+            user.sendActionBar("&cYou need &eisland level " + globalReq + " &cto collect this!");
             return;
         }
 
@@ -59,19 +59,26 @@ public class MiningListener implements Listener {
                 return;
             }
 
-            user.sendActionBar("&cYou need to be level &e" + type.levelRequirement + " &cto collect this!");
+            user.sendActionBar("&cYou need to have &emining level " + type.levelRequirement + " &cto collect this!");
             return;
         }
 
 		event.setDropItems(true);
+
+        double xpReward = 0.0;
+
+        if(type.levelRequirement == user.getLevel(SkillType.MINING, type.isNether)
+            || (type.levelRequirement == 0 && user.getLevel(SkillType.MINING, type.isNether) == 1)) {
+                xpReward = user.addExperience(SkillType.MINING, 1.0, type.isNether);
+            }
         
         user.sendActionBar(
-            String.format(
-                "&eIsland Level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eMining &2+&a%sxp &8(&b%s&8)",
-                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward)),
-				Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.MINING, 1.0, type.isNether)),
-                type.formatName()
-            )
+            new StringBuilder(String.format(
+                "&eIsland level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : ""),
+                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward))
+            )).append(
+                (xpReward <= 0 ? "" : String.format("&8| &eMining: &2+&a%sxp &8(&b%s&8)", Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))
+            ).toString()
         );
     }
 

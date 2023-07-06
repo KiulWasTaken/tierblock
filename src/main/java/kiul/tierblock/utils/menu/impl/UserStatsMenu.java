@@ -94,8 +94,8 @@ public class UserStatsMenu extends Menu {
                     ("&bLevel: &e" + user.getGlobalLevel()),
                     ("&bExperience: &e" + Main.DECIMAL_FORMAT.format(user.getGlobalExperience())),
                     ("&bProgress: &a" + 
-                        "%" + Main.DECIMAL_FORMAT.format((user.getGlobalExperience()/((user.getGlobalLevel() > 10) ? 1000.0 : 100.0))*100) +
-                        " &8[ " + drawProgressBar(user.getGlobalExperience(), ((user.getGlobalLevel() > 10) ? 1000.0 : 100.0)) + " &8]")
+                        Main.DECIMAL_FORMAT.format((user.getGlobalExperience()/((user.getGlobalLevel() > 10) ? 1000.0 : 100.0))*100) +
+                        "% &8[ " + drawProgressBar(user.getGlobalExperience(), ((user.getGlobalLevel() > 10) ? 1000.0 : 100.0)) + " &8]")
                 )
             ).build(), 13
         );
@@ -111,8 +111,8 @@ public class UserStatsMenu extends Menu {
 			if(skillType != SkillType.COMBAT)
 				levelUp = skillType == SkillType.FISHING ? fishingRequirement : collectibleType.levelUp();
 
-            String progress = user.getLevel(skillType, false) == skillType.maxLevel ? "&aMAXED" : "%" + Main.DECIMAL_FORMAT.format((user.getExperience(skillType, false)/levelUp)*100) +
-            " &8[ " + drawProgressBar(user.getExperience(skillType, false), levelUp) + " &8]";
+            String progress = user.getLevel(skillType, false) == skillType.maxLevel ? "&aMAXED" : Main.DECIMAL_FORMAT.format((user.getExperience(skillType, false)/levelUp)*100) +
+            "% &8[ " + drawProgressBar(user.getExperience(skillType, false), levelUp) + " &8]";
 
             List<String> skillLore = new ArrayList<>(skillType == SkillType.COMBAT ? 
                 List.of(
@@ -135,7 +135,7 @@ public class UserStatsMenu extends Menu {
                         "&c&lSub-skill &estats:",
                         "&cLevel: &e" + user.getLevel(skillType, true),
                         "&cExperience: &e" + Main.DECIMAL_FORMAT.format(user.getExperience(skillType, true)),
-                        "&cProgress: " + ((user.getLevel(skillType, true) == skillType.maxNetherLevel) ? "&aMAXED" : "&a%" + Main.DECIMAL_FORMAT.format(user.getExperience(skillType, true)/netherCollectibleType.levelUp()) + " &8[ " +
+                        "&cProgress: " + ((user.getLevel(skillType, true) == skillType.maxNetherLevel) ? "&aMAXED" : Main.DECIMAL_FORMAT.format(user.getExperience(skillType, true)/netherCollectibleType.levelUp()) + "% &8[ " +
                         drawProgressBar(user.getExperience(skillType, true), netherCollectibleType.levelUp()) + " &8]")
                     ) :
                     List.of(

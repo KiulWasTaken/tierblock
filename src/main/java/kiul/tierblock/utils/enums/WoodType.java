@@ -68,6 +68,20 @@ public enum WoodType implements SkillCollectible {
         }
     }
 
+    public static Material toSapling(WoodType woodType) {
+        switch(woodType) {
+            case OAK: return Material.OAK_SAPLING;
+            case BIRCH: return Material.BIRCH_SAPLING;
+            case ACACIA: return Material.ACACIA_SAPLING;
+            case DARK_OAK: return Material.DARK_OAK_LOG;
+            case SPRUCE: return Material.SPRUCE_SAPLING;
+            case JUNGLE: return Material.JUNGLE_SAPLING;
+            case CRIMSON: return Material.CRIMSON_FUNGUS;
+            case WARPED: return Material.WARPED_FUNGUS;
+            default: return Material.AIR;
+        }
+    }
+        
     @Override
     public double levelUp() {
         return levelUp;
