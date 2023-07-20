@@ -42,6 +42,13 @@ public class TestCommand implements CommandExecutor {
             return false;
         }
 
+        if("scc".equalsIgnoreCase(args[0])) {
+            if(!user.hasIsland()) return false;
+            user.getIslandMembers().forEach(member -> {
+                user.sendMessage(member.getName() + " (sc_chance): " + member.getSeaCreatureChance() * 100 + "%");
+            });
+        }
+
         if("metadata".equalsIgnoreCase(args[0])) {
             if(!user.isWithinAnyIsland()) {
                 user.sendMessage("&cYou aren't in any island!");

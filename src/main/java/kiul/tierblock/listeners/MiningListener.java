@@ -26,8 +26,9 @@ public class MiningListener implements Listener {
         MineableType type = MineableType.fromMaterial(event.getBlock().getType());
 		
 		if(type == null) return;
-		if(event.getBlock().hasMetadata("pp")) return;// pp as in player-placed, no other meaning.... trust me
+		if(event.getBlock().hasMetadata("pp")) return; // pp as in player-placed, no other meaning.... trust me
 		User user = UserManager.getInstance().getUser(event.getPlayer());
+		
 		event.setDropItems(false);
 		
 		if(user.getPlayer().getGameMode() != GameMode.SURVIVAL) return;
@@ -43,23 +44,23 @@ public class MiningListener implements Listener {
             user.sendActionBar("&cYou need &eisland level " + globalReq + " &cto collect this!");
             return;
         }
-
+		
         if(user.getLevel(SkillType.MINING, type.isNether) < type.levelRequirement) {
             // show progress, if the block is unlockable in the next level (In other words: block level = user level + 1)
             // if not tell them the level requirement:
             boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.MINING, type.isNether);
             if(progress) {
+				MineableType previousType = MineableType.values()[type.ordinal() - 1];
                 user.sendActionBar(
                     String.format(
                         "&cYou need to break &e%s &cmore &e%s&c to collect this!", 
-                        (int)(type.levelUp - user.getExperience(SkillType.MINING, type.isNether)),
-                        MineableType.values()[type.ordinal() - 1].formatName()
+                        (int)(previousType.levelUp - user.getExperience(SkillType.MINING, type.isNether)),
+                        previousType.formatName()
                     )
                 );
                 return;
             }
 
-            user.sendActionBar("&cYou need to have &emining level " + type.levelRequirement + " &cto collect this!");
             return;
         }
 
@@ -68,16 +69,16 @@ public class MiningListener implements Listener {
         double xpReward = 0.0;
 
         if(type.levelRequirement == user.getLevel(SkillType.MINING, type.isNether)
-            || (type.levelRequirement == 0 && user.getLevel(SkillType.MINING, type.isNether) == 1)) {
-                xpReward = user.addExperience(SkillType.MINING, 1.0, type.isNether);
-            }
-        
+			|| (type.levelRequirement == 0 && user.getLevel(SkillType.MINING, type.isNether) == 1)) {
+			xpReward = user.addExperience(SkillType.MINING, 1.0, type.isNether);
+        }
+		
         user.sendActionBar(
             new StringBuilder(String.format(
-                "&eIsland level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : ""),
+                "&eIsland: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : ""),
                 Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward))
             )).append(
-                (xpReward <= 0 ? "" : String.format("&8| &eMining: &2+&a%sxp &8(&b%s&8)", Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))
+                (xpReward <= 0.0 ? "" : String.format("&8| &eMining: &2+&a%sxp &8(&b%s&8)", Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))
             ).toString()
         );
     }

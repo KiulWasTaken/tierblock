@@ -55,13 +55,16 @@ public class UserStatsMenu extends Menu {
     }
 
     private SkillCollectible getSkillCollectibleType(User user, SkillType skillType, boolean isNether) {
+        // int maxLevel = (isNether) ? (skillType.maxNetherLevel) : (skillType.maxLevel);
+        int userLevel = user.getLevel(skillType, isNether);
+
         switch(skillType) {
             case FORAGING:
-                return WoodType.values()[user.getLevel(skillType, isNether) - 1 + (isNether ? 6 : 0)];
+                return WoodType.values()[Math.min(userLevel - 1 + (isNether ? 6 : 0), 7)];
             case FARMING:
-                return CropType.values()[user.getLevel(skillType, isNether) - 1 + (isNether ? 7 : 0)];
+                return CropType.values()[Math.min(userLevel - 1 + (isNether ? 7 : 0), 8)];
             case MINING:
-                return MineableType.values()[user.getLevel(skillType, isNether) - 1 + (isNether ? 8 : 0)];
+                return MineableType.values()[Math.min(userLevel - 1 + (isNether ? 8 : 0), 12)];
             default:
                 return null;
         }
@@ -108,8 +111,9 @@ public class UserStatsMenu extends Menu {
             SkillCollectible collectibleType = getSkillCollectibleType(user, skillType, false);
 			
 			double levelUp = 0.0;
-			if(skillType != SkillType.COMBAT)
-				levelUp = skillType == SkillType.FISHING ? fishingRequirement : collectibleType.levelUp();
+			if(skillType != SkillType.COMBAT) {
+				levelUp = (skillType == SkillType.FISHING ? fishingRequirement : collectibleType.levelUp());
+			}
 
             String progress = user.getLevel(skillType, false) == skillType.maxLevel ? "&aMAXED" : Main.DECIMAL_FORMAT.format((user.getExperience(skillType, false)/levelUp)*100) +
             "% &8[ " + drawProgressBar(user.getExperience(skillType, false), levelUp) + " &8]";
@@ -126,16 +130,17 @@ public class UserStatsMenu extends Menu {
 
             if(skillType != SkillType.FISHING && skillType != SkillType.COMBAT) {
                 SkillCollectible netherCollectibleType = getSkillCollectibleType(user, skillType, true);
-
+				double netherProgress = (netherCollectibleType.levelUp() <= 0 ? 0 : Math.min(0, user.getExperience(skillType, true)/netherCollectibleType.levelUp()));
                 skillLore.addAll(
 					new ArrayList<String>(
                     user.getStats().getBoolean(skillType.toString().toLowerCase() + ".nether.unlocked") ?
                     List.of(
-                        "",
+                        " ",
                         "&c&lSub-skill &estats:",
                         "&cLevel: &e" + user.getLevel(skillType, true),
                         "&cExperience: &e" + Main.DECIMAL_FORMAT.format(user.getExperience(skillType, true)),
-                        "&cProgress: " + ((user.getLevel(skillType, true) == skillType.maxNetherLevel) ? "&aMAXED" : Main.DECIMAL_FORMAT.format(user.getExperience(skillType, true)/netherCollectibleType.levelUp()) + "% &8[ " +
+						// cuz last nether collectibles have no levelUp value.
+                        "&cProgress: " + ((user.getLevel(skillType, true) == skillType.maxNetherLevel) ? "&aMAXED" : Main.DECIMAL_FORMAT.format(netherProgress) + "% &8[ " +
                         drawProgressBar(user.getExperience(skillType, true), netherCollectibleType.levelUp()) + " &8]")
                     ) :
                     List.of(

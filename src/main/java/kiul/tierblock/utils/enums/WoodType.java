@@ -73,7 +73,7 @@ public enum WoodType implements SkillCollectible {
             case OAK: return Material.OAK_SAPLING;
             case BIRCH: return Material.BIRCH_SAPLING;
             case ACACIA: return Material.ACACIA_SAPLING;
-            case DARK_OAK: return Material.DARK_OAK_LOG;
+            case DARK_OAK: return Material.DARK_OAK_SAPLING;
             case SPRUCE: return Material.SPRUCE_SAPLING;
             case JUNGLE: return Material.JUNGLE_SAPLING;
             case CRIMSON: return Material.CRIMSON_FUNGUS;

@@ -52,10 +52,11 @@ public class ForagingListener implements Listener {
             // show progress, if the block is unlockable in the next level (In other words: block level = user level + 1)
             // if not tell them the level requirement:
             boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.FORAGING, type.isNether);
+			WoodType previousType = WoodType.values()[type.ordinal() - 1];
             user.sendActionBar((progress) ? String.format(
                 "&cYou need to forage &e%s &cmore &e%s&c to collect this!", 
-                (int)(type.levelUp - user.getExperience(SkillType.FORAGING, type.isNether)),
-                WoodType.values()[type.ordinal() - 1].formatName()
+                (int)(previousType.levelUp - user.getExperience(SkillType.FORAGING, type.isNether)),
+                previousType.formatName()
             ) : "&cYou need to have &eforaging level " + type.levelRequirement + " &cto forage this!");
             return;
         }
@@ -71,10 +72,10 @@ public class ForagingListener implements Listener {
         
         user.sendActionBar(
             new StringBuilder(String.format(
-                "&eIsland level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : ""),
+                "&eIsland: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : ""),
                 Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward))
             )).append(
-                (xpReward <= 0 ? "" : String.format("&8| &eForaging: &2+&a%sxp &8(&b%s&8)", Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))
+                (xpReward <= 0.0 ? "" : String.format("&8| &eForaging: &2+&a%sxp &8(&b%s&8)", Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))
             ).toString()
         );
     }

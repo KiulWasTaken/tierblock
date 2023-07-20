@@ -44,6 +44,7 @@ public class FishingListeners implements Listener {
         EntityType.ELDER_GUARDIAN, 600.0
     );
 
+    // spawnAndFling has no extreme change towards the event, it only flings the mob a different way, and also preventing it from dying to fall damage.
     @EventHandler
     public void SeaCreatureCatch (PlayerFishEvent e) {
         User user = UserManager.getInstance().getUser(e.getPlayer());
@@ -171,6 +172,7 @@ public class FishingListeners implements Listener {
         }
     }
 
+    // Has no affect on your original code, just adds actionbar.
     @EventHandler
     public void SeaCreatureKill (EntityDeathEvent e) {
         // don't check if killer is instanceof Player, it returns Player regardless. (it'll be null if killer is not a player, will cause an error.)
@@ -189,7 +191,7 @@ public class FishingListeners implements Listener {
 
             user.sendActionBar(
 				String.format(
-					"&eIsland Level: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFishing: &2+&a%sxp &8(&b%s&8)",
+					"&eIsland: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFishing: &2+&a%sxp &8(&b%s&8)",
 					Main.DECIMAL_FORMAT.format(user.addGlobalExperience(FISHING_REWARD_ENTITIES.get(e.getEntityType()))),
                     Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FISHING, 1.0, false)),
 					finishedEntityName

@@ -154,7 +154,7 @@ public class CombatListener implements Listener {
         
         user.sendActionBar(
             String.format(
-                "&eIsland Level: &2+&a%sxp &8(&ekilled &b%s&8)", // &eCombat &2+&a1.0xp 
+                "&eIsland: &2+&a%sxp &8(&ekilled &b%s&8)", // &eCombat &2+&a1.0xp 
                 Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward)),
                 type.formatName()
             )
@@ -192,12 +192,12 @@ public class CombatListener implements Listener {
         if (player.hasPotionEffect(PotionEffectType.BAD_OMEN)){
            int currentAmplifier = player.getPotionEffect(PotionEffectType.BAD_OMEN).getAmplifier();
            if (currentAmplifier < 4){
-              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 120000, currentAmplifier + 1, false, false));
+              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 2400000, currentAmplifier + 1, false, false));
            } else {
-              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 120000, 4, false, false));
+              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 2400000, 4, false, false));
            }
         } else {
-           player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 120000, 0, false, false));
+           player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 2400000, 0, false, false));
         }
     }
 

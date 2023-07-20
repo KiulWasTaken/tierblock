@@ -1,72 +1,16 @@
 # Bug fixes:
 
 - ## Latest commit:
-  - User no longer gets xp (from Farming, Foraging, and Mining) from previous-level blocks.
-  - User stat ``has_island`` isn't changed when user becomes an island member.
-  - User stats sometimes don't get fully wiped.
-
-- ## Recent:
-  - Sub-skills in stats menu used to display user's (non-nether/end) experience as progress percentage.
-  - Player flight removed after player changes gamemode to creative/spectator.
-  - After the reimplementation of global levels, the plugin didn't check for global levelups.
-  - getIsland() used to return inconsistent results after server restarts, causing most of the plugin to not work.
-  - Island Metadata seems to not be saved after server reloads, only working after server restarts.
-  - User data value ``has_island`` couldn't be changed due to ``Stats#setBoolean()`` not saving changes to user data file (dum dum).
-  - SkillType max level mistakes:
-    - Farming max level was 8 instead of 7
-    - Foraging max level was 7 instead of 6
-  - Fixed dropping beetroot & other crops (while the player doesn't fit the level requirement) when trampled.
+  - When unlocking level 4, the level-up reward gives the user a dark oak log instead of a sapling; I made a typo.
+  - Sugar canes now only gives xp per block broken, because bad.
+  - Sugar canes, melons, and pumpkins now flag whether they were player-player or not (To prevent massive free xp doo doo).
+  - Sub-skill stats may display N/A, due to it dividing by zero sometimes.
+  - Global level-ups are now displayed for every island team member, instead of only the member who cause the level-up.
+  - Beehives now give the same boost time for each island member, instead of the time varying for each one.
+  - Fishing sometimes just ignores everything and doesn't work.
+  - Some mining goals in stats menu varied from the actual goal.
 
 # Latest changes:
 
 - ## Latest commit:
-  - User now gets seeds, and saplings when levelling up in farming and foraging.
-  - Stopped using PatriciaChips' foraging listener; it's very hard to work with.
-
-- ## Recent:
-  - ``IslandCreationListener`` renamed to ``IslandListener``.
-  - Booster time left (or whether you have a booster or not) is added to the stats menu.
-  - User stats menu doesn't show a maxed skill's progress bar, instead just says "MAXED".
-  - Sorta despaghettified ``UserStatsMenu``.
-  - Added nether/end sub-skill stats to ``UserStatsMenu`` (Only for the skills that have it).
-  - Minor combat changes:
-    - User data value ``pillager_kills`` renamed to ``pillagers_killed``.
-    - Added new user data value ``monsters_killed``.
-  - All skills are now managed with the new ``SkillManager`` class.
-  - Fully implemented Farming (With beehive boosters).
-  - Fully implemented Mining.
-  - Monster-combat system implemented (With the pillager & the raid captain system).
-  - Rewrote ``Commands`` class (contains most of the dev commands)
-  - Added new features to ``TestCommand (/test)`` for dev tools:
-    - ``booster`` subcommand, displays booster time left.
-    - ``metadata`` subcommand, displays island's main metadata value, and available ones.
-    - ``setbool`` & ``setdouble`` subcommands, both change an island's metadata value of their type.
-    - ``copydefaults`` subcommand, completely resets the user's stats (Only the executor).
-    - ``readyuphive`` subcommand, makes a hive ready to boosted (Doesn't change the honey state).
-    - ``islandlevel`` subcommand, changes an island's level.
-    - ``debug_scoreboard`` subcommand, displays a hot scoreboard for skill-debugging purposes
-  - Added new ``/leaderboard`` command which has other aliases:
-    - leaderb
-    - lboard
-    - lb
-    - leaderousboardous
-  - Added new ``/stats`` command which displays a small menu that contains general user stats, and has other aliases:
-    - stat
-    - statistics
-    - statisticus
-    - je_mange_un_chat
-  - Major overhauls for ``WoodType``, ``MineableType``, ``CropType``, and ``MonsterType``
-  - New ``Menu`` abstract class for easier menu creation
-    - New ``ItemBuilder`` class to make ItemStacks, and ``ClickableItem``
-    - New ``ClickableItem`` (created from ItemBuilder's ``buildAsClickable(ClickableEvent)``)
-
-# How to use the ItemBuilder
-
-```java
-// normal item stack
-new ItemBuilder(Material.STONE).displayName("&7Hot stone block").lore(/*Your own List<String> as lore*/).build()
-
-// clickable gui item. ONLY WORKS WITH Menu CLASS!!! <-------
-new ItemBuilder(Material.STONE).displayName("&7Hot &cclickable &7stone block").lore(/*Your own List<String>*/).buidAsClickAble(() -> {
-    // Do stuff here. fired once clicked only.
-});```
+  - New ``/test scc`` sub-command for more fishing debugging.
