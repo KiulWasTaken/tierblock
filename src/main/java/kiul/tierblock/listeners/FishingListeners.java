@@ -13,7 +13,6 @@ import org.bukkit.util.Vector;
 import java.util.Map;
 import java.util.Random;
 
-import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillManager;
@@ -189,17 +188,17 @@ public class FishingListeners implements Listener {
                 unfinishedEntityName.split(" ")[1].substring(0, 1).toUpperCase() 
                 + unfinishedEntityName.split(" ")[1].substring(1).toLowerCase() : unfinishedEntityName;
 
+            double globalXp = user.addGlobalExperience(FISHING_REWARD_ENTITIES.get(e.getEntityType()));
+            double fishingXp = user.addExperience(SkillType.FISHING, 1.0, false);
+
             user.sendActionBar(
-				String.format(
-					"&eIsland: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFishing: &2+&a%sxp &8(&b%s&8)",
-					Main.DECIMAL_FORMAT.format(user.addGlobalExperience(FISHING_REWARD_ENTITIES.get(e.getEntityType()))),
-                    Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FISHING, 1.0, false)),
-					finishedEntityName
-				)
+				new StringBuilder(String.format(
+					"&eIsland: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster)" : ""),
+					globalXp
+				)).append((fishingXp > 0.0) ? String.format(" &8| &eFishing: &2+&a%sxp &8(&b%s&8)", fishingXp, finishedEntityName) : "").toString()
 			);
 
             user.addSeaCreatureKills(1);
-            // userData.save(); all work is done with the user's Stats instance. (automatically saves changes)
         }
 
     }

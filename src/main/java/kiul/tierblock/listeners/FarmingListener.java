@@ -15,7 +15,6 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityEnterBlockEvent;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.metadata.FixedMetadataValue;
 
 import kiul.tierblock.Main;
@@ -54,13 +53,13 @@ import world.bentobox.bentobox.managers.RanksManager;
 
 public class FarmingListener implements Listener {
 
-	private final List<Material> allowedDrops = List.of(
-		Material.POTATO,
-		Material.CARROT,
-		Material.BEETROOT_SEEDS,
-		Material.PUMPKIN_SEEDS,
-		Material.MELON_SEEDS
-	);
+	// private final List<Material> allowedDrops = List.of(
+	// 	Material.POTATO,
+	// 	Material.CARROT,
+	// 	Material.BEETROOT_SEEDS,
+	// 	Material.PUMPKIN_SEEDS,
+	// 	Material.MELON_SEEDS
+	// );
 
     public FarmingListener() {
         SkillManager.getInstance().registerSkill(new FarmingSkill());
@@ -218,14 +217,14 @@ public class FarmingListener implements Listener {
 					above.getLocation().getWorld().playSound(above.getLocation(), Sound.BLOCK_CROP_BREAK, 1, 1);
 					
 					// user.sendMessage(above.getDrops().size() + above.getDrops().toString()); DEBUG
-					Material lastItem = null; // to prevent duplicates no touchies
-                    for(ItemStack itemStack : above.getDrops()) {
-						if(lastItem != itemStack.getType() && allowedDrops.contains(itemStack.getType())) {
-							itemStack.setAmount(1);
-							above.getLocation().getWorld().dropItem(above.getLocation().add(0, 1, 0), itemStack);
-							lastItem = itemStack.getType();
-						}
-                    }
+					// Material lastItem = null; // to prevent duplicates no touchies
+                    // for(ItemStack itemStack : above.getDrops()) {
+					// 	if(lastItem != itemStack.getType() && allowedDrops.contains(itemStack.getType())) {
+					// 		itemStack.setAmount(1);
+					// 		above.getLocation().getWorld().dropItem(above.getLocation().add(0, 1, 0), itemStack);
+					// 		lastItem = itemStack.getType();
+					// 	}
+                    // }
 					above.setType(Material.AIR);
 					block.setType(Material.DIRT);
 					user.getPlayer().teleport(user.getLocation().add(0, 0.00251, 0)); // to prevent user from phasing through block

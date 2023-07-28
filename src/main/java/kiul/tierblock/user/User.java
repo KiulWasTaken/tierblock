@@ -355,7 +355,6 @@ public class User {
         return getStats().getDouble(skillType.toString().toLowerCase() + extra + ".xp");
     }
 
-
     public void setLevel(SkillType skillType, int levels, boolean nether) {
         String extra = nether ? ".nether" : "";
         getStats().setNumber(skillType.toString().toLowerCase() + extra + ".level", levels);
@@ -367,11 +366,17 @@ public class User {
     }
 
     public void addLevels(SkillType skillType, int levels, boolean nether) {
+        int maxLevel = nether ? skillType.maxNetherLevel : skillType.maxLevel;
+        if(getLevel(skillType, nether) >= maxLevel) return;
+
         String extra = nether ? ".nether" : "";
         getStats().addInt(skillType.toString().toLowerCase() + extra + ".level", levels);
     }
     
     public double addExperience(SkillType skillType, double experience, boolean nether) {
+        int maxLevel = nether ? skillType.maxNetherLevel : skillType.maxLevel;
+        if(getLevel(skillType, nether) == maxLevel) return 0;
+
         String extra = nether ? ".nether" : "";
         
         getStats().addDouble(skillType.toString().toLowerCase() + extra + ".xp", experience);

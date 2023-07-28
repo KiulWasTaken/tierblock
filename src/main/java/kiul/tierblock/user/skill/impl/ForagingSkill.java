@@ -41,7 +41,7 @@ public class ForagingSkill extends Skill {
     public boolean checkForLevelUp(User user, boolean isNether) {
         if(user.getLevel(getSkillType(), isNether) >= MAX_LEVEL) return false;
 
-        int indexInEnum = user.getLevel(getSkillType(), isNether) - 1;
+        int indexInEnum = Math.min(user.getLevel(getSkillType(), isNether) - 1 + (isNether ? 6 : 0), 7);
         WoodType lastType = WoodType.values()[indexInEnum];
         if(user.getExperience(getSkillType(), isNether) < lastType.levelUp) return false;
 

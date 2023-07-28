@@ -1,5 +1,7 @@
 package kiul.tierblock.user.skill.impl;
 
+import java.lang.Math;
+
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
@@ -36,7 +38,7 @@ public class FarmingSkill extends Skill {
     public boolean checkForLevelUp(User user, boolean isNether) {
         if(user.getLevel(SkillType.FARMING, isNether) >= MAX_LEVEL) return false;
 
-        int indexInEnum = user.getLevel(SkillType.FARMING, isNether) - 1;
+        int indexInEnum =Math.min(user.getLevel(SkillType.FARMING, isNether) - 1 + (isNether ? 7 : 0), 8);
         CropType lastType = CropType.values()[indexInEnum];
         if(user.getExperience(SkillType.FARMING, isNether) < lastType.levelUp) return false;
 
