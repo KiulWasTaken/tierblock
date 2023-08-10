@@ -24,7 +24,7 @@ import kiul.tierblock.listeners.CombatListener;
 import kiul.tierblock.listeners.ConnectionListener;
 import kiul.tierblock.listeners.FarmingListener;
 import kiul.tierblock.listeners.FishingListeners;
-import kiul.tierblock.listeners.ForagingListeners;
+import kiul.tierblock.listeners.ForagingListener;
 import kiul.tierblock.listeners.IslandListener;
 import kiul.tierblock.listeners.MenuClickListener;
 import kiul.tierblock.listeners.MiningListener;
@@ -92,7 +92,7 @@ public final class Main extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new CombatListener(), this);
         Bukkit.getPluginManager().registerEvents(new MiningListener(), this);
         Bukkit.getPluginManager().registerEvents(new FishingListeners(), this); // kiul's listener
-        Bukkit.getPluginManager().registerEvents(new ForagingListeners(), this); // pat's listener
+        Bukkit.getPluginManager().registerEvents(new ForagingListener(), this); // pat's listener
 
 		BentoBox.getInstance().getIslands().getIslands().forEach(island -> {
 			BentoBox.getInstance().getIslands().save(island);

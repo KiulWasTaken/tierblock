@@ -82,7 +82,7 @@ combat:
     xp_reward: 8.4
 
 mining:
-  cobblestone:
+  stone:
     xp_reward: 1.0
     level_up: 50.0
   coal:

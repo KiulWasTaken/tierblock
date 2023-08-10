@@ -15,7 +15,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.EntityEnterBlockEvent;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.inventory.ItemStack;
+import org.bukkit.metadata.FixedMetadataValue;
 
 import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
@@ -53,13 +53,13 @@ import world.bentobox.bentobox.managers.RanksManager;
 
 public class FarmingListener implements Listener {
 
-	private final List<Material> allowedDrops = List.of(
-		Material.POTATO,
-		Material.CARROT,
-		Material.BEETROOT_SEEDS,
-		Material.PUMPKIN_SEEDS,
-		Material.MELON_SEEDS
-	);
+	// private final List<Material> allowedDrops = List.of(
+	// 	Material.POTATO,
+	// 	Material.CARROT,
+	// 	Material.BEETROOT_SEEDS,
+	// 	Material.PUMPKIN_SEEDS,
+	// 	Material.MELON_SEEDS
+	// );
 
     public FarmingListener() {
         SkillManager.getInstance().registerSkill(new FarmingSkill());
@@ -72,20 +72,26 @@ public class FarmingListener implements Listener {
         CropType type = CropType.fromMaterial(block.getType());
         
 		if(type == null) return; // not a crop, stopping here.
-        if(!user.hasIsland()) return;
+		if(!user.hasIsland()) return;
 		
-		Ageable crop = (Ageable) block.getState().getBlockData();
-		
-		if(crop.getAge() < crop.getMaximumAge()) return; // plant not fully grown
+        List<Material> nonAgeable = List.of(Material.SUGAR_CANE, Material.PUMPKIN, Material.MELON);
+
+        if(block.hasMetadata("pp")) return;
+
+        // check if it can age...
+        if(!nonAgeable.contains(block.getType())) {
+            Ageable crop = (Ageable) block.getState().getBlockData();
+            if(crop.getAge() < crop.getMaximumAge()) return; // plant not fully grown
+        }
 		
         event.setDropItems(false);
-        int blockLevelRequirement = Main.getGlobalLevelRequirement("farming." + type.label);
 
 		if(type.isNether && !user.getStats().getBoolean("farming.nether.unlocked")) {
 			user.sendActionBar("&cYou need to &emax farming &cto unlock nether/end content!");
 			return;
 		}
 
+        int blockLevelRequirement = Main.getGlobalLevelRequirement("farming." + type.label);
         if(
             // We check if the broken block has a level requirement:
             blockLevelRequirement != 0
@@ -96,37 +102,44 @@ public class FarmingListener implements Listener {
             return;
         }
 		
-		if(user.getLevel(SkillType.FARMING, false) < type.levelRequirement) {
+		if(user.getLevel(SkillType.FARMING, type.isNether) < type.levelRequirement) {
             // show progress, if the block is unlockable in the next level (In other words: block level = user level + 1)
             // if not tell them the level requirement:
 			if(type == CropType.CHORUS_FLOWER || type == CropType.NETHER_WART) return; // no progress checks for chorus fruits, no farming goal found.
             boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.FARMING, type.isNether);
+			CropType previousType = CropType.values()[type.ordinal() - 1];
             if(progress) {
                 user.sendActionBar(
                     String.format(
                         "&cYou need to farm &e%s &cmore &e%s&c to collect this!", 
-                        (int)(type.levelUp - user.getExperience(SkillType.FARMING, type.isNether)),
-                        CropType.values()[type.ordinal() - 1].formatName()
+                        (int)(previousType.levelUp - user.getExperience(SkillType.FARMING, type.isNether)),
+                        previousType.formatName()
                     )
                 );
                 return;
             }
 
-            user.sendActionBar("&cYou need to be level &e" + type.levelRequirement + " &cto farm this!");
+            user.sendActionBar("&cYou need to have &efarming level " + type.levelRequirement + " &cto farm this!");
             return;
         }
         
         event.setDropItems(true);
 		
-        user.sendActionBar(
-            String.format(
-                "&eGlobal: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster) " : "") + "&8| &eFarming &2+&a%sxp &8(&b%s&8)",
-                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward)),
-                Main.DECIMAL_FORMAT.format(user.addExperience(SkillType.FARMING, 1.0, type.isNether)),
-                type.formatName()
-            )
-        );
+        double xpReward = 0.0;
+	
+        if(type.levelRequirement == user.getLevel(SkillType.FARMING, type.isNether)
+            || (type.levelRequirement == 0 && user.getLevel(SkillType.FARMING, type.isNether) == 1)) {
+            xpReward = user.addExperience(SkillType.FARMING, 1.0, type.isNether);
+        }
 
+        user.sendActionBar(
+            new StringBuilder(String.format(
+                "&eIsland: &2+&a%sxp " + (user.getBoosterMultiplier() > 1.0 ? "(x" + (int)user.getBoosterMultiplier() + " booster)" : ""),
+                Main.DECIMAL_FORMAT.format(user.addGlobalExperience(type.xpReward))
+            )).append(
+                (xpReward <= 0.0 ? "" : String.format(" &8| &eFarming: &2+&a%sxp &8(&b%s&8)", Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))
+            ).toString()
+        );
         
     }
 
@@ -134,8 +147,15 @@ public class FarmingListener implements Listener {
     public void blockPlaceEvent(BlockPlaceEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
         Block block = event.getBlock();
+
+        List<Material> flaggableBlocks = List.of(Material.SUGAR_CANE, Material.PUMPKIN, Material.MELON);
 		
-        if(block.getType() != Material.BEEHIVE) return;
+        if(block.getType() != Material.BEEHIVE) {
+            if(flaggableBlocks.contains(block.getType()))
+                block.setMetadata("pp", new FixedMetadataValue(Main.getInstance(), "f"));
+            return;
+        }
+
         if(user.getIsland() == null) return;
 		
 		event.setCancelled(true);
@@ -154,7 +174,7 @@ public class FarmingListener implements Listener {
 
         event.setCancelled(false);
 
-        long nextRefill = ((Beehive)block.getBlockData()).getHoneyLevel() != 5 ? System.currentTimeMillis() + 86400000 : 0;
+        long nextRefill = ((Beehive)block.getBlockData()).getHoneyLevel() != 5 ? System.currentTimeMillis() + 86400000 : 0; // +24 hrs (in milliseconds)
 
         islandMetaData.put("hasBeeHive", new MetaDataValue(true));
 
@@ -197,14 +217,14 @@ public class FarmingListener implements Listener {
 					above.getLocation().getWorld().playSound(above.getLocation(), Sound.BLOCK_CROP_BREAK, 1, 1);
 					
 					// user.sendMessage(above.getDrops().size() + above.getDrops().toString()); DEBUG
-					Material lastItem = null; // to prevent duplicates no touchies
-                    for(ItemStack itemStack : above.getDrops()) {
-						if(lastItem != itemStack.getType() && allowedDrops.contains(itemStack.getType())) {
-							itemStack.setAmount(1);
-							above.getLocation().getWorld().dropItem(above.getLocation().add(0, 1, 0), itemStack);
-							lastItem = itemStack.getType();
-						}
-                    }
+					// Material lastItem = null; // to prevent duplicates no touchies
+                    // for(ItemStack itemStack : above.getDrops()) {
+					// 	if(lastItem != itemStack.getType() && allowedDrops.contains(itemStack.getType())) {
+					// 		itemStack.setAmount(1);
+					// 		above.getLocation().getWorld().dropItem(above.getLocation().add(0, 1, 0), itemStack);
+					// 		lastItem = itemStack.getType();
+					// 	}
+                    // }
 					above.setType(Material.AIR);
 					block.setType(Material.DIRT);
 					user.getPlayer().teleport(user.getLocation().add(0, 0.00251, 0)); // to prevent user from phasing through block
@@ -235,7 +255,7 @@ public class FarmingListener implements Listener {
         
         // user.sendMessage("currentTimeMillis: " + System.currentTimeMillis());
         
-        long nextRefill = System.currentTimeMillis() + 24L * 3600000L; // (Unix-Timestamp + (24 * 1hr) <- simplification
+        long nextRefill = System.currentTimeMillis() + 24L * 3600000L; // Current time (in milliseconds) + (24 * 1hr (in milliseconds)) <- simplification
 
         user.getStats().setNumber("farming.beehive.next_refill", nextRefill);
         user.getStats().setBoolean("farming.beehive.booster_active", true);

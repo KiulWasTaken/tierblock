@@ -22,6 +22,7 @@ import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.api.metadata.MetaDataValue;
 import world.bentobox.bentobox.database.objects.Island;
 import world.bentobox.bentobox.managers.IslandsManager;
+import world.bentobox.bentobox.managers.RanksManager;
 
 public class TestCommand implements CommandExecutor {
 
@@ -40,6 +41,31 @@ public class TestCommand implements CommandExecutor {
         if(args.length < 1) {
             user.sendMessage("&cInsufficient arguments");
             return false;
+        }
+
+        if("setmeupchief".equalsIgnoreCase(args[0])) {
+            user.setSeaCreatureChance(0.50);
+            user.sendMessage("&esc_chance &ais now &350%");
+        }
+
+        if("aboutme".equalsIgnoreCase(args[0])) {
+            user.sendMessage("&eGay: " + (user.getPlayer().getName().equals("themightyfrogge") ? "&cNo" : "&aYes"));
+            
+            user.sendMessage("has_island: " + user.hasIsland());
+            user.sendMessage("&8- &eIs Island Owner: &f" + (user.hasIsland() ? (user.getIslandRank() == RanksManager.OWNER_RANK) : "&chas_island is false"));
+
+            user.sendMessage("booster: " + (user.getBooster() > System.currentTimeMillis()));
+            user.sendMessage("booster_multiplier: " + user.getBoosterMultiplier());
+            user.sendMessage("sc_chance: " + user.getSeaCreatureChance());
+            user.sendMessage("flight: " + user.isAllowedToFly());
+        }
+
+        if("scc".equalsIgnoreCase(args[0])) {
+            if(!user.hasIsland()) return false;
+            user.getIslandMembers().forEach(member -> {
+                user.sendMessage(member.getName() + " (sc_chance): " + member.getSeaCreatureChance() * 100 + "%");
+            });
+            return true;
         }
 
         if("metadata".equalsIgnoreCase(args[0])) {

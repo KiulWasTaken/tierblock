@@ -92,6 +92,8 @@ public enum MineableType implements SkillCollectible {
 
             case SOUL_SAND:
             case SOUL_SOIL: return groupWithSetMaterial(material, SOUL_GROUP);
+			
+			case ANCIENT_DEBRIS: return ANCIENT_DEBRIS;
             default: return null;
         }
     }

@@ -103,7 +103,7 @@ public class User {
 			userIsland = island; // breaks if user is somehow a member in more than one island...
 		}
 		
-        //userIsland = islandsManager.getIsland(Main.getBSkyBlockWorld(), getUUID());
+        //userIsland = islandsManager.getIsland(Main.getBSkyBlockWorld(), getUUID()); wtf why did i do that
         
         return userIsland;
     }
@@ -116,9 +116,8 @@ public class User {
 
         getIsland().getMembers().forEach((uuid, rank) -> {
             if(rank >= RanksManager.MEMBER_RANK && rank <= RanksManager.OWNER_RANK) {
-                userList.add(
-                    UserManager.getInstance().getUser(uuid)
-                );
+                User user = UserManager.getInstance().getUser(uuid);
+                if(user != null) userList.add(user);
             }
         });
 
@@ -190,16 +189,17 @@ public class User {
     }
 
     public void activateBooster() {
-		getIsland().getMembers().forEach((uuid, rank) -> {
+		long[] durations = {30L, 60L, 120L};
+        int randomIndex = new Random().nextInt(durations.length);
+		long selectedDuration = durations[randomIndex];
+        getIsland().getMembers().forEach((uuid, rank) -> {
 			if (rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK) return;
 
 			User user = UserManager.getInstance().getUser(uuid);
 			if (user == null) return;
-
-			int[] durations = {30, 60, 120};
-			int randomIndex = new Random().nextInt(durations.length);
-			int selectedDuration = durations[randomIndex];
-			long boosterEnd = System.currentTimeMillis() + 60000 * selectedDuration;
+			
+			// add booster time instead of resetting value, if user is already booster.
+			long boosterEnd = ((user.getBooster() == 0) ? System.currentTimeMillis() : user.getBooster()) + 60000L * selectedDuration;
 
 			user.setBooster(boosterEnd);
 			user.setBoosterMultiplier(Main.BOOSTER_MULTIPLIER);
@@ -298,6 +298,10 @@ public class User {
     public void setBoosterMultiplier(double multiplier) {
         getStats().setNumber("booster_multiplier", multiplier);
     }
+	
+	public void addBoosterMultiplier(double rightHandSide) {
+		getStats().addDouble("booster_multiplier", rightHandSide);
+	}
 
 	public String formatBoosterTime() {
 		long timeLeftHrs = (getBooster() - System.currentTimeMillis()) / 3600000;
@@ -342,35 +346,40 @@ public class User {
     }
 
     public int getLevel(SkillType skillType, boolean nether) {
-        String extra = nether ? ".nether." : "";
+        String extra = nether ? ".nether" : "";
         return getStats().getInt(skillType.toString().toLowerCase() + extra + ".level");
     }
     
     public double getExperience(SkillType skillType, boolean nether) {
-        String extra = nether ? ".nether." : "";
+        String extra = nether ? ".nether" : "";
         return getStats().getDouble(skillType.toString().toLowerCase() + extra + ".xp");
     }
 
-
     public void setLevel(SkillType skillType, int levels, boolean nether) {
-        String extra = nether ? ".nether." : "";
+        String extra = nether ? ".nether" : "";
         getStats().setNumber(skillType.toString().toLowerCase() + extra + ".level", levels);
     }
     
     public void setExperience(SkillType skillType, double experience, boolean nether) {
-        String extra = nether ? ".nether." : "";
+        String extra = nether ? ".nether" : "";
         getStats().setNumber(skillType.toString().toLowerCase() + extra + ".xp", experience);
     }
 
     public void addLevels(SkillType skillType, int levels, boolean nether) {
-        String extra = nether ? ".nether." : "";
+        int maxLevel = nether ? skillType.maxNetherLevel : skillType.maxLevel;
+        if(getLevel(skillType, nether) >= maxLevel) return;
+
+        String extra = nether ? ".nether" : "";
         getStats().addInt(skillType.toString().toLowerCase() + extra + ".level", levels);
     }
     
     public double addExperience(SkillType skillType, double experience, boolean nether) {
-        String extra = nether ? ".nether." : "";
+        int maxLevel = nether ? skillType.maxNetherLevel : skillType.maxLevel;
+        if(getLevel(skillType, nether) == maxLevel) return 0;
+
+        String extra = nether ? ".nether" : "";
         
-        getStats().addDouble(skillType.toString().toLowerCase() + extra + ".xp", experience * getBoosterMultiplier());
+        getStats().addDouble(skillType.toString().toLowerCase() + extra + ".xp", experience);
 		SkillManager.getSkill(skillType).checkForLevelUp(this, nether);
 		setLastSkill(skillType);
 		
@@ -462,16 +471,19 @@ public class User {
     public void globalLevelUp(double excessXp) {
         addGlobalLevel(1);
 		setGlobalExperience(excessXp);
-        adjustSeaCreatureChance();
-        this.player.playSound(getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
-        sendMessage(
-            String.format(
-                "&a&lGLOBAL &2&lLEVEL-UP&2&l!\n" +
-                "&a%s &8-> &a%s&2!",
-                getGlobalLevel() - 1,
-                getGlobalLevel()
-            )
-        );
+
+        getIslandMembers().forEach(user -> {
+            user.adjustSeaCreatureChance();
+            user.getPlayer().playSound(getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+            user.sendMessage(
+                String.format(
+                    "&a&lGLOBAL &2&lLEVEL-UP&2&l!\n" +
+                    "&a%s &8-> &a%s&2!",
+                    getGlobalLevel() - 1,
+                    getGlobalLevel()
+                )
+            );
+        });
     }
 
     /**

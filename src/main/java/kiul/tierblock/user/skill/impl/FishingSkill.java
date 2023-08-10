@@ -1,6 +1,7 @@
 package kiul.tierblock.user.skill.impl;
 
 import java.util.Map;
+import java.lang.Math;
 import org.bukkit.Sound;
 
 import kiul.tierblock.user.User;
@@ -40,7 +41,7 @@ public class FishingSkill extends Skill {
     }
 
     public static double getRequirement(User user) {
-        return FISHING_LEVEL_REQUIREMENTS.get(user.getLevel(SkillType.FISHING, false)+1);
+        return FISHING_LEVEL_REQUIREMENTS.get(Math.min(6, user.getLevel(SkillType.FISHING, false)+1));
     }
     
 }
