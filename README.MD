@@ -13,11 +13,13 @@
 # Latest changes:
 
 - ## Latest commit:
+  - Added LuckPerms to the dependency list
+  - Added some scuffed integration for the cobblegen addon
+
+- ## Recent:
   - ``IslandCreationListener`` renamed to ``IslandListener``.
   - Booster time left (or whether you have a booster or not) is added to the stats menu.
-  - User stats menu doesn't show a maxed skill's progress bar, instead just says "MAXED".
-
-- ## Recent:    
+  - User stats menu doesn't show a maxed skill's progress bar, instead just says "MAXED".    
   - Sorta despaghettified ``UserStatsMenu``.
   - Added nether/end sub-skill stats to ``UserStatsMenu`` (Only for the skills that have it).
   - Minor combat changes:
