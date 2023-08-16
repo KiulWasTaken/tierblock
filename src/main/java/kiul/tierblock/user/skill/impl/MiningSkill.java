@@ -22,13 +22,15 @@ public class MiningSkill extends Skill {
     public void levelUp(User user, double excessXp, boolean isNether) {
         user.addLevels(SkillType.MINING, 1, isNether);
         user.setExperience(SkillType.MINING, excessXp, isNether);
+	    
         LuckPerms api = LuckPermsProvider.get();
         net.luckperms.api.model.user.User lpUser = api.getPlayerAdapter(Player.class).getUser(user.getPlayer());
-        String permission = "cobblegen." + user.getLevel(SkillType.MINING,false);
+	
+        String permission = "cobblegen." + (isNether ? "nether." : "" ) + user.getLevel(SkillType.MINING, isNether);
         Node permissionNode = Node.builder(permission).build();
+	    
         lpUser.data().add(permissionNode);
         api.getUserManager().saveUser(lpUser);
-
 
         if(user.getLevel(getSkillType(), false) >= getMaxLevel(false) && !isNether)
             user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
