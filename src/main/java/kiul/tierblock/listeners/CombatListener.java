@@ -192,12 +192,12 @@ public class CombatListener implements Listener {
         if (player.hasPotionEffect(PotionEffectType.BAD_OMEN)){
            int currentAmplifier = player.getPotionEffect(PotionEffectType.BAD_OMEN).getAmplifier();
            if (currentAmplifier < 4){
-              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 2400000, currentAmplifier + 1, false, false));
+              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, -1, currentAmplifier + 1, false, false));
            } else {
-              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 2400000, 4, false, false));
+              player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, -1, 4, false, false));
            }
         } else {
-           player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, 2400000, 0, false, false));
+           player.addPotionEffect(new PotionEffect(PotionEffectType.BAD_OMEN, -1, 0, false, false));
         }
     }
 
