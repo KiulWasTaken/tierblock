@@ -27,10 +27,10 @@ public class FarmingSkill extends Skill {
         ItemStack itemStack = new ItemStack(CropType.toSeed(CropType.values()[user.getLevel(getSkillType(), isNether) + addition - 1]));
         user.getPlayer().getInventory().addItem(itemStack);
         
-        if(user.getLevel(getSkillType(), isNether) >= MAX_LEVEL)
+        if(user.getLevel(getSkillType(), false) >= MAX_LEVEL)
             user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
 
-		user.getPlayer().playSound(user.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+	user.getPlayer().playSound(user.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
         user.sendMessage(getLevelUpMessage(user, isNether));
     }
 
@@ -38,7 +38,7 @@ public class FarmingSkill extends Skill {
     public boolean checkForLevelUp(User user, boolean isNether) {
         if(user.getLevel(SkillType.FARMING, isNether) >= MAX_LEVEL) return false;
 
-        int indexInEnum =Math.min(user.getLevel(SkillType.FARMING, isNether) - 1 + (isNether ? 7 : 0), 8);
+        int indexInEnum = Math.min(user.getLevel(SkillType.FARMING, isNether) - 1 + (isNether ? 7 : 0), 8);
         CropType lastType = CropType.values()[indexInEnum];
         if(user.getExperience(SkillType.FARMING, isNether) < lastType.levelUp) return false;
 
