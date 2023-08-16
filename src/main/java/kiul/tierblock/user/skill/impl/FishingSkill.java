@@ -21,22 +21,22 @@ public class FishingSkill extends Skill {
 
     @Override
     public void levelUp(User user, double excessXp, boolean isNether) {
-        user.addLevels(getSkillType(), 1, isNether);
-        user.setExperience(getSkillType(), excessXp, isNether);
+        user.addLevels(getSkillType(), 1, false);
+        user.setExperience(getSkillType(), excessXp, false);
         
 		user.getPlayer().playSound(user.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
-        user.sendMessage(getLevelUpMessage(user, isNether));
+        user.sendMessage(getLevelUpMessage(user, false));
     }
 
     @Override
     public boolean checkForLevelUp(User user, boolean isNether) {
-        if(user.getLevel(getSkillType(), isNether) >= MAX_LEVEL) return false;
+        if(user.getLevel(getSkillType(), false) >= MAX_LEVEL) return false;
 
-        double requirement = FISHING_LEVEL_REQUIREMENTS.get(user.getLevel(getSkillType(), isNether)+1);
-        if(user.getExperience(getSkillType(), isNether) < requirement) return false;
+        double requirement = FISHING_LEVEL_REQUIREMENTS.get(user.getLevel(getSkillType(), false)+1);
+        if(user.getExperience(getSkillType(), false) < requirement) return false;
 
-        double excess = user.getExperience(getSkillType(), isNether) - requirement;
-        levelUp(user, excess, isNether);
+        double excess = user.getExperience(getSkillType(), false) - requirement;
+        levelUp(user, excess, false);
         return true;
     }
 
