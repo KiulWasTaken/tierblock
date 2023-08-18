@@ -38,9 +38,9 @@ public class TestCommand implements CommandExecutor {
             return false;
         }
 
-	if("aboutme".equalsIgnoreCase(args[0])) {
+        if("aboutme".equalsIgnoreCase(args[0])) {
             user.sendMessage("&eGay: " + (user.getPlayer().getName().equals("themightyfrogge") ? "&cNo" : "&aYes"));
-            
+                
             user.sendMessage("has_island: " + user.hasIsland());
             user.sendMessage("&8- &eIs Island Owner: &f" + (user.hasIsland() ? (user.getIslandRank() == RanksManager.OWNER_RANK) : "&chas_island is false"));
 
@@ -50,7 +50,7 @@ public class TestCommand implements CommandExecutor {
             user.sendMessage("flight: " + user.isAllowedToFly());
         }
 	
-	if(!user.isOp()) {
+        if(!user.isOp()) {
             user.sendMessage("&cInsufficient permissions");
             return false;
         }
@@ -83,13 +83,13 @@ public class TestCommand implements CommandExecutor {
 
             List<String> list = List.copyOf(island.getMetaData().get().keySet());
 
-			for(int i = 0; i < list.size(); i++) {
-				if(i == list.size() - 1) {
-					keys.append(list.get(i) + "]");
-				} else {
-					keys.append(list.get(i) + ", ");
-				}
-			}
+            for (int i = 0; i < list.size(); i++) {
+                if (i == list.size() - 1) {
+                    keys.append(list.get(i) + "]");
+                } else {
+                    keys.append(list.get(i) + ", ");
+                }
+            }
             
             user.sendMessage(keys.toString());
             user.sendMessage(" &8- &fhasBeeHive &e-> &f" + island.getMetaData("hasBeeHive").get().asBoolean());
@@ -104,31 +104,31 @@ public class TestCommand implements CommandExecutor {
                 user.sendMessage("&e" + args[1] + " &cdoesn't exist in island's metadata");
                 return false;
             }
-			
-			double val = Double.parseDouble(args[2]);
-			
+
+            double val = Double.parseDouble(args[2]);
+
             user.getIsland().putMetaData(args[1], new MetaDataValue(val));
             user.sendMessage("&aValue set to: &e" + user.getIsland().getMetaData(args[1]).get().asDouble() * 100 + "%");
             return true;
         }
 
-		if("setbool".equalsIgnoreCase(args[0])) {
-			Map<String, MetaDataValue> metaData = user.getIsland().getMetaData().get();
+        if("setbool".equalsIgnoreCase(args[0])) {
+            Map<String, MetaDataValue> metaData = user.getIsland().getMetaData().get();
             if(!metaData.keySet().contains(args[1])) {
                 user.sendMessage("&e" + args[1] + " &cdoesn't exist in island's metadata");
                 return false;
             }
-			
-			boolean val = Boolean.parseBoolean(args[2]);
-			
-			user.getIsland().putMetaData(args[1], new MetaDataValue(val));
-			user.sendMessage("&aValue set to: &e" + user.getIsland().getMetaData(args[1]).get().asBoolean());
-		}
 
-		if("copydefaults".equalsIgnoreCase(args[0])) {
-			user.getStats().copyDefaults();
-			user.setHasIsland(true);
-		}
+            boolean val = Boolean.parseBoolean(args[2]);
+
+            user.getIsland().putMetaData(args[1], new MetaDataValue(val));
+            user.sendMessage("&aValue set to: &e" + user.getIsland().getMetaData(args[1]).get().asBoolean());
+        }
+
+        if("copydefaults".equalsIgnoreCase(args[0])) {
+            user.getStats().copyDefaults();
+            user.setHasIsland(true);
+        }
 
         if("readyuphive".equalsIgnoreCase(args[0])) {
             if(user.getBeehive() == null) {
@@ -147,17 +147,17 @@ public class TestCommand implements CommandExecutor {
             user.sendMessage("Beehive ready!");
             return true;
         }
-		
-		if("booster".equalsIgnoreCase(args[0])) {
-			user.sendMessage("BOOSTER TIME LEFT: " + user.formatBoosterTime());
-			return true;
-		}
-		
-		if("islandlevel".equalsIgnoreCase(args[0])) {
-			int level = Integer.parseInt(args[1]);
-			user.getIsland().putMetaData("level", new MetaDataValue(level));
-			user.sendMessage(user.getIsland().getMetaData("level").get().asInt() + "");
-		}
+
+        if("booster".equalsIgnoreCase(args[0])) {
+            user.sendMessage("BOOSTER TIME LEFT: " + user.formatBoosterTime());
+            return true;
+        }
+
+        if ("islandlevel".equalsIgnoreCase(args[0])) {
+            int level = Integer.parseInt(args[1]);
+            user.getIsland().putMetaData("level", new MetaDataValue(level));
+            user.sendMessage(user.getIsland().getMetaData("level").get().asInt() + "");
+        }
 
         if("debug_scoreboard".equalsIgnoreCase(args[0])) {
             if(user.getDebugBoard() != null) {
@@ -183,7 +183,7 @@ public class TestCommand implements CommandExecutor {
                 " &8- &aExperience&8: &f" + (Main.DECIMAL_FORMAT.format(user.getLastSkill() == null ? 0.0 : user.getExperience(user.getLastSkill(), false)))
             );
 
-			List<String> formattedLines = new ArrayList<>();
+            List<String> formattedLines = new ArrayList<>();
 
             for(int i = 0; i < lines.size(); i++) {
                 formattedLines.add(ChatColor.translateAlternateColorCodes('&', lines.get(i)));
@@ -191,7 +191,7 @@ public class TestCommand implements CommandExecutor {
 
             fastBoard.updateTitle(ChatColor.translateAlternateColorCodes('&', "&e&lDEBUG"));
             fastBoard.updateLines(formattedLines);
-			user.setDebugBoard(fastBoard);
+            user.setDebugBoard(fastBoard);
             user.sendMessage("&aTurned on debug board");
             return true;
         }

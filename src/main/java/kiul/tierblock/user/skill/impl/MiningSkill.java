@@ -3,7 +3,6 @@ package kiul.tierblock.user.skill.impl;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
-import net.luckperms.api.node.NodeBuilder;
 import org.bukkit.Sound;
 
 import kiul.tierblock.user.User;
@@ -23,6 +22,7 @@ public class MiningSkill extends Skill {
         user.addLevels(SkillType.MINING, 1, isNether);
         user.setExperience(SkillType.MINING, excessXp, isNether);
 	    
+        // What you should've done is use the provider value you made in Main...
         LuckPerms api = LuckPermsProvider.get();
         net.luckperms.api.model.user.User lpUser = api.getPlayerAdapter(Player.class).getUser(user.getPlayer());
 	
