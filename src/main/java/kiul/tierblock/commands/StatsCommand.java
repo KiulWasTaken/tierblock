@@ -16,13 +16,19 @@ public class StatsCommand implements CommandExecutor {
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if(sender instanceof ConsoleCommandSender) {
             sender.sendMessage("No console-sender implementation for this command was made!");
-            return true;
+            return false;
         }
 
         User user = UserManager.getInstance().getUser((Player)sender);
 
+        // prevent UserStatsMenu doo doo when player has no island.
+        if(!user.hasIsland()) {
+            user.sendMessage("&cYou're not a(n) member/owner of an island!");
+            return false;         
+        }
+
         new UserStatsMenu(user);
-        return false;
+        return true;
     }
     
 }

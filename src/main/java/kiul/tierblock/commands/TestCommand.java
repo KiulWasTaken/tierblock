@@ -32,23 +32,13 @@ public class TestCommand implements CommandExecutor {
         if(sender instanceof ConsoleCommandSender) return false;
         
         User user = UserManager.getInstance().getUser((Player)sender);
-        
-        if(!user.isOp()) {
-            user.sendMessage("&cInsufficient permissions");
-            return false;
-        }
 
         if(args.length < 1) {
             user.sendMessage("&cInsufficient arguments");
             return false;
         }
 
-        if("setmeupchief".equalsIgnoreCase(args[0])) {
-            user.setSeaCreatureChance(0.50);
-            user.sendMessage("&esc_chance &ais now &350%");
-        }
-
-        if("aboutme".equalsIgnoreCase(args[0])) {
+	if("aboutme".equalsIgnoreCase(args[0])) {
             user.sendMessage("&eGay: " + (user.getPlayer().getName().equals("themightyfrogge") ? "&cNo" : "&aYes"));
             
             user.sendMessage("has_island: " + user.hasIsland());
@@ -58,6 +48,16 @@ public class TestCommand implements CommandExecutor {
             user.sendMessage("booster_multiplier: " + user.getBoosterMultiplier());
             user.sendMessage("sc_chance: " + user.getSeaCreatureChance());
             user.sendMessage("flight: " + user.isAllowedToFly());
+        }
+	
+	if(!user.isOp()) {
+            user.sendMessage("&cInsufficient permissions");
+            return false;
+        }
+
+        if("setmeupchief".equalsIgnoreCase(args[0])) {
+            user.setSeaCreatureChance(0.50);
+            user.sendMessage("&esc_chance &ais now &350%");
         }
 
         if("scc".equalsIgnoreCase(args[0])) {

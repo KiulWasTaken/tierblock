@@ -26,8 +26,8 @@ public class ForagingSkill extends Skill {
         user.getPlayer().getInventory().addItem(itemStack);
 
         // user is max-level, now able to mine beyond max-level blocks.
-        if(user.getLevel(getSkillType(), isNether) >= MAX_LEVEL) {
-            user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
+        if(user.getLevel(getSkillType(), false) >= MAX_LEVEL) {
+        	user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
             user.setFlight(true);
             user.getPlayer().setAllowFlight(true);
 			user.sendMessage("&aYou've unlocked the flight ability! (Only works while in island)");
