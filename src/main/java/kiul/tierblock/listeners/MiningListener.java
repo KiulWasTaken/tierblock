@@ -24,15 +24,14 @@ public class MiningListener implements Listener {
     @EventHandler
     public void blockBreak(BlockBreakEvent event) {
         MineableType type = MineableType.fromMaterial(event.getBlock().getType());
-
+        
         if (type == null)
             return;
-        
+
         if (event.getBlock().hasMetadata("pp"))
             return; // pp as in player-placed, no other meaning.... trust me
 
         User user = UserManager.getInstance().getUser(event.getPlayer());
-
         event.setDropItems(false);
 
         if (user.getPlayer().getGameMode() != GameMode.SURVIVAL)
@@ -95,8 +94,7 @@ public class MiningListener implements Listener {
     @EventHandler
     public void blockPlace(BlockPlaceEvent event) {
         MineableType type = MineableType.fromMaterial(event.getBlock().getType());
-
-        if (type == null)
+        if (type == null) 
             return;
             
         // block flagged, at least, until a restart is issued. (metadata not persistent)
