@@ -21,6 +21,16 @@ public class Commands implements CommandExecutor {
 
         User user = UserManager.getInstance().getUser((Player)sender);
 
+        switch(label.toLowerCase()) {
+            case "islandflight":
+                if(user.getLevel(SkillType.FORAGING, false) == SkillType.FORAGING.maxLevel) {
+                    user.sendMessage("&cYou need &eforaging level 6 &cto unlock flight!");
+                    return false;
+                }
+                user.setFlight(!user.isAllowedToFly());
+                user.sendMessage("&aFlight has been" + (user.isAllowedToFly() ? "&2enabled" : "&cdisabled"));
+        }
+
         if(!user.isOp()) {
             user.sendMessage("&cInsufficient permissions!");
             return false;

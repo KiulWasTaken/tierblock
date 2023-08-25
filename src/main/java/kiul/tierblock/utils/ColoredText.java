@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 // not used in my user, implement it yourself. @PatriciaChips (implement @ sendMessage(...), sendActionBar(...), sendTitle(...))
+@SuppressWarnings("deprecation")
 public class ColoredText {
 
     private static final Pattern HEX_PATTERN = Pattern.compile("&#(\\w{5}[0-9a-f])");

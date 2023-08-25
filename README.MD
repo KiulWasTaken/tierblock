@@ -13,8 +13,12 @@
 # Latest changes:
 
 - ## Latest commit:
-  - Added LuckPerms to the dependency list
-  - Added some scuffed integration for the cobblegen addon
+  - Default GEXP value for stone & cobblestone has been changed from ``1 GEXP`` to ``0.05 GEXP``.
+  - Added the new ``/test logme`` sub-command, for debugging, and admin purposes.
+  - Minor changes to User, and it now has some compatibility with Bukkit's ``OfflinePlayer``.
+  - Island flight is now toggleable, and not forced. Use command ``/islandflight``
+  - Added support for cobblegen addon.
+  - Removed LuckPerms to the dependency list
 
 - ## Recent:
   - ``IslandCreationListener`` renamed to ``IslandListener``.
