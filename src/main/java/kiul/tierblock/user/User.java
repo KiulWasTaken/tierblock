@@ -177,7 +177,7 @@ public class User {
     public boolean isWithinAnyIsland() {
         if (!getLocation().getWorld().getName().startsWith("bskyblock"))
             return false;
-        if (BentoBox.getInstance().getIslandsManager().getIslandAt(getLocation()) == null)
+        if (BentoBox.getInstance().getIslandsManager().getIslandAt(getLocation()).get() == null)
             return false;
         return true;
     }
@@ -196,13 +196,22 @@ public class User {
     }
 
     /**
+     * @return The {@link Island} at the user's current position, provided that <code>isWithinIsland()</code>
+     *         returns true.
+     */
+    public Island getIslandAtPosition() {
+        if(!isWithinAnyIsland()) return null;
+        return BentoBox.getInstance().getIslandsManager().getIslandAt(getLocation()).get();
+    }
+
+    /**
      * @return The beehive block. (Returns null if not island owner!)
      */
     public Block getBeehive() {
         if (!hasIsland())
             return null;
         if (getIslandRank() != RanksManager.OWNER_RANK)
-            return null; // only owners
+            return null; // only ownersa
         if (!getStats().getBoolean("farming.beehive.placed"))
             return null;
 

@@ -14,6 +14,8 @@ import kiul.tierblock.user.skill.SkillManager;
 import kiul.tierblock.user.skill.SkillType;
 import kiul.tierblock.user.skill.impl.ForagingSkill;
 import kiul.tierblock.utils.enums.WoodType;
+import world.bentobox.bentobox.database.objects.Island;
+import world.bentobox.bentobox.managers.RanksManager;
 
 public class ForagingListener implements Listener {
 
@@ -29,6 +31,10 @@ public class ForagingListener implements Listener {
         
         if(!user.hasIsland()) return;
 		if(type == null) return; // not wood, stopping here.
+        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+            user.sendMessage("&cYou must be an island member to break this!");
+            return;
+        }
         if(event.getBlock().hasMetadata("pp")) return; // player placed
 		
         if(type.isNether && !user.getStats().getBoolean("foraging.nether.unlocked")) {
@@ -85,6 +91,17 @@ public class ForagingListener implements Listener {
 		WoodType type = WoodType.fromMaterial(event.getBlock().getType());
 		
 		if(type == null) return; // not wood :(.
+
+        User user = UserManager.getInstance().getUser(event.getPlayer());
+
+        if(user.isWithinAnyIsland()) {
+            Island island = user.getIslandAtPosition();
+            if(island.getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+                user.sendMessage("&cYou must be an island member to place this!");
+                return;
+            }
+        }
+
 		// if wood, do:
 		// i hate this; it's not persistent, but I assume the server is gonna barely restart, and not a lot of people would really care/notice. it feels wrong, ok?
 		event.getBlock().setMetadata("pp", new FixedMetadataValue(Main.getInstance(), "f"));
