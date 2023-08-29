@@ -33,6 +33,7 @@ import world.bentobox.bentobox.database.objects.Island;
 import world.bentobox.bentobox.managers.IslandsManager;
 import world.bentobox.bentobox.managers.RanksManager;
 
+@SuppressWarnings("deprecation")
 public class CombatListener implements Listener {
 
     // note: my balls were itchy when i wrote this.
@@ -83,6 +84,7 @@ public class CombatListener implements Listener {
 			island.getMembers().forEach((uuid, rank) -> {
 				if(rank >= RanksManager.MEMBER_RANK || rank <= RanksManager.OWNER_RANK) {
 					User user = UserManager.getInstance().getUser(uuid);
+					if(user == null) return;
 					if(user.isWithinOwnIsland()) {
 						user.getPlayer().playSound(user.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1);
 						user.sendMessage(message);
@@ -91,7 +93,7 @@ public class CombatListener implements Listener {
 			});
 			
 			
-			island.putMetaData("pillagerSpawnChance", new MetaDataValue(0.02));
+			island.putMetaData("pillagerSpawnChance", new MetaDataValue((double)0.02));
         }
 
 		event.setCancelled(false);

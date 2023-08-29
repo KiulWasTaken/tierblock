@@ -4,6 +4,10 @@ main: kiul.tierblock.Main
 depend: [BentoBox]
 api-version: 1.19
 commands:
+  islandflight:
+    aliases:
+      - fly
+      - flight
   givexp:
     description: gives global XP to the user that runs the command.
   modifyint:

@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 
 import org.bukkit.ChatColor;
 import org.bukkit.Location;
+import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
@@ -31,93 +32,127 @@ import world.bentobox.bentobox.managers.IslandsManager;
 import world.bentobox.bentobox.managers.RanksManager;
 
 @Getter
+@SuppressWarnings("deprecation")
 public class User {
 
     /*
-     * Do NOT use any of the check-for-levelup methods inside of set level / xp methods.
+     * Do NOT use any of the check-for-levelup methods inside of set level / xp
+     * methods.
      * If used, it'll call itself recursively, and consequently cause a shitstorm.
      */
-    
-    private Player player; 
+
+    private Player player;
+    private OfflinePlayer offlinePlayer;
     private Stats stats;
-    @Setter private FastBoard debugBoard;
+    @Setter
+    private FastBoard debugBoard;
     private SkillType lastSkill;
 
     public User(Player player) {
+        if (player == null)
+            return;
         this.player = player;
+        this.stats = new Stats(this);
+    }
+
+    /**
+     * Creates an empty user with just the user stats, if found.
+     * Sorta the equivalent of OfflinePlayer
+     * 
+     * @param stats
+     */
+    public User(OfflinePlayer offlinePlayer) {
+        this.offlinePlayer = offlinePlayer;
         this.stats = new Stats(this);
     }
 
     public void setLastSkill(SkillType skillType) {
         lastSkill = skillType;
-        if(getDebugBoard() == null) return;
-        
-		getDebugBoard().updateLine(1, ChatColor.translateAlternateColorCodes('&', " &8- &aLVL&8, &aXP&8: &8(&a" + getGlobalLevel() + "&f, &a" + Main.DECIMAL_FORMAT.format(getGlobalExperience()) + "&8)"));
+        if (getDebugBoard() == null)
+            return;
+
+        getDebugBoard().updateLine(1, ChatColor.translateAlternateColorCodes('&', " &8- &aLVL&8, &aXP&8: &8(&a"
+                + getGlobalLevel() + "&f, &a" + Main.DECIMAL_FORMAT.format(getGlobalExperience()) + "&8)"));
         getDebugBoard().updateLine(9, ChatColor.translateAlternateColorCodes('&', "&2" + skillType + "&8:"));
-		getDebugBoard().updateLine(10, ChatColor.translateAlternateColorCodes('&', " &8- &aLevel&8: &f" + getLevel(skillType, false)));
-		getDebugBoard().updateLine(11, ChatColor.translateAlternateColorCodes('&', " &8- &aExperience&8: &f" + Main.DECIMAL_FORMAT.format(getExperience(skillType, false))));
+        getDebugBoard().updateLine(10,
+                ChatColor.translateAlternateColorCodes('&', " &8- &aLevel&8: &f" + getLevel(skillType, false)));
+        getDebugBoard().updateLine(11, ChatColor.translateAlternateColorCodes('&',
+                " &8- &aExperience&8: &f" + Main.DECIMAL_FORMAT.format(getExperience(skillType, false))));
     }
 
     public void sendMessage(String message) {
+        if (this.offlinePlayer != null)
+            return;
         this.player.sendMessage(ChatColor.translateAlternateColorCodes('&', message));
     }
 
     public void sendActionBar(String message) {
+        if (this.offlinePlayer != null)
+            return;
         this.player.spigot().sendMessage(ChatMessageType.ACTION_BAR, new TextComponent(
-            ChatColor.translateAlternateColorCodes('&', message)
-        ));
+                ChatColor.translateAlternateColorCodes('&', message)));
     }
 
     /**
      * Sends a title message to the user.
-     * @param title Title of the message.
-     * @param subtitle Subtitle.
-     * @param stayInSeconds The amount of time the message will stay on the screen for.
+     * 
+     * @param title         Title of the message.
+     * @param subtitle      Subtitle.
+     * @param stayInSeconds The amount of time the message will stay on the screen
+     *                      for.
      */
     public void sendTitle(String title, String subtitle, int stayInSeconds) {
-		String t = ChatColor.translateAlternateColorCodes('&', title);
-		String st = ChatColor.translateAlternateColorCodes('&', subtitle);
+        if (this.offlinePlayer != null)
+            return;
+        String t = ChatColor.translateAlternateColorCodes('&', title);
+        String st = ChatColor.translateAlternateColorCodes('&', subtitle);
         this.player.sendTitle(t, st, 20, stayInSeconds * 20, 20);
     }
 
-
     /**
-     * @return The user's island (Where user is either a member or the owner of said island)
+     * @return The user's island (Where user is either a member or the owner of said
+     *         island)
      */
     public Island getIsland() {
-        if(!hasIsland()) return null;
-		
+        if (!hasIsland())
+            return null;
+
         IslandsManager islandsManager = BentoBox.getInstance().getIslands();
         Island userIsland = null;
 
-		Predicate<Island> containsPlayer = island -> { 
-            if(!island.getMembers().containsKey(getUUID())) return false;
+        Predicate<Island> containsPlayer = island -> {
+            if (!island.getMembers().containsKey(getUUID()))
+                return false;
             int rank = island.getMembers().get(getUUID());
-            
+
             return (rank >= RanksManager.MEMBER_RANK || rank <= RanksManager.OWNER_RANK);
         };
-        
+
         List<Island> islandsContainingPlayer = islandsManager.getIslands().stream().filter(containsPlayer).toList();
 
-        for(Island island : islandsContainingPlayer) {
-			userIsland = island; // breaks if user is somehow a member in more than one island...
-		}
-		
-        //userIsland = islandsManager.getIsland(Main.getBSkyBlockWorld(), getUUID()); wtf why did i do that
-        
+        for (Island island : islandsContainingPlayer) {
+            userIsland = island; // breaks if user is somehow a member in more than one island...
+        }
+
+        // userIsland = islandsManager.getIsland(Main.getBSkyBlockWorld(), getUUID());
+        // wtf why did i do that
+
         return userIsland;
     }
 
     /**
-     * @return Island members that fit the predicate: <p><code>rank >= MEMBER_RANK && rank <= OWNER_RANK</code>
+     * @return Island members that fit the predicate:
+     *         <p>
+     *         <code>rank >= MEMBER_RANK && rank <= OWNER_RANK</code>
      */
     public List<User> getIslandMembers() {
         List<User> userList = new ArrayList<>();
 
         getIsland().getMembers().forEach((uuid, rank) -> {
-            if(rank >= RanksManager.MEMBER_RANK && rank <= RanksManager.OWNER_RANK) {
+            if (rank >= RanksManager.MEMBER_RANK && rank <= RanksManager.OWNER_RANK) {
                 User user = UserManager.getInstance().getUser(uuid);
-                if(user != null) userList.add(user);
+                if (user != null)
+                    userList.add(user);
             }
         });
 
@@ -136,11 +171,14 @@ public class User {
     }
 
     /**
-     * @return Whether the user is with-in any island (Not strictly the user's island)
+     * @return Whether the user is with-in any island (Not strictly the user's
+     *         island)
      */
     public boolean isWithinAnyIsland() {
-		if(!getLocation().getWorld().getName().startsWith("bskyblock")) return false;
-        if(BentoBox.getInstance().getIslandsManager().getIslandAt(getLocation()) == null) return false;
+        if (!getLocation().getWorld().getName().startsWith("bskyblock"))
+            return false;
+        if (BentoBox.getInstance().getIslandsManager().getIslandAt(getLocation()).get() == null)
+            return false;
         return true;
     }
 
@@ -148,25 +186,40 @@ public class User {
      * @return Whether the user is with-in own island
      */
     public boolean isWithinOwnIsland() {
-        if(!hasIsland()) return false;
-        if(!getIsland().inIslandSpace(getLocation())) return false;
-        return true;
+        if (!hasIsland())
+            return false;
+
+        if (!getIsland().inIslandSpace(getLocation()))
+            return false;
+        
+            return true;
+    }
+
+    /**
+     * @return The {@link Island} at the user's current position, provided that <code>isWithinIsland()</code>
+     *         returns true.
+     */
+    public Island getIslandAtPosition() {
+        if(!isWithinAnyIsland()) return null;
+        return BentoBox.getInstance().getIslandsManager().getIslandAt(getLocation()).get();
     }
 
     /**
      * @return The beehive block. (Returns null if not island owner!)
      */
     public Block getBeehive() {
-        if(!hasIsland()) return null;
-        if(getIslandRank() != RanksManager.OWNER_RANK) return null; // only owners
-        if(!getStats().getBoolean("farming.beehive.placed")) return null;
+        if (!hasIsland())
+            return null;
+        if (getIslandRank() != RanksManager.OWNER_RANK)
+            return null; // only ownersa
+        if (!getStats().getBoolean("farming.beehive.placed"))
+            return null;
 
         Location location = new Location(
-            Main.getBSkyBlockWorld(), 
-            getStats().getDouble("farming.beehive.x"), 
-            getStats().getDouble("farming.beehive.y"), 
-            getStats().getDouble("farming.beehive.z")
-        );
+                Main.getBSkyBlockWorld(),
+                getStats().getDouble("farming.beehive.x"),
+                getStats().getDouble("farming.beehive.y"),
+                getStats().getDouble("farming.beehive.z"));
 
         return location.getBlock();
     }
@@ -181,58 +234,67 @@ public class User {
 
     /**
      * Shouldda just named this isIslandOwner
+     * 
      * @return Whether the player can place a beehive or not
      */
     public boolean canPlaceBeeHive() {
-        if(getIsland().getRank(getUUID()) != RanksManager.OWNER_RANK) return false;
+        if (getIsland().getRank(getUUID()) != RanksManager.OWNER_RANK)
+            return false;
         return true;
     }
 
     public void activateBooster() {
-		long[] durations = {30L, 60L, 120L};
+        long[] durations = { 30L, 60L, 120L };
         int randomIndex = new Random().nextInt(durations.length);
-		long selectedDuration = durations[randomIndex];
+        long selectedDuration = durations[randomIndex];
         getIsland().getMembers().forEach((uuid, rank) -> {
-			if (rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK) return;
+            if (rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK)
+                return;
 
-			User user = UserManager.getInstance().getUser(uuid);
-			if (user == null) return;
-			
-			// add booster time instead of resetting value, if user is already booster.
-			long boosterEnd = ((user.getBooster() == 0) ? System.currentTimeMillis() : user.getBooster()) + 60000L * selectedDuration;
+            User user = UserManager.getInstance().getUser(uuid);
+            if (user == null)
+                return;
 
-			user.setBooster(boosterEnd);
-			user.setBoosterMultiplier(Main.BOOSTER_MULTIPLIER);
+            // add booster time instead of resetting value, if user is already booster.
+            long boosterEnd = ((user.getBooster() == 0) ? System.currentTimeMillis() : user.getBooster())
+                    + 60000L * selectedDuration;
 
-			UserManager.getBoostedUsers().add(user);
+            user.setBooster(boosterEnd);
+            user.setBoosterMultiplier(Main.BOOSTER_MULTIPLIER);
 
-			long timeLeftHrs = (user.getBooster() - System.currentTimeMillis()) / 3600000;
-			long timeLeftMins = (user.getBooster() - System.currentTimeMillis() - timeLeftHrs * 3600000) / 60000;
+            UserManager.getBoostedUsers().add(user);
+
+            long timeLeftHrs = (user.getBooster() - System.currentTimeMillis()) / 3600000;
+            long timeLeftMins = (user.getBooster() - System.currentTimeMillis() - timeLeftHrs * 3600000) / 60000;
 
             player.playSound(getLocation(), Sound.BLOCK_BEACON_ACTIVATE, 1, 1);
             user.sendMessage("&a&lISLAND BOOSTER ACTIVATED!");
 
-			user.sendMessage(
-					String.format("&aYou have a x%s booster for &e%s hrs&a, and &e%s mins",
-					user.getBoosterMultiplier(),
+            user.sendMessage(
+                String.format(
+                    "&aYou have a x%s booster for &e%s hrs&a, and &e%s mins",
+                    user.getBoosterMultiplier(),
                     timeLeftHrs,
                     timeLeftMins
                 )
-			);
-		});
-	}
+            );
+        });
+    }
 
     public void deActivateBooster() {
         Island island = getIsland();
 
-        if(island == null) return;
-        
+        if (island == null)
+            return;
+
         island.getMembers().forEach((uuid, rank) -> {
-            if(rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK) return;
+            if (rank < RanksManager.MEMBER_RANK || rank > RanksManager.OWNER_RANK)
+                return;
 
             User user = UserManager.getInstance().getUser(uuid);
-            
-            if(user == null || user.getBooster() <= 0L) return;
+
+            if (user == null || user.getBooster() <= 0L)
+                return;
 
             UserManager.getBoostedUsers().remove(user);
             user.setBooster(0);
@@ -243,38 +305,50 @@ public class User {
     }
 
     /**
-     * @return The user's rank with-in the island, and <i><b>not</b></i> the Island ranking on other islands.
+     * @return The user's rank with-in the island, and <i><b>not</b></i> the Island
+     *         ranking on other islands.
      */
     public int getIslandRank() {
         return getIsland().getRank(getUUID());
     }
 
     public boolean isBeehiveBoosterActive() {
-        if(!Main.activeHives.contains(getBeehive())) return false;
+        if (!Main.activeHives.contains(getBeehive()))
+            return false;
         return true;
     }
-    
+
     public boolean isOp() {
         return this.player.isOp();
     }
 
     public String getName() {
+        if (offlinePlayer != null)
+            return this.offlinePlayer.getName();
         return this.player.getName();
     }
 
     public UUID getUUID() {
+        if (offlinePlayer != null)
+            return this.offlinePlayer.getUniqueId();
         return this.player.getUniqueId();
     }
 
     public Location getLocation() {
+        if (offlinePlayer != null)
+            return null;
         return this.player.getLocation();
     }
-    
+
     public Vector getVelocity(Vector vector) {
+        if (offlinePlayer != null)
+            return null;
         return this.player.getVelocity();
     }
 
     public void setVelocity(Vector vector) {
+        if (offlinePlayer != null)
+            return;
         this.player.setVelocity(vector);
     }
 
@@ -298,20 +372,22 @@ public class User {
     public void setBoosterMultiplier(double multiplier) {
         getStats().setNumber("booster_multiplier", multiplier);
     }
-	
-	public void addBoosterMultiplier(double rightHandSide) {
-		getStats().addDouble("booster_multiplier", rightHandSide);
-	}
 
-	public String formatBoosterTime() {
-		long timeLeftHrs = (getBooster() - System.currentTimeMillis()) / 3600000;
-		long timeLeftMins = (getBooster() - System.currentTimeMillis() - timeLeftHrs * 3600000) / 60000;
-		
-		return getBooster() > 0L ? "&e" + timeLeftHrs + " &ahrs, &e" + timeLeftMins + " &amins" : "&cNo booster found!";
-	}
+    public void addBoosterMultiplier(double rightHandSide) {
+        getStats().addDouble("booster_multiplier", rightHandSide);
+    }
+
+    public String formatBoosterTime() {
+        long timeLeftHrs = (getBooster() - System.currentTimeMillis()) / 3600000;
+        long timeLeftMins = (getBooster() - System.currentTimeMillis() - timeLeftHrs * 3600000) / 60000;
+
+        return getBooster() > 0L ? "&e" + timeLeftHrs + " &ahrs, &e" + timeLeftMins + " &amins" : "&cNo booster found!";
+    }
 
     public long getBooster() {
-        if(getStats().isNull("booster")) return 0;
+        if (getStats().isNull("booster"))
+            return 0;
+        
         return getStats().getLong("booster");
     }
 
@@ -322,7 +398,7 @@ public class User {
     public void setGlobalLevel(int globalLevel) {
         getIsland().putMetaData("level", new MetaDataValue(globalLevel));
     }
-    
+
     public void addGlobalLevel(int rightHandSide) {
         setGlobalLevel(getGlobalLevel() + rightHandSide);
     }
@@ -337,7 +413,7 @@ public class User {
 
     public double addGlobalExperience(double rightHandSide) {
         setGlobalExperience(getGlobalExperience() + (rightHandSide * getBoosterMultiplier()));
-		checkGlobalLevelUp();
+        checkGlobalLevelUp();
         return rightHandSide * getBoosterMultiplier();
     }
 
@@ -349,7 +425,7 @@ public class User {
         String extra = nether ? ".nether" : "";
         return getStats().getInt(skillType.toString().toLowerCase() + extra + ".level");
     }
-    
+
     public double getExperience(SkillType skillType, boolean nether) {
         String extra = nether ? ".nether" : "";
         return getStats().getDouble(skillType.toString().toLowerCase() + extra + ".xp");
@@ -359,7 +435,7 @@ public class User {
         String extra = nether ? ".nether" : "";
         getStats().setNumber(skillType.toString().toLowerCase() + extra + ".level", levels);
     }
-    
+
     public void setExperience(SkillType skillType, double experience, boolean nether) {
         String extra = nether ? ".nether" : "";
         getStats().setNumber(skillType.toString().toLowerCase() + extra + ".xp", experience);
@@ -367,42 +443,46 @@ public class User {
 
     public void addLevels(SkillType skillType, int levels, boolean nether) {
         int maxLevel = nether ? skillType.maxNetherLevel : skillType.maxLevel;
-        if(getLevel(skillType, nether) >= maxLevel) return;
+        if (getLevel(skillType, nether) >= maxLevel)
+            return;
 
         String extra = nether ? ".nether" : "";
         getStats().addInt(skillType.toString().toLowerCase() + extra + ".level", levels);
     }
-    
+
     public double addExperience(SkillType skillType, double experience, boolean nether) {
         int maxLevel = nether ? skillType.maxNetherLevel : skillType.maxLevel;
-        if(getLevel(skillType, nether) == maxLevel) return 0;
+        if (getLevel(skillType, nether) == maxLevel)
+            return 0;
 
         String extra = nether ? ".nether" : "";
-        
+
         getStats().addDouble(skillType.toString().toLowerCase() + extra + ".xp", experience);
-		SkillManager.getSkill(skillType).checkForLevelUp(this, nether);
-		setLastSkill(skillType);
-		
-		return experience;
+        SkillManager.getSkill(skillType).checkForLevelUp(this, nether);
+        setLastSkill(skillType);
+
+        return experience;
     }
-   
+
     public boolean isAllowedToFly() {
         return getStats().getBoolean("flight");
     }
 
     public void setFlight(boolean flight) {
         getStats().setBoolean("flight", flight);
+        this.player.setAllowFlight(flight);
     }
 
     // FISHING
-    
+
     /**
-     * Changes the user's sea_creature_chance according to their global level automatically!
+     * Changes the user's sea_creature_chance according to their global level
+     * automatically!
      */
     public void adjustSeaCreatureChance() {
-        if(getGlobalLevel() >= 10 && getGlobalLevel() <= 110) {
+        if (getGlobalLevel() >= 10 && getGlobalLevel() <= 110) {
             // level == 10? yes: 0.05, no: calculate chance.
-            double chance = (getGlobalLevel() == 10) ? 0.05 : 0.04 + (getGlobalLevel() * 0.001); // DO NOT TOUCH the formula.
+            double chance = (getGlobalLevel() == 10) ? 0.05 : 0.04 + (getGlobalLevel() * 0.001); // DO NOT TOUCH-a the formula.
             setSeaCreatureChance(chance);
         }
     }
@@ -427,18 +507,6 @@ public class User {
         getStats().setNumber("fishing.sc_chance", chance);
     }
 
-    public double getPillagerSpawnChance() {
-        return getStats().getDouble("combat.pillager_spawn_chance");
-    }
-
-    public void addPillagerSpawnChance(double rightHandSide) {
-        getStats().addDouble("combat.pillager_spawn_chance", rightHandSide);
-    }
-
-    public void setPillagerSpawnChance(double chance) {
-        getStats().setNumber("combat.pillager_spawn_chance", chance);
-    }
-
     public int getMonsterKills() {
         return getStats().getInt("combat.monsters_killed");
     }
@@ -446,7 +514,7 @@ public class User {
     public void addMonsterKills(int rightHandSide) {
         getStats().addInt("combat.monsters_killed", rightHandSide);
     }
-    
+
     public void setMonsterKills(int rightHandSide) {
         getStats().setNumber("combat.monsters_killed", rightHandSide);
     }
@@ -458,7 +526,7 @@ public class User {
     public void addPillagerKills(int rightHandSide) {
         getStats().addInt("combat.pillagers_killed", rightHandSide);
     }
-    
+
     public void setPillagerKills(int rightHandSide) {
         getStats().setNumber("combat.pillagers_killed", rightHandSide);
     }
@@ -466,11 +534,13 @@ public class User {
     // GLOBAL
     /**
      * The method name tells you what you need to know.
-     * @param excessXp (excess xp given to the player after consumption by the level-up process)
+     * 
+     * @param excessXp (excess xp given to the player after consumption by the
+     *                 level-up process)
      */
     public void globalLevelUp(double excessXp) {
         addGlobalLevel(1);
-		setGlobalExperience(excessXp);
+        setGlobalExperience(excessXp);
 
         getIslandMembers().forEach(user -> {
             user.adjustSeaCreatureChance();
@@ -478,9 +548,7 @@ public class User {
             user.sendMessage(
                 String.format(
                     "&a&lGLOBAL &2&lLEVEL-UP&2&l!\n" +
-                    "&a%s &8-> &a%s&2!",
-                    getGlobalLevel() - 1,
-                    getGlobalLevel()
+                    "&a%s &8-> &a%s&2!", getGlobalLevel() - 1, /* -> */ getGlobalLevel()
                 )
             );
         });
@@ -490,15 +558,18 @@ public class User {
      * @return Wheter user is eligible for a global level-up, or not.
      */
     public boolean checkGlobalLevelUp() {
-        if(getGlobalLevel() < 10) {
-            if(getGlobalExperience() < 100.0) return false;
+        if (getGlobalLevel() < 10) {
+            if (getGlobalExperience() < 100.0)
+                return false;
             globalLevelUp(getGlobalExperience() - 100.0);
             return true;
         }
-		
-        if(getGlobalExperience() < 1000) return false;
+
+        if (getGlobalExperience() < 1000)
+            return false;
+        
         globalLevelUp(getGlobalExperience() - 1000);
         return true;
     }
-    
+
 }

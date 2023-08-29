@@ -36,13 +36,14 @@ public abstract class Menu {
     private UUID uniqueId;
     private Map<Integer, ClickableEvent> clickableEvents;
 
+    @SuppressWarnings("deprecation")
     public Menu(User user, String displayName, InventorySize size) {
         this.inventory = Bukkit.createInventory(null, 
             size.toInt(), 
             ChatColor.translateAlternateColorCodes('&', displayName)
         );
-		
-		this.clickableEvents = new HashMap<>();
+        
+        this.clickableEvents = new HashMap<>();
 
         uniqueId = user.getUUID();
         MenuManager.getInstance().addMenu(this);
@@ -60,14 +61,14 @@ public abstract class Menu {
     public void setItem(ItemStack itemStack, int position) {
         inventory.setItem(position, itemStack);
     }
-	
-	public void fillRestWith(ItemStack stack) {
-		for(int i = 0; i < inventory.getSize(); i++) {
-			if(inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) {
-				setItem(stack, i);
-			}
-		}
-	}
+    
+    public void fillRestWith(ItemStack stack) {
+        for(int i = 0; i < inventory.getSize(); i++) {
+            if(inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) {
+                setItem(stack, i);
+            }
+        }
+    }
 
     public void show(User user) {
         user.getPlayer().openInventory(inventory);

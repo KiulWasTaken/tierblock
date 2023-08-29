@@ -26,6 +26,8 @@ public class ConnectionListener implements Listener {
             user.setBooster(0);
             user.setBoosterMultiplier(1.0);
         }
+
+        if(user.isAllowedToFly()) user.setFlight(true); // looks stupid, but spigot reset flight.
     }
 
     @EventHandler

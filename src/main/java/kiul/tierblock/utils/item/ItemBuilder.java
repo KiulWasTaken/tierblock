@@ -13,29 +13,30 @@ import net.md_5.bungee.api.ChatColor;
 public class ItemBuilder {
 
     ItemStack itemStack;
-	ItemMeta itemMeta;
+    ItemMeta itemMeta;
 
     ClickableEvent clickableEvent;
 
     public ItemBuilder(Material material) {
         this.itemStack = new ItemStack(material);
-		this.itemMeta = itemStack.getItemMeta();
+        this.itemMeta = itemStack.getItemMeta();
     }
 
+    @SuppressWarnings("deprecation")
     public ItemBuilder displayName(String displayName) {
         itemMeta.setDisplayName(
-            ChatColor.translateAlternateColorCodes('&', displayName)
-        );
+                ChatColor.translateAlternateColorCodes('&', displayName));
         return this;
     }
 
+    @SuppressWarnings("deprecation")
     public ItemBuilder lore(List<String> lore) {
-		List<String> formattedList = new ArrayList<>();
-		
+        List<String> formattedList = new ArrayList<>();
+
         lore.forEach(string -> {
             formattedList.add(ChatColor.translateAlternateColorCodes('&', string));
         });
-		
+
         itemMeta.setLore(formattedList);
         return this;
     }
@@ -51,8 +52,8 @@ public class ItemBuilder {
     }
 
     public ItemStack build() {
-		itemStack.setItemMeta(itemMeta);
+        itemStack.setItemMeta(itemMeta);
         return itemStack;
     }
-    
+
 }

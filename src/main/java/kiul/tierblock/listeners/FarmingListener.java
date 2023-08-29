@@ -73,7 +73,11 @@ public class FarmingListener implements Listener {
         
 		if(type == null) return; // not a crop, stopping here.
 		if(!user.hasIsland()) return;
-		
+        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+            user.sendMessage("&cYou must be an island member to farm this!");
+            return;
+        }
+
         List<Material> nonAgeable = List.of(Material.SUGAR_CANE, Material.PUMPKIN, Material.MELON);
 
         if(block.hasMetadata("pp")) return;
@@ -150,6 +154,13 @@ public class FarmingListener implements Listener {
 
         List<Material> flaggableBlocks = List.of(Material.SUGAR_CANE, Material.PUMPKIN, Material.MELON);
 		
+        if(CropType.fromMaterial(block.getType()) != null) {
+            if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+                user.sendMessage("&cYou must be an island member to plant this!");
+                return;
+            }
+        }
+
         if(block.getType() != Material.BEEHIVE) {
             if(flaggableBlocks.contains(block.getType()))
                 block.setMetadata("pp", new FixedMetadataValue(Main.getInstance(), "f"));

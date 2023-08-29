@@ -70,11 +70,14 @@ public final class Main extends JavaPlugin {
         }
 
         saveDefaultConfig();
+		
+		Commands commands = new Commands();
 
         // should just put them in one command
-        getCommand("givexp").setExecutor(new Commands());
-		getCommand("modifydouble").setExecutor(new Commands());
-        getCommand("modifyint").setExecutor(new Commands());
+		getCommand("islandflight").setExecutor(commands);
+        getCommand("givexp").setExecutor(commands);
+		getCommand("modifydouble").setExecutor(commands);
+        getCommand("modifyint").setExecutor(commands);
         getCommand("test").setExecutor(new TestCommand());
         getCommand("leaderboard").setExecutor(new LeaderboardCommand());
         getCommand("stats").setExecutor(new StatsCommand());

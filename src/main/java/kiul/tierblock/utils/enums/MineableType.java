@@ -44,14 +44,14 @@ public enum MineableType implements SkillCollectible {
         String first = new String(
             name.substring(0, 1).toUpperCase() + name.substring(1).toLowerCase()
         ).replace("_", " ");
-		
+
         String finished =
             first.contains(" ") ? 
-			first.split(" ")[0] + " "
+            first.split(" ")[0] + " "
             + first.split(" ")[1].substring(0, 1).toUpperCase()
             + first.split(" ")[1].substring(1).toLowerCase()
             : first;
-			
+
         return finished.replace(" Group", "");
     }
 
@@ -62,24 +62,24 @@ public enum MineableType implements SkillCollectible {
 
     public static MineableType fromMaterial(Material material) {
         switch(material) {
-			case STONE:
+            case STONE:
             case COBBLESTONE: return STONE;
             case COAL_ORE: return COAL;
             case IRON_ORE: return IRON;
             case GOLD_ORE: return GOLD;
 
-			case DEEPSLATE_REDSTONE_ORE:
-			case DEEPSLATE_LAPIS_ORE:
+            case DEEPSLATE_REDSTONE_ORE:
+            case DEEPSLATE_LAPIS_ORE:
             case REDSTONE_ORE:
             case LAPIS_ORE: return groupWithSetMaterial(material, REDSTONE_LAPIS);
             
-			case DEEPSLATE_DIAMOND_ORE:
+            case DEEPSLATE_DIAMOND_ORE:
             case DIAMOND_ORE: return DIAMOND;
-			
-			case DEEPSLATE_EMERALD_ORE:
+
+            case DEEPSLATE_EMERALD_ORE:
             case EMERALD_ORE: return EMERALD;
             
-			case OBSIDIAN: return OBSIDIAN;
+            case OBSIDIAN: return OBSIDIAN;
             case BASALT: return BASALT;
 
             case NETHERRACK:
@@ -92,8 +92,8 @@ public enum MineableType implements SkillCollectible {
 
             case SOUL_SAND:
             case SOUL_SOIL: return groupWithSetMaterial(material, SOUL_GROUP);
-			
-			case ANCIENT_DEBRIS: return ANCIENT_DEBRIS;
+
+            case ANCIENT_DEBRIS: return ANCIENT_DEBRIS;
             default: return null;
         }
     }
