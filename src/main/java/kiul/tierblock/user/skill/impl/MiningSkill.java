@@ -1,5 +1,8 @@
 package kiul.tierblock.user.skill.impl;
 
+import net.luckperms.api.LuckPerms;
+import net.luckperms.api.LuckPermsProvider;
+import net.luckperms.api.node.Node;
 import world.bentobox.magiccobblestonegenerator.StoneGeneratorAddon;
 import world.bentobox.magiccobblestonegenerator.database.objects.GeneratorDataObject;
 import world.bentobox.magiccobblestonegenerator.database.objects.GeneratorTierObject;
@@ -22,6 +25,11 @@ public class MiningSkill extends Skill {
     public void levelUp(User user, double excessXp, boolean isNether) {
         user.addLevels(SkillType.MINING, 1, isNether);
         user.setExperience(SkillType.MINING, excessXp, isNether);
+        LuckPerms api = LuckPermsProvider.get();
+        net.luckperms.api.model.user.User lpUser = api.getUserManager().getUser(user.getUUID());
+        Node permissionNode = Node.builder("tiercobblegen." + (isNether ? "nether" : "") + "gen" + user.getLevel(getSkillType(), isNether)).build();
+        lpUser.data().add(permissionNode);
+        api.getUserManager().saveUser(lpUser);
 
         unlockGenerator(user, isNether);
 
