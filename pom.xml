@@ -91,6 +91,14 @@
         </dependency>
 
         <dependency>
+            <groupId>org.patriciachips</groupId>
+            <artifactId>tiercobblegen</artifactId>
+            <version>1.0</version>
+            <scope>system</scope>
+            <systemPath>${project.basedir}/dependencies/tiercobblegen-1.0.jar</systemPath>
+        </dependency>
+
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.26</version>

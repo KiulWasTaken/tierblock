@@ -13,6 +13,7 @@ import org.bukkit.block.data.type.Beehive;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import kiul.tierblock.commands.BuyGEXP;
 import kiul.tierblock.commands.Commands;
 import kiul.tierblock.commands.LeaderboardCommand;
 import kiul.tierblock.commands.StatsCommand;
@@ -74,6 +75,7 @@ public final class Main extends JavaPlugin {
 		Commands commands = new Commands();
 
         // should just put them in one command
+        getCommand("buygexp").setExecutor(new BuyGEXP());
 		getCommand("islandflight").setExecutor(commands);
         getCommand("givexp").setExecutor(commands);
 		getCommand("modifydouble").setExecutor(commands);
