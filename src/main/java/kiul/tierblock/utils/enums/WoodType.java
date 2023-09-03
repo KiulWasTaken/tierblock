@@ -81,6 +81,18 @@ public enum WoodType implements SkillCollectible {
             default: return Material.AIR;
         }
     }
+    
+    public static WoodType fromSapling(Material material) {
+        String materialString = material.toString().toLowerCase();
+        if(!materialString.startsWith("potted") && materialString.endsWith("sapling")) {
+            String woodTypeString = materialString.replace("_sapling", "").toUpperCase();
+            for (WoodType type : WoodType.values()) {
+                if(type.toString().equals(woodTypeString))
+                    return type;
+            }
+        }
+        return null;
+    }
         
     @Override
     public double levelUp() {

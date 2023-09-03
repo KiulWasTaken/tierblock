@@ -33,7 +33,7 @@ public class ForagingSkill extends Skill {
 			user.sendMessage("&aYou've unlocked the flight ability! (Only works while in island)");
         }
         
-		user.getPlayer().playSound(user.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+		user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
         user.sendMessage(getLevelUpMessage(user, isNether));
     }
 

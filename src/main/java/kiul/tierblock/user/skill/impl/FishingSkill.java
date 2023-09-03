@@ -24,7 +24,7 @@ public class FishingSkill extends Skill {
         user.addLevels(getSkillType(), 1, false);
         user.setExperience(getSkillType(), excessXp, false);
         
-		user.getPlayer().playSound(user.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+		user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
         user.sendMessage(getLevelUpMessage(user, false));
     }
 

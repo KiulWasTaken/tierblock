@@ -88,11 +88,25 @@ public class ForagingListener implements Listener {
 
     @EventHandler
 	public void blockPlace(BlockPlaceEvent event) {
-		WoodType type = WoodType.fromMaterial(event.getBlock().getType());
-		
-		if(type == null) return; // not wood :(.
-
         User user = UserManager.getInstance().getUser(event.getPlayer());
+		WoodType type = WoodType.fromMaterial(event.getBlock().getType());
+		String blockTypeString = event.getBlock().getType().toString().toLowerCase();
+
+        if(!blockTypeString.startsWith("potted") && blockTypeString.endsWith("sapling")) {
+            if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+                event.setCancelled(true);
+                user.sendMessage("&cYou must be an island member to place this!");
+                return;
+            } else {
+                WoodType typeFromSapling = WoodType.fromSapling(event.getBlock().getType());
+                if(user.getLevel(SkillType.FORAGING, typeFromSapling.isNether) < typeFromSapling.levelRequirement) {
+                    user.sendMessage("&cYou need foraging &elevel " + typeFromSapling.levelRequirement + " &cto place this.");
+                    return;
+                }
+            }
+        }
+
+		if(type == null) return; // not wood :(.
 
         if(user.isWithinAnyIsland()) {
             Island island = user.getIslandAtPosition();

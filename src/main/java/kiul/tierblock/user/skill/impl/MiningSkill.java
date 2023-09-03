@@ -36,7 +36,7 @@ public class MiningSkill extends Skill {
         if(user.getLevel(getSkillType(), false) >= getMaxLevel(false) && !isNether)
             user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
 
-		user.getPlayer().playSound(user.getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+		user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
         user.sendMessage(getLevelUpMessage(user, isNether)); // level up message @ Skill abstract class.
     }
 

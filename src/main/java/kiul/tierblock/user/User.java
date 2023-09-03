@@ -544,7 +544,7 @@ public class User {
 
         getIslandMembers().forEach(user -> {
             user.adjustSeaCreatureChance();
-            user.getPlayer().playSound(getLocation(), Sound.UI_TOAST_CHALLENGE_COMPLETE, 1, 1);
+            user.getPlayer().playSound(getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
             user.sendMessage(
                 String.format(
                     "&a&lGLOBAL &2&lLEVEL-UP&2&l!\n" +
