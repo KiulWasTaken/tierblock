@@ -81,7 +81,7 @@ public class UserStatsMenu extends Menu {
     }
 
     public UserStatsMenu(User user) {
-        super(user, "&3&lYour statistics", Menu.InventorySize.BIG);
+        super(user, "&d&lYour statistics", Menu.InventorySize.BIG);
         
         fillRestWith(
             new ItemBuilder(Material.GRAY_STAINED_GLASS_PANE).
