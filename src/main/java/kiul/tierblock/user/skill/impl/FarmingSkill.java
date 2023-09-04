@@ -25,6 +25,7 @@ public class FarmingSkill extends Skill {
 
         int addition = 0 + (isNether ? 7 : 0);
         ItemStack itemStack = new ItemStack(CropType.toSeed(CropType.values()[user.getLevel(getSkillType(), isNether) + addition - 1]));
+        itemStack.setAmount(1);
         user.getPlayer().getInventory().addItem(itemStack);
         
         if(user.getLevel(getSkillType(), false) >= MAX_LEVEL)
