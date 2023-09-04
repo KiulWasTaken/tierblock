@@ -26,19 +26,21 @@ public class ForagingListener implements Listener {
     @EventHandler
     public void blockBreakListener(BlockBreakEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
-        Block block = event.getBlock();
-        WoodType type = WoodType.fromMaterial(block.getType());
         
         if(!user.hasIsland()) return;
-		if(type == null) return; // not wood, stopping here.
+        
+        Block block = event.getBlock();
+        WoodType type = WoodType.fromMaterial(block.getType());
+
+        if(type == null) return; // not wood, stopping here.
         if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
             user.sendMessage("&cYou must be an island member to break this!");
             return;
         }
         if(event.getBlock().hasMetadata("pp")) return; // player placed
-		
+
         if(type.isNether && !user.getStats().getBoolean("foraging.nether.unlocked")) {
-			user.sendActionBar("&cYou need to &emax foraging &cto unlock nether content!");
+            user.sendActionBar("&cYou need to &emax foraging &cto unlock nether content!");
             return;
         }
 
@@ -58,7 +60,7 @@ public class ForagingListener implements Listener {
             // show progress, if the block is unlockable in the next level (In other words: block level = user level + 1)
             // if not tell them the level requirement:
             boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.FORAGING, type.isNether);
-			WoodType previousType = WoodType.values()[type.ordinal() - 1];
+            WoodType previousType = WoodType.values()[type.ordinal() - 1];
             user.sendActionBar((progress) ? String.format(
                 "&cYou need to forage &e%s &cmore &e%s&c to collect this!", 
                 (int)(previousType.levelUp - user.getExperience(SkillType.FORAGING, type.isNether)),
@@ -87,14 +89,15 @@ public class ForagingListener implements Listener {
     }
 
     @EventHandler
-	public void blockPlace(BlockPlaceEvent event) {
+    public void blockPlace(BlockPlaceEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
-		WoodType type = WoodType.fromMaterial(event.getBlock().getType());
-		String blockTypeString = event.getBlock().getType().toString().toLowerCase();
+        WoodType type = WoodType.fromMaterial(event.getBlock().getType());
+        String blockTypeString = event.getBlock().getType().toString().toLowerCase();
+
+        event.setCancelled(true);
 
         if(!blockTypeString.startsWith("potted") && blockTypeString.endsWith("sapling")) {
             if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
-                event.setCancelled(true);
                 user.sendMessage("&cYou must be an island member to place this!");
                 return;
             } else {
@@ -106,7 +109,9 @@ public class ForagingListener implements Listener {
             }
         }
 
-		if(type == null) return; // not wood :(.
+        event.setCancelled(false);
+
+        if(type == null) return; // not wood :(.
 
         if(user.isWithinAnyIsland()) {
             Island island = user.getIslandAtPosition();
@@ -116,9 +121,9 @@ public class ForagingListener implements Listener {
             }
         }
 
-		// if wood, do:
-		// i hate this; it's not persistent, but I assume the server is gonna barely restart, and not a lot of people would really care/notice. it feels wrong, ok?
-		event.getBlock().setMetadata("pp", new FixedMetadataValue(Main.getInstance(), "f"));
-	}
+        // if wood, do:
+        // i hate this; it's not persistent, but I assume the server is gonna barely restart, and not a lot of people would really care/notice. it feels wrong, ok?
+        event.getBlock().setMetadata("pp", new FixedMetadataValue(Main.getInstance(), "f"));
+    }
 
 }

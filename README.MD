@@ -1,6 +1,7 @@
 # Bug fixes:
 
 - ## Latest commit:
+  - Fixed a stupid where it tells user they can't place block, but never cancels event (Stupid frog).
   - ``/buygexp`` uses ``add`` instead of ``subtract`` now... (Yeah, idk how I messed that up)
   - Users can't place blocks that require a high level now.
   - Beehives now tell the user if the beehive is theirs or not.
@@ -20,6 +21,7 @@
 # Latest changes:
 
 - ## Latest commit:
+  - Global level ups are now recursive.
   - Level up now plays a ``BLOCK_NOTE_BLOCK_PLING`` sound instead of ``UI_TOAST_CHALLENGE_COMPLETE`` sound.
 
 - ## Recent:

@@ -80,6 +80,10 @@ public class User {
                 " &8- &aExperience&8: &f" + Main.DECIMAL_FORMAT.format(getExperience(skillType, false))));
     }
 
+    public double getGlobalLevelUpRequirement() {
+        return (getGlobalLevel() < 10 ? 100.0 : 1000.0);
+    }
+    
     public void sendMessage(String message) {
         if (this.offlinePlayer != null)
             return;
@@ -542,6 +546,11 @@ public class User {
         addGlobalLevel(1);
         setGlobalExperience(excessXp);
 
+        if(checkGlobalLevelUp()) {
+            globalLevelUp(getGlobalExperience() - getGlobalLevelUpRequirement());
+            return;
+        }
+
         getIslandMembers().forEach(user -> {
             user.adjustSeaCreatureChance();
             user.getPlayer().playSound(getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
@@ -558,18 +567,7 @@ public class User {
      * @return Wheter user is eligible for a global level-up, or not.
      */
     public boolean checkGlobalLevelUp() {
-        if (getGlobalLevel() < 10) {
-            if (getGlobalExperience() < 100.0)
-                return false;
-            globalLevelUp(getGlobalExperience() - 100.0);
-            return true;
-        }
-
-        if (getGlobalExperience() < 1000)
-            return false;
-        
-        globalLevelUp(getGlobalExperience() - 1000);
-        return true;
+        return getGlobalExperience() >= getGlobalLevelUpRequirement();
     }
 
 }

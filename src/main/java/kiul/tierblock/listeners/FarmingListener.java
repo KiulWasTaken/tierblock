@@ -75,6 +75,7 @@ public class FarmingListener implements Listener {
         if(!user.hasIsland())
             return;
         if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+            event.setCancelled(true);
             user.sendMessage("&cYou must be an island member to farm this!");
             return;
         }
@@ -161,6 +162,8 @@ public class FarmingListener implements Listener {
 
         CropType type = CropType.fromMaterial(block.getType());
 
+        event.setCancelled(true);
+
         if(type != null) {
             if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
                 user.sendMessage("&cYou must be an island member to plant this!");
@@ -172,6 +175,8 @@ public class FarmingListener implements Listener {
                 }
             }
         }
+
+        event.setCancelled(false);
 
         if(block.getType() != Material.BEEHIVE) {
             if(flaggableBlocks.contains(block.getType()))
