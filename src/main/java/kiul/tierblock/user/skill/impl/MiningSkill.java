@@ -3,7 +3,6 @@ package kiul.tierblock.user.skill.impl;
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
-import org.bukkit.ChatColor;
 
 import org.bukkit.Sound;
 
@@ -20,14 +19,6 @@ public class MiningSkill extends Skill {
 
     @Override
     public void levelUp(User user, double excessXp, boolean isNether) {
-        if (isNether) {
-            int levelUp = user.getLevel(SkillType.MINING, true) + 1;
-            user.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "MINING LEVEL UP! " + ChatColor.RED + user.getLevel(SkillType.MINING, true) + ChatColor.GRAY + " -> " + ChatColor.RED + levelUp);
-        } else {
-            int levelUp = user.getLevel(SkillType.MINING, false) + 1;
-            user.sendMessage(ChatColor.GRAY + "" + ChatColor.BOLD + "MINING LEVEL UP! " + ChatColor.GOLD + user.getLevel(SkillType.MINING, false) + ChatColor.GRAY + " -> " + ChatColor.GOLD + levelUp);
-            user.sendMessage(ChatColor.DARK_GRAY + "Use " + ChatColor.GOLD + "/gen" + ChatColor.DARK_GRAY + " to configure your generator!");
-        }
         user.addLevels(SkillType.MINING, 1, isNether);
         user.setExperience(SkillType.MINING, excessXp, isNether);
         LuckPerms api = LuckPermsProvider.get();
@@ -39,6 +30,11 @@ public class MiningSkill extends Skill {
         if(user.getLevel(getSkillType(), false) >= getMaxLevel(false) && !isNether) {
             user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
         }
+
+        if(checkForLevelUp(user, isNether)) return;
+
+        user.sendMessage(getLevelUpMessage(user, isNether));
+        user.sendMessage("&8You can use &6/gen &8to configure your generator!");
 		user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
     }
 

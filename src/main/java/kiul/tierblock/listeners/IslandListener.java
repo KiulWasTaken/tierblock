@@ -17,7 +17,7 @@ import world.bentobox.bentobox.database.objects.Island;
 public class IslandListener implements Listener {
 
 private void initMetaData(Island island) {
-    island.putMetaData("level", new MetaDataValue(0));
+    island.putMetaData("level", new MetaDataValue(1));
     island.putMetaData("xp", new MetaDataValue(0.0));
     island.putMetaData("hasBeeHive", new MetaDataValue(false));
     island.putMetaData("pillagerSpawnChance", new MetaDataValue(0.02)); // 2%

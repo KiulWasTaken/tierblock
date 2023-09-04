@@ -1,6 +1,5 @@
 package kiul.tierblock.user.skill.impl;
 
-import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
@@ -19,13 +18,6 @@ public class ForagingSkill extends Skill {
 
     @Override
     public void levelUp(User user, double excessXp, boolean isNether) {
-        if (isNether) {
-            int levelUp = user.getLevel(SkillType.FORAGING, true) + 1;
-            user.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "FORAGING LEVEL UP! " + ChatColor.RED + user.getLevel(SkillType.FORAGING, true) + ChatColor.GRAY + " -> " + ChatColor.RED + levelUp);
-        } else {
-            int levelUp = user.getLevel(SkillType.FORAGING, false) + 1;
-            user.sendMessage(ChatColor.GOLD + "" + ChatColor.BOLD + "FORAGING LEVEL UP! " + ChatColor.GOLD + user.getLevel(SkillType.FORAGING, false) + ChatColor.GRAY + " -> " + ChatColor.GOLD + levelUp);
-        }
         user.addLevels(getSkillType(), 1, isNether);
         user.setExperience(getSkillType(), excessXp, isNether);
 
@@ -41,6 +33,9 @@ public class ForagingSkill extends Skill {
 			user.sendMessage("&aYou've unlocked the flight ability! (Only works while in island)");
         }
         
+        if(checkForLevelUp(user, isNether)) return;
+
+        user.sendMessage(getLevelUpMessage(user, isNether));
 		user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
     }
 

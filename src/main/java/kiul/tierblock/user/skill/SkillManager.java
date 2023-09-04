@@ -22,7 +22,12 @@ public class SkillManager {
 
     public static Skill getSkill(SkillType type) {
         return registeredSkills.get(type);
-    } 
+    }
+
+    // not implemented.
+    public static void checkLevelUp() {
+
+    }
 
     public static Map<SkillType, Skill> getRegisteredSkills() {
         return registeredSkills;

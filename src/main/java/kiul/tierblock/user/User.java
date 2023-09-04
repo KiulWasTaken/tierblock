@@ -417,7 +417,8 @@ public class User {
 
     public double addGlobalExperience(double rightHandSide) {
         setGlobalExperience(getGlobalExperience() + (rightHandSide * getBoosterMultiplier()));
-        checkGlobalLevelUp();
+        if(checkGlobalLevelUp()) globalLevelUp();
+        
         return rightHandSide * getBoosterMultiplier();
     }
 
@@ -542,12 +543,14 @@ public class User {
      * @param excessXp (excess xp given to the player after consumption by the
      *                 level-up process)
      */
-    public void globalLevelUp(double excessXp) {
+    public void globalLevelUp() {
+        double excessXp = getGlobalExperience() - getGlobalLevelUpRequirement();
+
         addGlobalLevel(1);
         setGlobalExperience(excessXp);
 
         if(checkGlobalLevelUp()) {
-            globalLevelUp(getGlobalExperience() - getGlobalLevelUpRequirement());
+            globalLevelUp();
             return;
         }
 
