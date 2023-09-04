@@ -31,7 +31,8 @@ public class BuyGEXP implements CommandExecutor {
                 return false;
             }
             
-            Eco.changeBalance(null, user.getUUID(), "add", finalPrice);
+            Eco.changeBalance(null, user.getUUID(), "remove", finalPrice);
+            user.addGlobalExperience(amountToBeBought);
             return true;
         }
 

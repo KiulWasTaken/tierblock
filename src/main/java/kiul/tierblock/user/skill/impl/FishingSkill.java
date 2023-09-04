@@ -2,6 +2,8 @@ package kiul.tierblock.user.skill.impl;
 
 import java.util.Map;
 import java.lang.Math;
+
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 
 import kiul.tierblock.user.User;
@@ -21,11 +23,17 @@ public class FishingSkill extends Skill {
 
     @Override
     public void levelUp(User user, double excessXp, boolean isNether) {
+        if (isNether) {
+            int levelUp = user.getLevel(SkillType.FISHING, true) + 1;
+            user.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "FISHING LEVEL UP! " + ChatColor.RED + user.getLevel(SkillType.FISHING, true) + ChatColor.GRAY + " -> " + ChatColor.RED + levelUp);
+        } else {
+            int levelUp = user.getLevel(SkillType.FISHING, false) + 1;
+            user.sendMessage(ChatColor.BLUE + "" + ChatColor.BOLD + "FISHING LEVEL UP! " + ChatColor.GOLD + user.getLevel(SkillType.FISHING, false) + ChatColor.GRAY + " -> " + ChatColor.GOLD + levelUp);
+        }
         user.addLevels(getSkillType(), 1, false);
         user.setExperience(getSkillType(), excessXp, false);
         
 		user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-        user.sendMessage(getLevelUpMessage(user, false));
     }
 
     @Override
