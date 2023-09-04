@@ -2,6 +2,7 @@ package kiul.tierblock.user.skill.impl;
 
 import java.lang.Math;
 
+import org.bukkit.ChatColor;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
@@ -20,6 +21,13 @@ public class FarmingSkill extends Skill {
 
     @Override
     public void levelUp(User user, double excessXp, boolean isNether) {
+        if (isNether) {
+            int levelUp = user.getLevel(SkillType.FARMING, true) + 1;
+            user.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "FARMING LEVEL UP! " + ChatColor.RED + user.getLevel(SkillType.FARMING, true) + ChatColor.GRAY + " -> " + ChatColor.RED + levelUp);
+        } else {
+            int levelUp = user.getLevel(SkillType.FARMING, false) + 1;
+            user.sendMessage(ChatColor.YELLOW + "" + ChatColor.BOLD + "FARMING LEVEL UP! " + ChatColor.GOLD + user.getLevel(SkillType.FARMING, false) + ChatColor.GRAY + " -> " + ChatColor.GOLD + levelUp);
+        }
         user.addLevels(SkillType.FARMING, 1, isNether);
         user.setExperience(SkillType.FARMING, excessXp, isNether);
 
@@ -31,7 +39,6 @@ public class FarmingSkill extends Skill {
             user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
 
 	user.getPlayer().playSound(user.getLocation(), Sound.BLOCK_NOTE_BLOCK_PLING, 1, 1);
-        user.sendMessage(getLevelUpMessage(user, isNether));
     }
 
     @Override
