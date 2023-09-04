@@ -44,10 +44,10 @@ public class FarmingSkill extends Skill {
         int indexInEnum = Math.min(user.getLevel(SkillType.FARMING, isNether) - 1 + (isNether ? 7 : 0), 8);
         CropType lastType = CropType.values()[indexInEnum];
         if(user.getExperience(SkillType.FARMING, isNether) < lastType.levelUp) return false;
+        if(lastType.globalLevelRequirement > user.getGlobalLevel()) return false;
 
-        // if somehow the player got excess xp in farming (most likely, if not only, via commands),
-        // the xp will be set to the excess.
-        double excess = user.getExperience(SkillType.FARMING, isNether) - lastType.levelUp;
+        double excess = lastType.globalLevelRequirement > 0 ? 0 :
+                user.getExperience(SkillType.FARMING, isNether) - lastType.levelUp;
         
         levelUp(user, excess, isNether);
         return true;

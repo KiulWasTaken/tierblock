@@ -46,10 +46,10 @@ public class ForagingSkill extends Skill {
         int indexInEnum = Math.min(user.getLevel(getSkillType(), isNether) - 1 + (isNether ? 6 : 0), 7);
         WoodType lastType = WoodType.values()[indexInEnum];
         if(user.getExperience(getSkillType(), isNether) < lastType.levelUp) return false;
+        if(lastType.globalLevelRequirement > user.getGlobalLevel()) return false;
 
-        // if somehow the player got excess xp (most likely, if not only, via commands),
-        // the xp will be set to the excess.
-        double excess = user.getExperience(getSkillType(), isNether) - lastType.levelUp;
+
+        double excess = lastType.globalLevelRequirement > 0 ? 0 : user.getExperience(getSkillType(), isNether) - lastType.levelUp;
         
         levelUp(user, excess, isNether);
         return true;

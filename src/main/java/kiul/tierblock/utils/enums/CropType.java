@@ -22,6 +22,7 @@ public enum CropType implements SkillCollectible {
     public final String label;
 
     public final int levelRequirement;
+    public int globalLevelRequirement;
 
     public final boolean isNether;
 
@@ -29,9 +30,16 @@ public enum CropType implements SkillCollectible {
     public final double xpReward;
 
     private CropType(int levelRequirement, boolean isNether) {
+
+        
+
         this.levelRequirement = levelRequirement;
         this.isNether = isNether;
         this.label = toString().toLowerCase();
+
+        boolean containsGlobalLevel = Main.getInstance().getConfig().contains("farming." + label + ".global_level_requirement");
+        this.globalLevelRequirement = containsGlobalLevel ? Main.getInstance().getConfig().getInt("farming." + label + ".global_level_requirement") : 0;
+        
         this.xpReward = Main.getInstance().getConfig().getDouble("farming." + label + ".xp_reward");
         this.levelUp = Main.getInstance().getConfig().getDouble("farming." + label + ".level_up");
     }

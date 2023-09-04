@@ -21,6 +21,7 @@ public enum WoodType implements SkillCollectible {
 
     public final String label;
     public final int levelRequirement;
+    public int globalLevelRequirement;
     
     public final double xpReward;
     public final double levelUp;
@@ -31,6 +32,8 @@ public enum WoodType implements SkillCollectible {
         this.isNether = isNether;
         this.levelRequirement = levelRequirement;
         this.label = toString().toLowerCase();
+        boolean containsGlobalLevel = Main.getInstance().getConfig().contains("foraging." + label + ".global_level_requirement");
+        this.globalLevelRequirement = containsGlobalLevel ? Main.getInstance().getConfig().getInt("foraging." + label + ".global_level_requirement") : 0;
         this.xpReward = Main.getInstance().getConfig().getDouble("foraging." + label + ".xp_reward");
         this.levelUp = Main.getInstance().getConfig().getDouble("foraging." + label + ".level_up");
     }
