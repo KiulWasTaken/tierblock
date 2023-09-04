@@ -30,8 +30,7 @@ public abstract class Skill {
         String levelColor = nether ? "&c" : "&6";
 
         return String.format(
-            skillColor.get(this.skillType) + "&l%s LEVEL UP! %s%s &7-> %s%s" + 
-            "&a%s &2-> &a%s&2!", // &a{old level} &2-> &a{new level}&2!
+            skillColor.get(this.skillType) + "&l%s LEVEL UP! %s%s &7-> %s%s",
             getSkillType().toString(), 
             levelColor,
             user.getLevel(skillType, nether) - 1, // old level
