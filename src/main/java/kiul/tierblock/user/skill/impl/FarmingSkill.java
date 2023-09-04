@@ -44,7 +44,12 @@ public class FarmingSkill extends Skill {
         int indexInEnum = Math.min(user.getLevel(SkillType.FARMING, isNether) - 1 + (isNether ? 7 : 0), 8);
         CropType lastType = CropType.values()[indexInEnum];
         if(user.getExperience(SkillType.FARMING, isNether) < lastType.levelUp) return false;
-        if(lastType.globalLevelRequirement > user.getGlobalLevel()) return false;
+        if(lastType.globalLevelRequirement > user.getGlobalLevel()) {
+            user.sendMessage(
+                "&e&lNOTE: &cTo use the newly unlocked type of wood, you need &e&lisland level "
+                + lastType.globalLevelRequirement + "&c!"
+            );
+        }
 
         double excess = lastType.globalLevelRequirement > 0 ? 0 :
                 user.getExperience(SkillType.FARMING, isNether) - lastType.levelUp;

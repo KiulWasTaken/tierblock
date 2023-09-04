@@ -1,12 +1,14 @@
 # Bug fixes:
 
 - ## Latest commit:
+  - Level up recursion in farming, and foraging due to forgetting to account for ``global_level_requirement``
+  - Island level ups happen again now.
+
+- ## Recent:
   - Fixed a stupid where it tells user they can't place block, but never cancels event (Stupid frog).
   - ``/buygexp`` uses ``add`` instead of ``subtract`` now... (Yeah, idk how I messed that up)
   - Users can't place blocks that require a high level now.
   - Beehives now tell the user if the beehive is theirs or not.
-
-- ## Recent:
   - Sub-skills in stats menu used to display user's (non-nether/end) experience as progress percentage.
   - Player flight removed after player changes gamemode to creative/spectator.
   - After the reimplementation of global levels, the plugin didn't check for global levelups.
@@ -21,6 +23,9 @@
 # Latest changes:
 
 - ## Latest commit:
+  - Added sub-command ``/test whereami`` for dev purposes.
+  - Islands have default names now.
+  - When levelling up in a skill and the new acquired item requires a level higher than the island's level, user will be told.
   - Global level ups are now recursive.
   - Level up now plays a ``BLOCK_NOTE_BLOCK_PLING`` sound instead of ``UI_TOAST_CHALLENGE_COMPLETE`` sound.
 

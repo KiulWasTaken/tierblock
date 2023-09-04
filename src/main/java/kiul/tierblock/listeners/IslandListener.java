@@ -28,6 +28,9 @@ private void initMetaData(Island island) {
 public void islandCreate(IslandCreateEvent event) {
     User user = UserManager.getInstance().getUser(event.getPlayerUUID());
     user.setHasIsland(true);
+    if(event.getIsland().getName() == null) {
+        event.getIsland().setName(user.getName() + "'s island");
+    }
     
     initMetaData(event.getIsland());
 }
@@ -38,6 +41,10 @@ public void islandReset(IslandResetEvent event) {
     user.getIslandMembers().forEach(islandMember -> {
         islandMember.getStats().copyDefaults();
     });
+
+    if(event.getIsland().getName() == null) {
+        event.getIsland().setName(user.getName() + "'s island");
+    }
     
     user.setHasIsland(true);
     initMetaData(event.getIsland());

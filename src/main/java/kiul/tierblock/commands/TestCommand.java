@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.UUID;
 
 import org.bukkit.Bukkit;
-import org.bukkit.Location;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
 import org.bukkit.block.data.type.Beehive;
@@ -28,7 +27,6 @@ import net.md_5.bungee.api.ChatColor;
 import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.api.metadata.MetaDataValue;
 import world.bentobox.bentobox.database.objects.Island;
-import world.bentobox.bentobox.managers.IslandsManager;
 import world.bentobox.bentobox.managers.RanksManager;
 
 public class TestCommand implements CommandExecutor {
@@ -151,9 +149,28 @@ public class TestCommand implements CommandExecutor {
             return false;
         }
 
+        if("whereami".equalsIgnoreCase(args[0])) {
+            Island currentIsland = user.getIslandAtPosition();
+            
+            if(currentIsland == null) {
+                user.sendMessage("You're not in an island!");
+                return false;
+            }
+
+            String rank = BentoBox.getInstance().getRanksManager().getRank(currentIsland.getRank(user.getUUID()));
+            int level = currentIsland.getMetaData("level").get().asInt();
+            double xp = currentIsland.getMetaData("xp").get().asDouble();
+            
+            user.sendMessage("&aYou're in island: &b&l" + currentIsland.getName());
+            user.sendMessage("&3Your rank in the island: &b&l" + rank);
+            user.sendMessage("&3Island owner: &b&l" + Bukkit.getOfflinePlayer(currentIsland.getOwner()).getName());
+            user.sendMessage("&3Global level&8/&3xp: &b" + level + " &8/&b " + xp);
+        }
+
         if ("setmeupchief".equalsIgnoreCase(args[0])) {
             user.setSeaCreatureChance(0.50);
             user.sendMessage("&esc_chance &ais now &350%");
+            return true;
         }
 
         if ("scc".equalsIgnoreCase(args[0])) {
@@ -166,15 +183,13 @@ public class TestCommand implements CommandExecutor {
         }
 
         if ("metadata".equalsIgnoreCase(args[0])) {
-            if (!user.isWithinAnyIsland()) {
+            if (user.getIslandAtPosition() == null) {
                 user.sendMessage("&cYou aren't in any island!");
                 return false;
             }
 
             user.sendMessage("Island's meta-data:");
-            Location location = user.getLocation();
-            IslandsManager manager = BentoBox.getInstance().getIslandsManager();
-            Island island = manager.getIslandAt(location).get();
+            Island island = user.getIslandAtPosition();
 
             StringBuilder keys = new StringBuilder().append("[");
 
