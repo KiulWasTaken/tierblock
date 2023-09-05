@@ -20,7 +20,7 @@ private void initMetaData(Island island) {
     island.putMetaData("level", new MetaDataValue(1));
     island.putMetaData("xp", new MetaDataValue(0.0));
     island.putMetaData("hasBeeHive", new MetaDataValue(false));
-    island.putMetaData("pillagerSpawnChance", new MetaDataValue(0.02)); // 2%
+    island.putMetaData("pillagerSpawnChance", new MetaDataValue(0.001)); // 0.1%
     island.putMetaData("raidCaptain", new MetaDataValue(false));
 }
 

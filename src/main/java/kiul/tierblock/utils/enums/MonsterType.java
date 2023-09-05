@@ -1,33 +1,37 @@
 package kiul.tierblock.utils.enums;
 
+import java.util.Random;
+
 import org.bukkit.entity.EntityType;
 
 import kiul.tierblock.Main;
 
 public enum MonsterType {
 
-    PILLAGER(0.0, 0),
-    ZOMBIE(2.0, 0),
-    SPIDER(2.8, 5),
-    SKELETON_CREEPER(3.4, 10),
-    ZOMBIE_VILLAGER(0.0, 20),
-    PIGLIN(4.0, 40),
-    HOGLIN(4.0, 40),
-    BLAZE(5.6, 50),
-    WITHER_SKELETON(5.6, 50),
-    SHULKER(8.4, 100);
+    PILLAGER(0.0, 0, "bskyblock_world"),
+    ZOMBIE(2.0, 0, "bskyblock_world"),
+    SPIDER(2.8, 5, "bskyblock_world"),
+    SKELETON_CREEPER(3.4, 10, "bskyblock_world"),
+    ZOMBIE_VILLAGER(0.0, 20, "bskyblock_world"),
+    PIGLIN(4.0, 40, "bskyblock_world_nether"),
+    HOGLIN(4.0, 40, "bskyblock_world_nether"),
+    BLAZE(5.6, 50, "bskyblock_world_nether"),
+    WITHER_SKELETON(5.6, 50, "bskyblock_world_nether"),
+    SHULKER(8.4, 100, "bskyblock_world_the_end");
 
     public final double xpReward;
     public final String label;
     public final int islandLevelRequirement;
+	public final String worldName;
 
     public EntityType entityType;
 
-    private MonsterType(double reward, int islandLevelRequirement) {
+    private MonsterType(double reward, int islandLevelRequirement, String worldName) {
         this.islandLevelRequirement = islandLevelRequirement;
         this.label = toString().toLowerCase();
         this.xpReward = Main.getInstance().getConfig().getDouble("combat." + label + ".xp_reward");
-    }
+        this.worldName = worldName;
+	}
 
     public String formatName() {
         String name = entityType == null ? label : entityType.toString();
@@ -72,5 +76,34 @@ public enum MonsterType {
             case SHULKER: return SHULKER;
             default: return null;
         }
+    }
+
+    public static EntityType toEntityType(MonsterType monsterType) {
+        double random = new Random().nextDouble();
+        switch(monsterType) {
+            case PILLAGER:
+                return EntityType.PILLAGER;
+            case ZOMBIE:
+                return EntityType.ZOMBIE;
+            case SPIDER:
+                return EntityType.SPIDER;
+            case SKELETON_CREEPER:
+                if(random > 0.4) return EntityType.SKELETON;
+                return EntityType.CREEPER;
+            case ZOMBIE_VILLAGER:
+                return EntityType.ZOMBIE_VILLAGER;
+            case PIGLIN:
+                if(random > 0.3) return EntityType.ZOMBIFIED_PIGLIN;
+                return EntityType.PIGLIN;
+            case HOGLIN:
+                return EntityType.HOGLIN;
+            case BLAZE:
+                return EntityType.BLAZE;
+            case WITHER_SKELETON:
+                return EntityType.WITHER_SKELETON;
+            case SHULKER:
+                return EntityType.SHULKER;
+        }
+        return null;
     }
 }

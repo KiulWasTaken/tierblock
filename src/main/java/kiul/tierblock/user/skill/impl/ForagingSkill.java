@@ -10,7 +10,9 @@ import kiul.tierblock.utils.enums.WoodType;
 
 public class ForagingSkill extends Skill {
 
-    final int MAX_LEVEL = getSkillType().maxLevel;
+    private int maxLevel(boolean isNether) {
+        return isNether ? SkillType.FORAGING.maxNetherLevel : SkillType.FORAGING.maxLevel;
+    }
 
     public ForagingSkill() {
         super(SkillType.FORAGING);
@@ -26,7 +28,7 @@ public class ForagingSkill extends Skill {
         user.getPlayer().getInventory().addItem(itemStack);
 
         // user is max-level, now able to mine beyond max-level blocks.
-        if(user.getLevel(getSkillType(), false) >= MAX_LEVEL) {
+        if(user.getLevel(getSkillType(), false) >= maxLevel(isNether)) {
         	user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
             user.setFlight(true);
             user.getPlayer().setAllowFlight(true);
@@ -41,7 +43,7 @@ public class ForagingSkill extends Skill {
 
     @Override
     public boolean checkForLevelUp(User user, boolean isNether) {
-        if(user.getLevel(getSkillType(), isNether) >= MAX_LEVEL) return false;
+        if(user.getLevel(getSkillType(), isNether) >= maxLevel(isNether)) return false;
 
         int indexInEnum = Math.min(user.getLevel(getSkillType(), isNether) - 1 + (isNether ? 6 : 0), 7);
         WoodType lastType = WoodType.values()[indexInEnum];

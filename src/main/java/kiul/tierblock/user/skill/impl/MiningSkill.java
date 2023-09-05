@@ -25,11 +25,13 @@ public class MiningSkill extends Skill {
         net.luckperms.api.model.user.User lpUser = api.getUserManager().getUser(user.getUUID());
         Node permissionNode = Node.builder("tiercobblegen." + (isNether ? "nether" : "") + "gen" + user.getLevel(getSkillType(), isNether)).build();
         lpUser.data().add(permissionNode);
-        api.getUserManager().saveUser(lpUser);
-
+        
         if(user.getLevel(getSkillType(), false) >= getMaxLevel(false) && !isNether) {
             user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
+			lpUser.data().add(Node.builder("tiercobblegen.nethergen1").build());
         }
+		
+		api.getUserManager().saveUser(lpUser);
 
         if(checkForLevelUp(user, isNether)) return;
 

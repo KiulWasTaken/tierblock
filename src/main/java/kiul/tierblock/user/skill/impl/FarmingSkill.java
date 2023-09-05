@@ -12,7 +12,9 @@ import kiul.tierblock.utils.enums.CropType;
 
 public class FarmingSkill extends Skill {
 
-    final int MAX_LEVEL = SkillType.FARMING.maxLevel;
+    private int maxLevel(boolean isNether) {
+        return isNether ? SkillType.FARMING.maxNetherLevel : SkillType.FARMING.maxLevel;
+	}
 
     public FarmingSkill() {
         super(SkillType.FARMING);
@@ -25,11 +27,20 @@ public class FarmingSkill extends Skill {
 
         int addition = 0 + (isNether ? 7 : 0);
         ItemStack itemStack = new ItemStack(CropType.toSeed(CropType.values()[user.getLevel(getSkillType(), isNether) + addition - 1]));
-        itemStack.setAmount(1);
         user.getPlayer().getInventory().addItem(itemStack);
         
-        if(user.getLevel(getSkillType(), false) >= MAX_LEVEL)
+        if(user.getLevel(getSkillType(), false) >= maxLevel(isNether) && user.getLevel(getSkillType(), true) == 1) {
             user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
+            user.sendMessage("&aYou've unlocked the &cfarming sub-skill&a!");
+            if(user.getGlobalLevel() < CropType.NETHER_WART.globalLevelRequirement) {
+                user.sendMessage(
+                    "&e&lNOTE: &cTo use the newly unlocked type of plant, you need &e&lisland level "
+                    + CropType.NETHER_WART.globalLevelRequirement + "&c!"
+                );
+            }
+			
+			user.getPlayer().getInventory().addItem(new ItemStack(CropType.toSeed(CropType.NETHER_WART)));
+        }
 
         if(checkForLevelUp(user, isNether)) return;
 
@@ -39,19 +50,20 @@ public class FarmingSkill extends Skill {
 
     @Override
     public boolean checkForLevelUp(User user, boolean isNether) {
-        if(user.getLevel(SkillType.FARMING, isNether) >= MAX_LEVEL) return false;
+        if(user.getLevel(SkillType.FARMING, isNether) >= maxLevel(isNether)) return false;
 
-        int indexInEnum = Math.min(user.getLevel(SkillType.FARMING, isNether) - 1 + (isNether ? 7 : 0), 8);
-        CropType lastType = CropType.values()[indexInEnum];
+        int indexInEnum = Math.min(user.getLevel(SkillType.FARMING, isNether) + (isNether ? 7 : 0), 8);
+        CropType lastType = CropType.values()[indexInEnum - 1];
+		CropType newType = CropType.values()[indexInEnum];
         if(user.getExperience(SkillType.FARMING, isNether) < lastType.levelUp) return false;
-        if(lastType.globalLevelRequirement > user.getGlobalLevel()) {
+        if(newType.globalLevelRequirement > user.getGlobalLevel()) {
             user.sendMessage(
-                "&e&lNOTE: &cTo use the newly unlocked type of wood, you need &e&lisland level "
-                + lastType.globalLevelRequirement + "&c!"
+                "&e&lNOTE: &cTo use the newly unlocked type of plant, you need &e&lisland level "
+                + newType.globalLevelRequirement + "&c!"
             );
         }
 
-        double excess = lastType.globalLevelRequirement > 0 ? 0 :
+        double excess = newType.globalLevelRequirement > 0 ? 0 :
                 user.getExperience(SkillType.FARMING, isNether) - lastType.levelUp;
         
         levelUp(user, excess, isNether);

@@ -1,6 +1,7 @@
 package kiul.tierblock.listeners;
 
 import java.util.Random;
+import java.util.Map;
 import java.util.Optional;
 
 import org.bukkit.Sound;
@@ -36,67 +37,90 @@ import world.bentobox.bentobox.managers.RanksManager;
 @SuppressWarnings("deprecation")
 public class CombatListener implements Listener {
 
+    private static final Map<Double, MonsterType> MOB_SPAWN_CHANCES = Map.of(
+        0.6,  MonsterType.SPIDER,           0.3,    MonsterType.SKELETON_CREEPER, 
+        0.1,  MonsterType.ZOMBIE_VILLAGER,  0.6,    MonsterType.PIGLIN,
+        0.2,  MonsterType.HOGLIN,           0.05,   MonsterType.BLAZE,
+        0.05, MonsterType.WITHER_SKELETON,  0.001,  MonsterType.SHULKER
+    );
+
     // note: my balls were itchy when i wrote this.
     @EventHandler
     public void spawningListener(CreatureSpawnEvent event) {
         MonsterType monsterType = MonsterType.fromEntityType(event.getEntityType());
-		
-		if(!event.getLocation().getWorld().equals(Main.getBSkyBlockWorld())) return;
+        
+        // to align with the world, and monster type.
         if(monsterType == null) return;
-		
-		event.setCancelled(true);
-		
+        if(!monsterType.worldName.equals(event.getLocation().getWorld().getName())) return;
+
+        // then we actually choose the mob that's supposed to spawn...
+        Random random = new Random();
+
+        double mobChance = random.nextDouble(0.001, 1.000);
+
+        if(mobChance >= 0.7) {
+            monsterType = MonsterType.ZOMBIE;
+        } else {
+            monsterType = MOB_SPAWN_CHANCES.get(mobChance);
+        }
+
+        event.setCancelled(true);
+
         IslandsManager manager = BentoBox.getInstance().getIslands();
         Island island = manager.getIslandAt(event.getLocation()).get();
 
         if(island == null) return; // not spawning inside island
-		
-        if(event.getSpawnReason() != SpawnReason.NATURAL) {
-			event.setCancelled(false); // incase it's an other way of spawning, we don't cancel this
-			return;
-		}
 
-		if(island.getMetaData("level").get().asInt() < monsterType.islandLevelRequirement) {
+        if(event.getSpawnReason() != SpawnReason.NATURAL) {
+            event.setCancelled(false); // incase it's an other way of spawning, we don't cancel this
+            return;
+        }
+
+        if(island.getMetaData("level").get().asInt() < monsterType.islandLevelRequirement) {
             event.setCancelled(true);
             return;
         }
 
-        double random = new Random().nextDouble();
-		final String message = 
-			island.getMetaData("raidCaptain").get().asBoolean() ? 
-			"&cA raid captain pillager has spawned in your island!" : 
-			"&cA pillager has spawned in your island!";
+        event.getEntity().remove();
 
-		// pillager spawning mechanism
-        if(random < island.getMetaData("pillagerSpawnChance").get().asDouble()) {
-			event.setCancelled(true);
-			event.getEntity().remove();
+        // pillager stuff:
+        final String message = island.getMetaData("raidCaptain").get().asBoolean() ? 
+            "&cA raid captain pillager has spawned in your island!" : 
+            "&cA pillager has spawned in your island!";
+
+        // pillager spawning mechanism
+        double pillagerChance = random.nextDouble();
+        if(pillagerChance < island.getMetaData("pillagerSpawnChance").get().asDouble()
+                && event.getLocation().getWorld().getName().equals("bskyblock_world")) {
+            event.setCancelled(true);
             monsterType = MonsterType.PILLAGER;
+
             if(island.getMetaData("raidCaptain").get().asBoolean()) {
                 spawnPillagerRaidCaptain(event.getLocation());
                 island.putMetaData("raidCaptain", new MetaDataValue(false));
             }else {
-				ItemStack crossbow = new ItemStack(Material.CROSSBOW);
-				Pillager pillager = (Pillager) event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.PILLAGER, false);
-				pillager.getEquipment().setItemInMainHand(crossbow);
-			}
-			
-			island.getMembers().forEach((uuid, rank) -> {
-				if(rank >= RanksManager.MEMBER_RANK || rank <= RanksManager.OWNER_RANK) {
-					User user = UserManager.getInstance().getUser(uuid);
-					if(user == null) return;
-					if(user.isWithinOwnIsland()) {
-						user.getPlayer().playSound(user.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1);
-						user.sendMessage(message);
-					}
-				}
-			});
-			
-			
-			island.putMetaData("pillagerSpawnChance", new MetaDataValue((double)0.02));
+                ItemStack crossbow = new ItemStack(Material.CROSSBOW);
+                Pillager pillager = (Pillager) event.getLocation().getWorld().spawnEntity(event.getLocation(), EntityType.PILLAGER, false);
+                pillager.getEquipment().setItemInMainHand(crossbow);
+            }
+            
+            island.getMembers().forEach((uuid, rank) -> {
+                if(rank >= RanksManager.MEMBER_RANK || rank <= RanksManager.OWNER_RANK) {
+                    User user = UserManager.getInstance().getUser(uuid);
+                    if(user == null) return;
+                    if(user.isWithinOwnIsland()) {
+                        user.getPlayer().playSound(user.getLocation(), Sound.ENTITY_ILLUSIONER_PREPARE_BLINDNESS, 1, 1);
+                        user.sendMessage(message);
+                    }
+                }
+            });
+            
+            
+            island.putMetaData("pillagerSpawnChance", new MetaDataValue((double)0.001));
+            return;
         }
-
-		event.setCancelled(false);
+        event.setCancelled(false);
+        event.getLocation().getWorld().spawnEntity(event.getLocation(), MonsterType.toEntityType(monsterType));
     }
 
     @EventHandler
@@ -123,14 +147,14 @@ public class CombatListener implements Listener {
         
         if(type == MonsterType.ZOMBIE_VILLAGER) {
             double currentChance = island.get().getMetaData("pillagerSpawnChance").get().asDouble();
-            island.get().putMetaData("pillagerSpawnChance", new MetaDataValue(currentChance+0.02)); // +2%
+            island.get().putMetaData("pillagerSpawnChance", new MetaDataValue(currentChance+0.001)); // +0.01%
             user.sendActionBar("&cNo XP reward &8| &4Pillager Spawn Chance +&c2% &8(&bZombie Villager&8)");
             return;
         }
 
         if(type == MonsterType.PILLAGER) {
             user.addPillagerKills(1);
-			String actionBarMessage = "&cRaid captain progress: (&4" + user.getPillagerKills() + "&8/&420&c)";
+            String actionBarMessage = "&cRaid captain progress: (&4" + user.getPillagerKills() + "&8/&420&c)";
             Pillager pillager = (Pillager) event.getEntity();
 
             if(pillager.isPatrolLeader()) {
@@ -140,18 +164,18 @@ public class CombatListener implements Listener {
                 return;
             }
 
-			if(user.getPillagerKills() >= 20) {
+            if(user.getPillagerKills() >= 20) {
                 user.setPillagerKills(0);
                 island.get().putMetaData("pillagerSpawnChance", new MetaDataValue(1.0));
                 island.get().putMetaData("raidCaptain", new MetaDataValue(true));
                 actionBarMessage = "&cRaid captain progress reset! (Raid captain will spawn, at some point)";
             }
-			
+            
             user.sendActionBar(actionBarMessage);
             return;
         }
 
-		// combat has no skill class; it's purely based on the user's island level (counts if user is a member or the owner of the mentioned island)
+        // combat has no skill class; it's purely based on the user's island level (counts if user is a member or the owner of the mentioned island)
         // user.addExperience(SkillType.COMBAT, 1, false); unnecessary.
         
         user.sendActionBar(
@@ -161,8 +185,8 @@ public class CombatListener implements Listener {
                 type.formatName()
             )
         );
-		
-		user.addMonsterKills(1);
+        
+        user.addMonsterKills(1);
     }
 
     private void spawnPillagerRaidCaptain(Location location) {
@@ -179,14 +203,14 @@ public class CombatListener implements Listener {
         bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.HALF_HORIZONTAL));
         bannerMeta.addPattern(new Pattern(DyeColor.LIGHT_GRAY, PatternType.CIRCLE_MIDDLE));
         bannerMeta.addPattern(new Pattern(DyeColor.BLACK, PatternType.BORDER));
-		banner.setItemMeta(bannerMeta);	
+        banner.setItemMeta(bannerMeta);    
 
-		ItemStack crossbow = new ItemStack(Material.CROSSBOW);
-		
-		pillager.getEquipment().setItemInMainHand(crossbow);
+        ItemStack crossbow = new ItemStack(Material.CROSSBOW);
+        
+        pillager.getEquipment().setItemInMainHand(crossbow);
         pillager.getEquipment().setHelmetDropChance(1.0F);
         pillager.getEquipment().setHelmet(banner);
-		pillager.setPatrolLeader(true);
+        pillager.setPatrolLeader(true);
     }
 
     // proudly copied from spigot, because i can't bother typing
