@@ -5,6 +5,7 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.bukkit.Sound;
+import org.bukkit.World;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Location;
@@ -38,35 +39,42 @@ import world.bentobox.bentobox.managers.RanksManager;
 public class CombatListener implements Listener {
 
     // Chance, Monster type.
-    private static final Map<Double, MonsterType> MOB_SPAWN_CHANCES = Map.of(
-        0.6,  MonsterType.SPIDER,           0.3,    MonsterType.SKELETON_CREEPER, 
-        0.1,  MonsterType.ZOMBIE_VILLAGER,  0.6,    MonsterType.PIGLIN,
-        0.2,  MonsterType.HOGLIN,           0.05,   MonsterType.BLAZE,
-        0.05, MonsterType.WITHER_SKELETON
+    private static final Map<String, Map<Double, MonsterType>> MOB_SPAWN_CHANCES = Map.of(
+        "bskyblock_world", Map.of(
+            0.6,  MonsterType.SPIDER,           0.3,    MonsterType.SKELETON_CREEPER, 
+            0.1,  MonsterType.ZOMBIE_VILLAGER
+        ),
+        "bskyblock_world_nether", Map.of(
+            0.6,  MonsterType.PIGLIN,  0.2, MonsterType.HOGLIN,
+            0.05,   MonsterType.BLAZE, 0.05, MonsterType.WITHER_SKELETON
+        )
     );
 
     // note: my balls were itchy when i wrote this.
     @EventHandler
     public void spawningListener(CreatureSpawnEvent event) {
         MonsterType monsterType = MonsterType.fromEntityType(event.getEntityType());
-        
+        World world = event.getLocation().getWorld();
         // to align with the world, and monster type.
         if(monsterType == null) return;
-        if(!monsterType.worldName.equals(event.getLocation().getWorld().getName())) return;
+        if(!monsterType.worldName.equals(world.getName())) return;
+        Map<Double, MonsterType> spawns = MOB_SPAWN_CHANCES.get(world.getName());
 
         // then we actually choose the mob that's supposed to spawn...
         Random random = new Random();
 
-        // take the chance and change it randomly.
         double mobChance = random.nextDouble(0.001, 1);
         
-        if(mobChance >= 0.7) {
-            monsterType = MonsterType.ZOMBIE;
-        } else if(mobChance <= 0.005) {
+        if(mobChance >= 0.7 && !world.getName().equals("bskyblock_world_the_end")) {
+            monsterType = world.getName().equals("bskyblock_world") ? 
+                        MonsterType.ZOMBIE : MonsterType.PIGLIN;
+        } else if(mobChance <= 0.005 && world.getName().equals("bskyblock_world_the_end")) {
             monsterType = MonsterType.SHULKER;  
-        } else {    
-            monsterType = MOB_SPAWN_CHANCES.get(mobChance);
+        } else {
+            monsterType = spawns.get(mobChance);
         }
+
+        if(monsterType == null) return;
 
         event.setCancelled(true);
 
