@@ -15,6 +15,7 @@
 
 - ## Latest commit:
   - Combat mob spawns improvements:
+    - Increased spawn chances of shulker.
     - Due to how frequent pillager spawn rates are, they've been decreased from ``2%`` to ``0.1%``.
     - Which mobs spawned, and where are now finally determined by tierblock and not spigot. This means shulkers, wither skeletons, blazes now spawn naturally in their worlds.
 
@@ -35,4 +36,5 @@ new ItemBuilder(Material.STONE).displayName("&7Hot stone block").lore(/*Your own
 // clickable gui item. ONLY WORKS WITH Menu CLASS!!! <-------
 new ItemBuilder(Material.STONE).displayName("&7Hot &cclickable &7stone block").lore(/*Your own List<String>*/).buidAsClickAble(() -> {
     // Do stuff here. fired once clicked only.
-});```
+});
+```

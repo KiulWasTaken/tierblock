@@ -37,11 +37,12 @@ import world.bentobox.bentobox.managers.RanksManager;
 @SuppressWarnings("deprecation")
 public class CombatListener implements Listener {
 
+    // Chance, Monster type.
     private static final Map<Double, MonsterType> MOB_SPAWN_CHANCES = Map.of(
         0.6,  MonsterType.SPIDER,           0.3,    MonsterType.SKELETON_CREEPER, 
         0.1,  MonsterType.ZOMBIE_VILLAGER,  0.6,    MonsterType.PIGLIN,
         0.2,  MonsterType.HOGLIN,           0.05,   MonsterType.BLAZE,
-        0.05, MonsterType.WITHER_SKELETON,  0.001,  MonsterType.SHULKER
+        0.05, MonsterType.WITHER_SKELETON
     );
 
     // note: my balls were itchy when i wrote this.
@@ -56,11 +57,14 @@ public class CombatListener implements Listener {
         // then we actually choose the mob that's supposed to spawn...
         Random random = new Random();
 
-        double mobChance = random.nextDouble(0.001, 1.000);
-
+        // take the chance and change it randomly.
+        double mobChance = random.nextDouble(0.001, 1);
+        
         if(mobChance >= 0.7) {
             monsterType = MonsterType.ZOMBIE;
-        } else {
+        } else if(mobChance <= 0.005) {
+            monsterType = MonsterType.SHULKER;  
+        } else {    
             monsterType = MOB_SPAWN_CHANCES.get(mobChance);
         }
 
