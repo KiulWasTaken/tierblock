@@ -77,6 +77,7 @@ public final class Main extends JavaPlugin {
         // should just put them in one command
         getCommand("buygexp").setExecutor(new BuyGEXP());
 		getCommand("islandflight").setExecutor(commands);
+		getCommand("reloadconfig").setExecutor(commands);
         getCommand("givexp").setExecutor(commands);
 		getCommand("modifydouble").setExecutor(commands);
         getCommand("modifyint").setExecutor(commands);

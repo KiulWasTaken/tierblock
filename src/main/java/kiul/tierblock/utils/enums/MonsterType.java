@@ -1,5 +1,7 @@
 package kiul.tierblock.utils.enums;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 import org.bukkit.entity.EntityType;
@@ -20,6 +22,7 @@ public enum MonsterType {
     SHULKER(8.4, 100, "bskyblock_world_the_end");
 
     public final double xpReward;
+    public final double spawnChance;
     public final String label;
     public final int islandLevelRequirement;
 	public final String worldName;
@@ -30,6 +33,7 @@ public enum MonsterType {
         this.islandLevelRequirement = islandLevelRequirement;
         this.label = toString().toLowerCase();
         this.xpReward = Main.getInstance().getConfig().getDouble("combat." + label + ".xp_reward");
+        this.spawnChance = Main.getInstance().getConfig().getDouble("combat." + label + ".spawn_chance");
         this.worldName = worldName;
 	}
 
@@ -105,5 +109,35 @@ public enum MonsterType {
                 return EntityType.SHULKER;
         }
         return null;
+    }
+
+    public static MonsterType getMonsterByChance(double chance, String worldName, int islandLevel) {
+        List<MonsterType> monsters = Arrays.asList(MonsterType.values()).stream().filter(monsterType -> {
+			if(monsterType == MonsterType.PILLAGER) return false;
+			if(!monsterType.worldName.equals(worldName)) return false;
+			if(monsterType.islandLevelRequirement > islandLevel) return false;
+			if(monsterType.spawnChance < chance) return false;
+            return true;
+        }).toList();
+
+		MonsterType closest = null;
+
+		if(monsters.size() > 0) {
+			closest = monsters.get(0);
+			double minDifference = Math.abs(chance - closest.spawnChance);
+			for(int i = 0; i < monsters.size(); i++) {
+				MonsterType current = monsters.get(i);
+				
+				if(current == null) break;
+				
+				double difference = Math.abs(chance - current.spawnChance);
+
+				if(difference < minDifference) {
+					closest = current;
+					minDifference = difference;
+				}
+			}
+		}
+        return closest;
     }
 }

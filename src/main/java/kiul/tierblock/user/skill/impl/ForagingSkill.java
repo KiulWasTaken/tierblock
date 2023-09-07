@@ -1,5 +1,6 @@
 package kiul.tierblock.user.skill.impl;
 
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
@@ -28,10 +29,17 @@ public class ForagingSkill extends Skill {
         user.getPlayer().getInventory().addItem(itemStack);
 
         // user is max-level, now able to mine beyond max-level blocks.
-        if(user.getLevel(getSkillType(), false) >= maxLevel(isNether)) {
+        if(user.getLevel(getSkillType(), false) >= maxLevel(isNether) && user.getLevel(getSkillType(), true) == 1) {
         	user.getStats().setBoolean(getSkillType().toString().toLowerCase() + ".nether.unlocked", true);
             user.setFlight(true);
             user.getPlayer().setAllowFlight(true);
+			if(user.getGlobalLevel() < WoodType.CRIMSON.globalLevelRequirement) {
+                user.sendMessage(
+                    "&e&lNOTE: &cTo use the newly unlocked type of plant, you need &e&lisland level "
+                    + WoodType.CRIMSON.globalLevelRequirement + "&c!"
+                );
+            }
+			user.getPlayer().getInventory().addItem(new ItemStack(Material.CRIMSON_FUNGUS));
 			user.sendMessage("&aYou've unlocked the flight ability! (Only works while in island)");
         }
         

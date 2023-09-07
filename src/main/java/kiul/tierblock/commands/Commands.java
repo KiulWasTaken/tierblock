@@ -6,6 +6,7 @@ import org.bukkit.command.CommandSender;
 import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.entity.Player;
 
+import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillType;
@@ -22,13 +23,15 @@ public class Commands implements CommandExecutor {
         User user = UserManager.getInstance().getUser((Player)sender);
 
         switch(label.toLowerCase()) {
-            case "islandflight":
-                if(user.getLevel(SkillType.FORAGING, false) == SkillType.FORAGING.maxLevel) {
+            case "islandflight": {
+                if(user.getLevel(SkillType.FORAGING, false) < SkillType.FORAGING.maxLevel) {
                     user.sendMessage("&cYou need &eforaging level 6 &cto unlock flight!");
                     return false;
                 }
                 user.setFlight(!user.isAllowedToFly());
-                user.sendMessage("&aFlight has been" + (user.isAllowedToFly() ? "&2enabled" : "&cdisabled"));
+                user.sendMessage("&aFlight has been: " + (user.isAllowedToFly() ? "&2enabled" : "&cdisabled"));
+				return true;
+			}
         }
 
         if(!user.isOp()) {
@@ -37,6 +40,10 @@ public class Commands implements CommandExecutor {
         }
 
         switch(label) {
+			case "reloadconfig":
+				Main.getInstance().reloadConfig();
+				user.sendMessage("&aDone!");
+				return true;
             case "givexp":
                 if(args[0].equalsIgnoreCase("help")) {
                     user.sendMessage("&aUsage: /givexp &7<amount> <(optional)skill index> <(optional)true/false for nether>");

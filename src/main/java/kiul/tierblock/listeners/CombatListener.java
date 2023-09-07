@@ -1,7 +1,6 @@
 package kiul.tierblock.listeners;
 
 import java.util.Random;
-import java.util.Map;
 import java.util.Optional;
 
 import org.bukkit.Sound;
@@ -13,6 +12,7 @@ import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Monster;
 import org.bukkit.entity.Pillager;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -38,43 +38,20 @@ import world.bentobox.bentobox.managers.RanksManager;
 @SuppressWarnings("deprecation")
 public class CombatListener implements Listener {
 
-    // Chance, Monster type.
-    private static final Map<String, Map<Double, MonsterType>> MOB_SPAWN_CHANCES = Map.of(
-        "bskyblock_world", Map.of(
-            0.6,  MonsterType.SPIDER,           0.3,    MonsterType.SKELETON_CREEPER, 
-            0.1,  MonsterType.ZOMBIE_VILLAGER
-        ),
-        "bskyblock_world_nether", Map.of(
-            0.6,  MonsterType.PIGLIN,  0.2, MonsterType.HOGLIN,
-            0.05,   MonsterType.BLAZE, 0.05, MonsterType.WITHER_SKELETON
-        )
-    );
-
     // note: my balls were itchy when i wrote this.
     @EventHandler
     public void spawningListener(CreatureSpawnEvent event) {
+        if(!(event.getEntity() instanceof Monster)) return;
+
         MonsterType monsterType = MonsterType.fromEntityType(event.getEntityType());
+
         World world = event.getLocation().getWorld();
-        // to align with the world, and monster type.
-        if(monsterType == null) return;
-        if(!monsterType.worldName.equals(world.getName())) return;
-        Map<Double, MonsterType> spawns = MOB_SPAWN_CHANCES.get(world.getName());
 
         // then we actually choose the mob that's supposed to spawn...
         Random random = new Random();
 
-        double mobChance = random.nextDouble(0.001, 1);
-        
-        if(mobChance >= 0.7 && !world.getName().equals("bskyblock_world_the_end")) {
-            monsterType = world.getName().equals("bskyblock_world") ? 
-                        MonsterType.ZOMBIE : MonsterType.PIGLIN;
-        } else if(mobChance <= 0.005 && world.getName().equals("bskyblock_world_the_end")) {
-            monsterType = MonsterType.SHULKER;  
-        } else {
-            monsterType = spawns.get(mobChance);
-        }
-
-        if(monsterType == null) return;
+		// get spawn chance with some bias on nether.
+        double mobChance = random.nextDouble(0.0001, 1);
 
         event.setCancelled(true);
 
@@ -82,19 +59,30 @@ public class CombatListener implements Listener {
         Island island = manager.getIslandAt(event.getLocation()).get();
 
         if(island == null) return; // not spawning inside island
+		
+		int islandLevel = island.getMetaData("level").get().asInt();
+		
+		if(monsterType != null && monsterType.islandLevelRequirement > islandLevel) event.getEntity().remove();
 
         if(event.getSpawnReason() != SpawnReason.NATURAL) {
             event.setCancelled(false); // incase it's an other way of spawning, we don't cancel this
             return;
         }
 
-        if(island.getMetaData("level").get().asInt() < monsterType.islandLevelRequirement) {
-            event.setCancelled(true);
-            return;
-        }
-
-        event.getEntity().remove();
-
+        // event.getEntity().remove();
+        monsterType = MonsterType.getMonsterByChance(
+            mobChance, // chance, it'll find the closest
+            world.getName(), // world name, it'll find the ones that fit
+            islandLevel// and island level so it doesn't spawn everything when it shouldn't
+        );
+		
+		if(monsterType == null) {
+			event.setCancelled(false);
+			return;
+		} else {
+			event.getEntity().remove();
+		}
+		
         // pillager stuff:
         final String message = island.getMetaData("raidCaptain").get().asBoolean() ? 
             "&cA raid captain pillager has spawned in your island!" : 
@@ -104,6 +92,7 @@ public class CombatListener implements Listener {
         double pillagerChance = random.nextDouble();
         if(pillagerChance < island.getMetaData("pillagerSpawnChance").get().asDouble()
                 && event.getLocation().getWorld().getName().equals("bskyblock_world")) {
+			event.getEntity().remove();
             event.setCancelled(true);
             monsterType = MonsterType.PILLAGER;
 
@@ -126,7 +115,6 @@ public class CombatListener implements Listener {
                     }
                 }
             });
-            
             
             island.putMetaData("pillagerSpawnChance", new MetaDataValue((double)0.001));
             return;
@@ -159,8 +147,8 @@ public class CombatListener implements Listener {
         
         if(type == MonsterType.ZOMBIE_VILLAGER) {
             double currentChance = island.get().getMetaData("pillagerSpawnChance").get().asDouble();
-            island.get().putMetaData("pillagerSpawnChance", new MetaDataValue(currentChance+0.001)); // +0.01%
-            user.sendActionBar("&cNo XP reward &8| &4Pillager Spawn Chance +&c2% &8(&bZombie Villager&8)");
+            island.get().putMetaData("pillagerSpawnChance", new MetaDataValue(currentChance+0.001)); // +0.1%
+            user.sendActionBar("&cNo XP reward &8| &4Pillager Spawn Chance +&c0.1% &8(&bZombie Villager&8)");
             return;
         }
 

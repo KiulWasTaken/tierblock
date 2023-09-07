@@ -470,11 +470,10 @@ public class User {
     }
 
     public boolean isAllowedToFly() {
-        return getStats().getBoolean("flight");
+        return this.player.getAllowFlight();
     }
 
     public void setFlight(boolean flight) {
-        getStats().setBoolean("flight", flight);
         this.player.setAllowFlight(flight);
     }
 

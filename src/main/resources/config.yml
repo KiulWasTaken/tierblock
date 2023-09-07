@@ -61,24 +61,34 @@ farming:
 # no level up stuff cuz it's calculated from island level
 combat:
   pillager:
+    spawn_chance: 0.0
     xp_reward: 0.0
   zombie:
+    spawn_chance: 0.6
     xp_reward: 2.0
   spider:
+    spawn_chance: 0.5
     xp_reward: 2.8
   skeleton_creeper:
+    spawn_chance: 0.4
     xp_reward: 3.4
   zombie_villager:
+    spawn_chance: 0.05
     xp_reward: 0.0
   piglin:
+    spawn_chance: 0.6
     xp_reward: 4.0
   hoglin:
+    spawn_chance: 0.3
     xp_reward: 4.0
   blaze:
+    spawn_chance: 0.09
     xp_reward: 5.6
-  piglin:
+  wither_skeleton:
+    spawn_chance: 0.07
     xp_reward: 5.6
   shulker:
+    spawn_chance: 0.009
     xp_reward: 8.4
 
 mining:

@@ -167,16 +167,13 @@ public class FarmingListener implements Listener {
         if(type != null) {
             if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
                 user.sendMessage("&cYou must be an island member to plant this!");
-                user.sendMessage("REMOVE ME! &bCancelled: " + event.isCancelled());
                 return;
             } else {
                 if(user.getLevel(SkillType.FARMING, type.isNether) < type.levelRequirement) {
                     user.sendMessage("&cYou need farming &elevel " + type.levelRequirement + " &cto plant this!");
-                    user.sendMessage("REMOVE ME! &bCancelled: " + event.isCancelled());
                     return;
                 }
             }
-            user.sendMessage("REMOVE ME! &bPlayer can place");
         }
 
         event.setCancelled(false);

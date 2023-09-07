@@ -4,6 +4,7 @@ main: kiul.tierblock.Main
 depend: [BentoBox]
 api-version: 1.19
 commands:
+  reloadconfig:
   buygexp:
   islandflight:
     aliases:

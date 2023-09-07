@@ -68,7 +68,6 @@ public class Stats {
 
         configuration.set("booster", 0);
         configuration.set("booster_multiplier", 1.0);
-        configuration.set("flight", false);
         configuration.set("has_island", false);
 
         configuration.set("fishing.level", 1);
