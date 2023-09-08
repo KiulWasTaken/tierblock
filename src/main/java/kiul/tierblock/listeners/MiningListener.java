@@ -4,6 +4,7 @@ import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockFormEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.metadata.FixedMetadataValue;
 
@@ -14,6 +15,7 @@ import kiul.tierblock.user.skill.SkillManager;
 import kiul.tierblock.user.skill.SkillType;
 import kiul.tierblock.user.skill.impl.MiningSkill;
 import kiul.tierblock.utils.enums.MineableType;
+import world.bentobox.bentobox.managers.RanksManager;
 
 public class MiningListener implements Listener {
 
@@ -33,6 +35,10 @@ public class MiningListener implements Listener {
 
         User user = UserManager.getInstance().getUser(event.getPlayer());
         event.setDropItems(false);
+
+        // prevent users from getting xp or stuff like that on anyone else's island
+        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK)
+            return;
 
         if (user.getPlayer().getGameMode() != GameMode.SURVIVAL)
             return;
@@ -89,6 +95,15 @@ public class MiningListener implements Listener {
                 : String.format("&8| &eMining: &2+&a%sxp &8(&b%s&8)",
                 Main.DECIMAL_FORMAT.format(xpReward), type.formatName()))).toString()
             );
+    }
+
+    public void blockForm(BlockFormEvent event) {
+        MineableType mineableType = MineableType.fromMaterial(event.getBlock().getType());
+
+        if(mineableType == null) return;
+
+        if(event.getBlock().getMetadata("pp").size() < 1) return;
+        event.getBlock().removeMetadata("pp", Main.getInstance());
     }
 
     @EventHandler

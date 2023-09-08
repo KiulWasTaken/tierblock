@@ -1,5 +1,6 @@
 package kiul.tierblock.listeners;
 
+import org.bukkit.GameMode;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -32,13 +33,14 @@ public class ForagingListener implements Listener {
         Block block = event.getBlock();
         WoodType type = WoodType.fromMaterial(block.getType());
 
-        if(type == null) return; // not wood, stopping here.
-        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
-            user.sendMessage("&cYou must be an island member to break this!");
+        if(type == null)
+            return; // not wood, stopping here.
+        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK)
             return;
-        }
-        if(event.getBlock().hasMetadata("pp")) return; // player placed
-
+        if(user.getPlayer().getGameMode() != GameMode.SURVIVAL)
+            return;
+        if(event.getBlock().hasMetadata("pp"))
+            return; // player placed
         if(type.isNether && !user.getStats().getBoolean("foraging.nether.unlocked")) {
             user.sendActionBar("&cYou need to &emax foraging &cto unlock nether content!");
             return;

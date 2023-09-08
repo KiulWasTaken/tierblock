@@ -7,9 +7,6 @@ commands:
   reloadconfig:
   buygexp:
   islandflight:
-    aliases:
-      - fly
-      - flight
   givexp:
     description: gives global XP to the user that runs the command.
   modifyint:

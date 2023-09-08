@@ -74,11 +74,8 @@ public class FarmingListener implements Listener {
             return; // not a crop, stopping here.
         if(!user.hasIsland())
             return;
-        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
-            event.setCancelled(true);
-            user.sendMessage("&cYou must be an island member to farm this!");
+        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK)
             return;
-        }
 
         List<Material> nonAgeable = List.of(Material.SUGAR_CANE, Material.PUMPKIN, Material.MELON);
 
@@ -156,6 +153,12 @@ public class FarmingListener implements Listener {
     @EventHandler
     public void blockPlaceEvent(BlockPlaceEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayer());
+		
+		if(!user.isWithinOwnIsland()) { 
+			event.setCancelled(true);
+			return;
+		}
+
         Block block = event.getBlock();
 
         List<Material> flaggableBlocks = List.of(Material.SUGAR_CANE, Material.PUMPKIN, Material.MELON);
@@ -235,6 +238,8 @@ public class FarmingListener implements Listener {
 
                 if(type == null)
                     return; // make sure it's a plant above.
+                if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK) 
+                    return;
 
                 if(user.getLevel(SkillType.FARMING, type.isNether) < type.levelRequirement) {
                     // show progress, ifthe block is unlockable in the next level (In other words:
@@ -314,7 +319,7 @@ public class FarmingListener implements Listener {
         User user = UserManager.getInstance().getUser(event.getPlayer());
         Block block = event.getBlock();
 
-        if(!user.isWithinOwnIsland())
+        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK)
             return;
             
         if(block.getType() != Material.BEEHIVE)
@@ -323,8 +328,10 @@ public class FarmingListener implements Listener {
         if(!user.canPlaceBeeHive())
             return;
             
-        if(user.getIslandRank() != RanksManager.OWNER_RANK)
+        if(user.getIslandRank() != RanksManager.OWNER_RANK) {
+            event.setCancelled(true);
             return;
+        }
 
         Map<String, MetaDataValue> islandMetaData = user.getIsland().getMetaData().get();
 
