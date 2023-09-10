@@ -40,6 +40,18 @@ public class Commands implements CommandExecutor {
         }
 
         switch(label) {
+            case "setspawn":
+
+                user.sendMessage("&cNot implemented, yet.");
+
+                // Main.getInstance().getConfig().set("spawn.world", user.getLocation().getWorld().getName());
+                // Main.getInstance().getConfig().set("spawn.x", user.getLocation().getX());
+                // Main.getInstance().getConfig().set("spawn.y", user.getLocation().getY());
+                // Main.getInstance().getConfig().set("spawn.z", user.getLocation().getZ());
+                // Main.getInstance().getConfig().set("spawn.pitch", user.getLocation().getPitch());
+                // Main.getInstance().getConfig().set("spawn.yaw", user.getLocation().getYaw());
+                // Main.getInstance().saveConfig();
+                return true;
 			case "reloadconfig":
 				Main.getInstance().reloadConfig();
 				user.sendMessage("&aDone!");

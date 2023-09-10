@@ -49,14 +49,15 @@ public class LeaderboardCommand implements CommandExecutor {
 
         // This is for an in-game player:
         User user = UserManager.getInstance().getUser((Player) sender);
-        topTen.forEach(island -> {
+        for(int i = 0; i < topTen.size(); i++) {
+			Island island = topTen.get(i);
             int islandLevel = island.getMetaData("level").isPresent() ? island.getMetaData("level").get().asInt() : 0; // to make intellij happy x2
             String ownerName = Bukkit.getOfflinePlayer(island.getOwner()).getName();
 			String name = (island.getName() == null) ? "&a" + ownerName + "'s island" : island.getName();
-            user.sendMessage("&b#1 &8- &a" + name + " &2| Lvl: &a" + islandLevel + ((island.getName() == null) ? "" : "&2, Owner: &a" + ownerName));
+            user.sendMessage("&b#" + (i+1) + " &8- &a" + name + " &2| Lvl: &a" + islandLevel + ((island.getName() == null) ? "" : "&2, Owner: &a" + ownerName));
             // ^ Remove this, if you want a GUI
             // Make ItemStack, add to GUI.
-        });
+        }
         // off to warthunder i go!
         return false;
     }

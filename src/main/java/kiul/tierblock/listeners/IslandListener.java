@@ -1,5 +1,6 @@
 package kiul.tierblock.listeners;
 
+import org.bukkit.GameMode;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 
@@ -53,10 +54,12 @@ public void islandReset(IslandResetEvent event) {
 @EventHandler
 public void islandExit(IslandExitEvent event) {
     User user = UserManager.getInstance().getUser(event.getPlayerUUID());
-    if(user.isAllowedToFly()) user.getPlayer().setAllowFlight(false);
+    if(user.getPlayer().getGameMode() == GameMode.SURVIVAL && user.isAllowedToFly()) {
+        user.setFlight(false);
+    }
 }
 
-@EventHandler
+// useless for now.
 public void islandEnter(IslandEnterEvent event) {
     User user = UserManager.getInstance().getUser(event.getPlayerUUID());
     if(user.isAllowedToFly()) user.getPlayer().setAllowFlight(true);

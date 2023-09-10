@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.OfflinePlayer;
 import org.bukkit.Sound;
+import org.bukkit.block.Block;
 import org.bukkit.block.data.type.Beehive;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -147,6 +148,15 @@ public class TestCommand implements CommandExecutor {
         if (!user.isOp()) {
             user.sendMessage("&cInsufficient permissions");
             return false;
+        }
+
+        if("isthispp".equalsIgnoreCase(args[0])) {
+            Block block = user.getPlayer().getTargetBlockExact(5);
+            
+            boolean isPp = block.hasMetadata("pp");
+
+            user.sendMessage("&dThis block is " + (isPp ? "" : "&cnot&d") + " pp!");
+            return true;
         }
 
         if("whereami".equalsIgnoreCase(args[0])) {

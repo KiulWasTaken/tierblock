@@ -165,21 +165,19 @@ public class FarmingListener implements Listener {
 
         CropType type = CropType.fromMaterial(block.getType());
 
-        event.setCancelled(true);
-
         if(type != null) {
             if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+				event.setCancelled(true);
                 user.sendMessage("&cYou must be an island member to plant this!");
                 return;
             } else {
                 if(user.getLevel(SkillType.FARMING, type.isNether) < type.levelRequirement) {
-                    user.sendMessage("&cYou need farming &elevel " + type.levelRequirement + " &cto plant this!");
+                    event.setCancelled(true);
+					user.sendMessage("&cYou need farming &elevel " + type.levelRequirement + " &cto plant this!");
                     return;
                 }
             }
         }
-
-        event.setCancelled(false);
 
         if(block.getType() != Material.BEEHIVE) {
             if(flaggableBlocks.contains(block.getType()))
@@ -224,7 +222,6 @@ public class FarmingListener implements Listener {
         Block block = event.getClickedBlock();
 
         if(!user.isWithinOwnIsland()) {
-            user.sendMessage("&cThis beehive is not for your island!");
             return;
         }
 

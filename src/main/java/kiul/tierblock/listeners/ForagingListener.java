@@ -1,6 +1,7 @@
 package kiul.tierblock.listeners;
 
 import org.bukkit.GameMode;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -39,8 +40,10 @@ public class ForagingListener implements Listener {
             return;
         if(user.getPlayer().getGameMode() != GameMode.SURVIVAL)
             return;
-        if(event.getBlock().hasMetadata("pp"))
+        if(event.getBlock().hasMetadata("pp")) {
+            block.removeMetadata("pp", Main.getInstance());
             return; // player placed
+        }
         if(type.isNether && !user.getStats().getBoolean("foraging.nether.unlocked")) {
             user.sendActionBar("&cYou need to &emax foraging &cto unlock nether content!");
             return;
@@ -96,22 +99,26 @@ public class ForagingListener implements Listener {
         WoodType type = WoodType.fromMaterial(event.getBlock().getType());
         String blockTypeString = event.getBlock().getType().toString().toLowerCase();
 
-        event.setCancelled(true);
-
+		if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK)
+            return;
+		
         if(!blockTypeString.startsWith("potted") && blockTypeString.endsWith("sapling")) {
+            if(event.getBlock().getType() == Material.CHERRY_SAPLING
+                || event.getBlock().getType() == Material.BAMBOO_SAPLING) return;
+            
             if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+				event.setCancelled(true);
                 user.sendMessage("&cYou must be an island member to place this!");
                 return;
             } else {
                 WoodType typeFromSapling = WoodType.fromSapling(event.getBlock().getType());
                 if(user.getLevel(SkillType.FORAGING, typeFromSapling.isNether) < typeFromSapling.levelRequirement) {
+					event.setCancelled(true);
                     user.sendMessage("&cYou need foraging &elevel " + typeFromSapling.levelRequirement + " &cto place this.");
                     return;
                 }
             }
         }
-
-        event.setCancelled(false);
 
         if(type == null) return; // not wood :(.
 

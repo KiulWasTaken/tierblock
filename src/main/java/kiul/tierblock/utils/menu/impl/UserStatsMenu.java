@@ -98,8 +98,8 @@ public class UserStatsMenu extends Menu {
                     ("&bLevel: &e" + user.getGlobalLevel()),
                     ("&bExperience: &e" + Main.DECIMAL_FORMAT.format(user.getGlobalExperience())),
                     ("&bProgress: &a" + 
-                        Main.DECIMAL_FORMAT.format((user.getGlobalExperience()/((user.getGlobalLevel() > 10) ? 1000.0 : 100.0))*100) +
-                        "% &8[ " + drawProgressBar(user.getGlobalExperience(), ((user.getGlobalLevel() > 10) ? 1000.0 : 100.0)) + " &8]")
+                        Main.DECIMAL_FORMAT.format((user.getGlobalExperience()/((user.getGlobalLevel() >= 10) ? 1000.0 : 100.0))*100) +
+                        "% &8[ " + drawProgressBar(user.getGlobalExperience(), ((user.getGlobalLevel() >= 10) ? 1000.0 : 100.0)) + " &8]")
                 )
             ).build(), 13
         );
