@@ -71,7 +71,7 @@ public class MiningListener implements Listener {
                 return;
             }
 
-            user.sendActionBar("&cYou need to have &emining level " + type.levelRequirement + " &cto farm this!");
+            user.sendActionBar("&cYou need to have &emining level " + type.levelRequirement + " &cto mine this!");
             return;
         }
 

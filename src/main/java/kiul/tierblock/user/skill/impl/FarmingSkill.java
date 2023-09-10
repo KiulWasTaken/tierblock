@@ -2,6 +2,7 @@ package kiul.tierblock.user.skill.impl;
 
 import java.lang.Math;
 
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.inventory.ItemStack;
 
@@ -38,7 +39,17 @@ public class FarmingSkill extends Skill {
                     + CropType.NETHER_WART.globalLevelRequirement + "&c!"
                 );
             }
+
+            user.sendMessage(
+                "&eYou've reached &lBOOSTERS AND &6&lBEE&e&lHIVES!\n" +
+                "&6Bee&ehives, once harvested will &6&ltriple&e your island xp gains!\n" +
+                "&8------------\n" +
+                "&8* &eTo use the &6bee&ehive, your &6bees &emust be alive, and working in the &6bee&ehive\n" +
+                "&8* &eYou'll also have to wait &624 hours &eafter first placement and between each harvest!\n" +
+                "&4&lWARNING&4: &cBreaking the beehive will restart the &4&l24 hour&c countdown. Be careful!"
+            );
 			
+            user.getPlayer().getInventory().addItem(new ItemStack(Material.BEEHIVE));
 			user.getPlayer().getInventory().addItem(new ItemStack(CropType.toSeed(CropType.NETHER_WART)));
         }
 

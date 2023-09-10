@@ -6,6 +6,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.player.PlayerMoveEvent;
 
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
@@ -25,6 +26,7 @@ public class IslandListener implements Listener {
         island.putMetaData("level", new MetaDataValue(1));
         island.putMetaData("xp", new MetaDataValue(0.0));
         island.putMetaData("hasBeeHive", new MetaDataValue(false));
+        island.putMetaData("beehivePlacedBefore", new MetaDataValue(false));
         island.putMetaData("pillagerSpawnChance", new MetaDataValue(0.001)); // 0.1%
         island.putMetaData("raidCaptain", new MetaDataValue(false));
     }
@@ -103,6 +105,33 @@ public class IslandListener implements Listener {
         int rank = user.getIslandAtPosition().getRank(user.getUUID());
 
         if(rank < RanksManager.COOP_RANK && user.hasIsland()) {
+            user.teleport(user.getIsland().getSpawnPoint(Environment.NORMAL));
+            return;
+        }
+
+        user.teleport(Bukkit.getWorld("world").getSpawnLocation());
+    }
+
+    @EventHandler
+    public void playerMoveEvent(PlayerMoveEvent event) {
+        User user = UserManager.getInstance().getUser(event.getPlayer());
+
+        if(user.getLocation().getY() > -64 /* Could be wrong */) return;
+
+        if(user.getIslandAtPosition() == null) {
+            user.setFlight(true);
+            user.teleport(Bukkit.getWorld("world").getSpawnLocation());
+            user.setFlight(false);
+            return;
+        }
+
+        if(user.getIslandAtPosition().equals(user.getIsland()))
+            return;
+
+        int rank = user.getIslandAtPosition().getRank(user.getUUID());
+
+        if(rank < RanksManager.COOP_RANK && user.hasIsland()) {
+            user.setFlight(true);
             user.teleport(user.getIsland().getSpawnPoint(Environment.NORMAL));
             return;
         }
