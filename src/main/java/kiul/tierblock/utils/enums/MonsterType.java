@@ -113,7 +113,7 @@ public enum MonsterType {
 
     public static MonsterType getMonsterByChance(double chance, String worldName, int islandLevel) {
         List<MonsterType> monsters = Arrays.asList(MonsterType.values()).stream().filter(monsterType -> {
-			if(monsterType == MonsterType.PILLAGER) return false;
+			if(monsterType == PILLAGER || monsterType == SPIDER) return false;
 			if(!monsterType.worldName.equals(worldName)) return false;
 			if(monsterType.islandLevelRequirement > islandLevel) return false;
 			if(monsterType.spawnChance < chance) return false;

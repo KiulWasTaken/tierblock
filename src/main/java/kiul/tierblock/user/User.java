@@ -97,6 +97,24 @@ public class User {
                 ChatColor.translateAlternateColorCodes('&', message)));
     }
 
+    public void teleport(Location location) {
+        if(this.offlinePlayer != null)
+            return;
+        this.player.teleport(location);
+    }
+
+    public void teleport(User user) {
+        if(this.offlinePlayer != null)
+            return;
+        this.player.teleport(user.getLocation());
+    }
+
+    public void teleport(Player player) {
+        if(this.offlinePlayer != null)
+            return;
+        this.player.teleport(player);
+    }
+
     /**
      * Sends a title message to the user.
      * 

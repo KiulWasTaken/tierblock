@@ -1,31 +1,27 @@
 # Bug fixes:
 
 - ## Latest commit:
+  - Dying in an island warp, will teleport you to your island/the spawn island, unless you're a member of that island.
+  - Spiders only spawn where they should.
+  - Farming listener doesn't stop operators from building on anyone's island anymore.
+  - Foraging rewards increased for level 4 to 6 (inclusive).
+
+- ## Recent:
   - Pillagers don't spawn anywhere now.
   - You can actually access nether generators after unlocking nether subskill in mining, smh.
   - Fixed foraging, and farming level ups.
 
-- ## Recent:
-  - Level up recursion in farming, and foraging due to forgetting to account for ``global_level_requirement``
-  - Island level ups happen again now.
-  - Fixed a stupid where it tells user they can't place block, but never cancels event (Stupid frog).
-  - ``/buygexp`` uses ``add`` instead of ``subtract`` now... (Yeah, idk how I messed that up)
-
 # Latest changes:
 
 - ## Latest commit:
+  - New ``/test isthispp`` sub-command for mining debug purposes.
+
+- ## Recent:
   - Combat mob spawns improvements:
     - Increased spawn chances of shulker.
     - Due to how frequent pillager spawn rates are, they've been decreased from ``2%`` to ``0.1%``.
     - Which mobs spawned, and where are now finally determined by tierblock and not spigot. This means shulkers, wither skeletons, blazes now spawn naturally in their worlds.
 
-
-- ## Recent:
-  - Added sub-command ``/test whereami`` for dev purposes.
-  - Islands have default names now.
-  - When levelling up in a skill and the new acquired item requires a level higher than the island's level, user will be told.
-  - Global level ups are now recursive.
-  - Level up now plays a ``BLOCK_NOTE_BLOCK_PLING`` sound instead of ``UI_TOAST_CHALLENGE_COMPLETE`` sound.
 
 # How to use the ItemBuilder
 

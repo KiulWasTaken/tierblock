@@ -25,7 +25,9 @@ public class ForagingSkill extends Skill {
         user.setExperience(getSkillType(), excessXp, isNether);
 
         int addition = 0 + (isNether ? 6 : 0);
-        ItemStack itemStack = new ItemStack(WoodType.toSapling(WoodType.values()[user.getLevel(getSkillType(), isNether) + addition - 1]));
+        int ordinal = (user.getLevel(getSkillType(), isNether) + addition - 1);
+        boolean more = ordinal >= 3 && ordinal <= 5;
+        ItemStack itemStack = new ItemStack(WoodType.toSapling(WoodType.values()[user.getLevel(getSkillType(), isNether) + addition - 1]), more ? 4 : 1);
         user.getPlayer().getInventory().addItem(itemStack);
 
         // user is max-level, now able to mine beyond max-level blocks.

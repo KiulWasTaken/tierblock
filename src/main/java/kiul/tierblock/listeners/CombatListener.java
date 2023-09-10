@@ -70,11 +70,13 @@ public class CombatListener implements Listener {
         }
 
         // event.getEntity().remove();
-        monsterType = MonsterType.getMonsterByChance(
-            mobChance, // chance, it'll find the closest
-            world.getName(), // world name, it'll find the ones that fit
-            islandLevel// and island level so it doesn't spawn everything when it shouldn't
-        );
+        // to prevent spiders from spawning where they shouldn't
+        if(monsterType != MonsterType.SPIDER)
+            monsterType = MonsterType.getMonsterByChance(
+                mobChance, // chance, it'll find the closest
+                world.getName(), // world name, it'll find the ones that fit
+                islandLevel// and island level so it doesn't spawn everything when it shouldn't
+            );
 		
 		if(monsterType == null) {
 			event.setCancelled(false);
