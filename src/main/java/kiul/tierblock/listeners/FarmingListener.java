@@ -271,12 +271,13 @@ public class FarmingListener implements Listener {
                     event.setCancelled(true);
                     String message = "&cYou need to be level &e" + type.levelRequirement + " &cto farm this!";
                     boolean progress = (type.levelRequirement - 1) == user.getLevel(SkillType.FARMING, type.isNether);
+                    CropType previousType = CropType.values()[type.ordinal() - 1];
                     if (progress) {
                         message = String.format(
                                 "&cYou need to farm &e%s &cmore &e%s&c to collect this!",
-                                (int) (type.levelUp -
+                                (int) (previousType.levelUp -
                                         user.getExperience(SkillType.FARMING, type.isNether)),
-                                CropType.values()[type.ordinal() - 1].formatName());
+                                previousType.formatName());
                     }
 
                     user.sendActionBar(message);

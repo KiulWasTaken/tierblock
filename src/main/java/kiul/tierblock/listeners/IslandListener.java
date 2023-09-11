@@ -6,6 +6,7 @@ import org.bukkit.World.Environment;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.PlayerDeathEvent;
+import org.bukkit.event.entity.SpawnerSpawnEvent;
 import org.bukkit.event.player.PlayerMoveEvent;
 
 import kiul.tierblock.user.User;
@@ -69,12 +70,22 @@ public class IslandListener implements Listener {
     public void islandEnter(IslandEnterEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayerUUID());
         if(user.isAllowedToFly()) user.getPlayer().setAllowFlight(true);
+        if(event.getIsland().getRank(user.getUUID()) < RanksManager.MEMBER_RANK) {
+            boolean hasMeta = user.getIsland().getMetaData().get().containsKey("beehivePlacedBefore");
+            if(hasMeta)
+                user.getIsland().putMetaData("beehivePlacedBefore", new MetaDataValue(false));
+        }
     }
 
     @EventHandler
     public void islandJoin(TeamJoinEvent event) {
         User user = UserManager.getInstance().getUser(event.getPlayerUUID());
         user.setHasIsland(true);
+    }
+
+    @EventHandler
+    public void spawnerEvent(SpawnerSpawnEvent event) {
+        event.setCancelled(true);
     }
 
 

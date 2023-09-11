@@ -14,6 +14,7 @@ public enum MineableType implements SkillCollectible {
     DIAMOND(6, false),
     EMERALD(7, false),
     OBSIDIAN(8, false), // MAX LEVEL (8)
+    
     BASALT(1, true),
     NETHERRACK_GROUP(2, true),
     BLACKSTONE_GROUP(3, true),
