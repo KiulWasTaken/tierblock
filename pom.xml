@@ -6,7 +6,7 @@
 
     <groupId>kiul</groupId>
     <artifactId>Tierblock</artifactId>
-    <version>1.02-RELEASE</version>
+    <version>1.04-RELEASE</version>
     <packaging>jar</packaging>
 
     <name>Tierblock</name>
