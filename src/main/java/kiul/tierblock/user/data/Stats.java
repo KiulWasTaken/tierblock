@@ -16,7 +16,7 @@ import lombok.NonNull;
 public class Stats {
 
     // moved from main.
-    private static final File USER_DATA_FOLDER = new File(Main.getInstance().getDataFolder() + "/userdata");
+    public static final File USER_DATA_FOLDER = new File(Main.getInstance().getDataFolder() + "/userdata");
 
     private final File userFile;
     private final User user;
@@ -50,6 +50,17 @@ public class Stats {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public Stats(File file) {
+        user = null;
+        this.userFile = file;
+
+        if (userFile.exists()) {
+            this.configuration = YamlConfiguration.loadConfiguration(userFile);
+            return;
+        }
+
     }
 
     /**

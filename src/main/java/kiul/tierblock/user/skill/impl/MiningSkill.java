@@ -1,5 +1,7 @@
 package kiul.tierblock.user.skill.impl;
 
+import java.lang.Math;
+
 import net.luckperms.api.LuckPerms;
 import net.luckperms.api.LuckPermsProvider;
 import net.luckperms.api.node.Node;
@@ -43,8 +45,8 @@ public class MiningSkill extends Skill {
     @Override
     public boolean checkForLevelUp(User user, boolean isNether) {
         if(user.getLevel(SkillType.MINING, isNether) >= getMaxLevel(isNether)) return false;
-
-        int indexInEnum = user.getLevel(SkillType.MINING, isNether) - 1;
+        
+        int indexInEnum = Math.min(user.getLevel(SkillType.MINING, isNether) - 1 + (isNether ? 8 : 0), 12);
         MineableType lastType = MineableType.values()[indexInEnum];
         if(user.getExperience(SkillType.MINING, isNether) < lastType.levelUp) return false;
 

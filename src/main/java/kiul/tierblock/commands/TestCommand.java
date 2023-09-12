@@ -24,6 +24,7 @@ import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
 import kiul.tierblock.user.skill.SkillType;
+import kiul.tierblock.utils.enums.SkillCollectible;
 import net.md_5.bungee.api.ChatColor;
 import world.bentobox.bentobox.BentoBox;
 import world.bentobox.bentobox.api.metadata.MetaDataValue;
@@ -155,8 +156,39 @@ public class TestCommand implements CommandExecutor {
             
             boolean isPp = block.hasMetadata("pp");
 
-            user.sendMessage("&dThis block is " + (isPp ? "" : "&cnot&d") + " pp!");
+            user.sendMessage("&dThis block is" + (isPp ? "" : " &cnot&d") + " pp!");
             return true;
+        }
+
+        if("rewardtable".equalsIgnoreCase(args[0])) {
+            if(args.length < 2) {
+                user.sendMessage("&cIncorrect usage, use: /test rewardtable help");
+                return false;
+            }
+
+            if(args[1].equalsIgnoreCase("help")) {
+                for(SkillType skillType : SkillType.values()) {
+                    if(skillType != SkillType.COMBAT && skillType != SkillType.FISHING) {
+                        user.sendMessage("&b&l" + skillType.toString() + " &eordinal: " + skillType.ordinal());
+                    }
+                }
+                return true;
+            }
+
+            int ordinal = Integer.parseInt(args[1]);
+            SkillType skillType = SkillType.values()[ordinal];
+            
+            
+            
+            SkillCollectible[] skillCollectibles = SkillCollectible.getSkillCollectibleType(skillType);
+            if(skillType == null || (skillType == SkillType.COMBAT || skillType == SkillType.FISHING)) {
+                user.sendMessage("&cThis skill ordinal is invalid, or the skill has no rewardtable for breaking blocks");
+                return false;
+            }
+            user.sendMessage("&3level_up & rewards for &b&l" + skillType.toString() + "&3:");
+            for(SkillCollectible collectible : skillCollectibles) {
+                user.sendMessage("&e&l" + collectible.label() + ", &3level_up: &b" + collectible.levelUp() + "&3, xp_reward: &b" + collectible.xpReward());
+            }
         }
 
         if("whereami".equalsIgnoreCase(args[0])) {

@@ -100,8 +100,18 @@ public enum MineableType implements SkillCollectible {
     }
 
     @Override
+    public String label() {
+        return label;
+    }
+
+    @Override
     public double levelUp() {
         return levelUp;
+    }
+    
+    @Override
+    public double xpReward() {
+        return xpReward;
     }
 
 }

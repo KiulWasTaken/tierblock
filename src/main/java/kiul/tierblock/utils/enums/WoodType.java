@@ -96,10 +96,19 @@ public enum WoodType implements SkillCollectible {
         }
         return null;
     }
+
+    @Override
+    public String label() {
+        return label;
+    }
         
     @Override
     public double levelUp() {
         return levelUp;
     }
 
+    @Override
+    public double xpReward() {
+        return xpReward;
+    }
 }

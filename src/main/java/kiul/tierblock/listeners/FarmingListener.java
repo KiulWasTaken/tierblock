@@ -238,6 +238,7 @@ public class FarmingListener implements Listener {
         if(!islandMetaData.get("beehivePlacedBefore").asBoolean()) {
             block.getWorld().spawnEntity(block.getLocation().add(0, 1, 0), EntityType.BEE);
             block.getWorld().spawnEntity(block.getLocation().add(0, 1, 0), EntityType.BEE);
+            islandMetaData.put("beehivePlacedBefore", new MetaDataValue(true));
         }
     }
 
@@ -311,11 +312,11 @@ public class FarmingListener implements Listener {
         Beehive data = (Beehive) block.getBlockData();
         if (event.getAction() != Action.RIGHT_CLICK_BLOCK)
             return;
-        if (event.getItem() == null ||
-                event.getItem().getType() != Material.GLASS_BOTTLE ||
-                event.getItem().getType() != Material.SHEARS)
-            return;
+        
         if (data.getHoneyLevel() != data.getMaximumHoneyLevel())
+            return;
+        
+        if (event.getItem() == null || (event.getItem().getType() != Material.GLASS_BOTTLE && event.getItem().getType() != Material.SHEARS))
             return;
 
         event.setCancelled(true);

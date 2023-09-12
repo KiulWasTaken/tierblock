@@ -1,5 +1,9 @@
 package kiul.tierblock.commands;
 
+import java.io.File;
+
+import org.bukkit.Bukkit;
+import org.bukkit.block.Block;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -9,6 +13,7 @@ import org.bukkit.entity.Player;
 import kiul.tierblock.Main;
 import kiul.tierblock.user.User;
 import kiul.tierblock.user.UserManager;
+import kiul.tierblock.user.data.Stats;
 import kiul.tierblock.user.skill.SkillType;
 
 public class Commands implements CommandExecutor {
@@ -40,6 +45,38 @@ public class Commands implements CommandExecutor {
         }
 
         switch(label) {
+            case "resetnetherstats":
+                if(!user.getAttributes().containsKey("resetNetherConfirm"))
+                    user.getAttributes().put("resetNetherConfirm", false);
+
+                if((boolean)user.getAttributes().get("resetNetherConfirm")) {
+                    for(File file : Stats.USER_DATA_FOLDER.listFiles()) {
+                        Stats stats = new Stats(file);
+                        stats.setNumber("mining.nether.level", 1);
+                        stats.setNumber("mining.nether.xp", 0.0);
+                    }
+                    user.getAttributes().put("resetNetherConfirm", false);
+                    user.sendMessage("&aDone!");
+                    return true;
+                }
+
+                user.getAttributes().put("resetNetherConfirm", true);
+                Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
+                    if((boolean)user.getAttributes().get("resetNetherConfirm")) {
+                        user.getAttributes().put("resetNetherConfirm", false);
+                        user.sendMessage("&cNo confirmation recieved!");
+                    }
+                }, 20 * 5);
+                return true;
+            case "untag":
+                Block block = user.getPlayer().getTargetBlockExact(5);
+                if(block.hasMetadata("pp")) {
+                    block.removeMetadata("pp", Main.getInstance());
+                    user.sendMessage("&aUntagged successfully!");
+                    return true;
+                }
+                user.sendMessage("&cBlock isn't tagged!");
+                return false;
             case "setspawn":
 
                 user.sendMessage("&cNot implemented, yet.");

@@ -4,6 +4,8 @@ main: kiul.tierblock.Main
 depend: [BentoBox]
 api-version: 1.20
 commands:
+  resetnetherstats:
+  untag:
   reloadconfig:
   buygexp:
   islandflight:

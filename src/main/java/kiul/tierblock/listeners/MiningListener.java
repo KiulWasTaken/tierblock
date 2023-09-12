@@ -27,11 +27,13 @@ public class MiningListener implements Listener {
     public void blockBreak(BlockBreakEvent event) {
         MineableType type = MineableType.fromMaterial(event.getBlock().getType());
         
+        if (event.getBlock().hasMetadata("pp")) {
+            event.getBlock().removeMetadata("pp", Main.getInstance());
+            return; // pp as in player-placed, no other meaning.... trust me
+        }
+        
         if (type == null)
             return;
-
-        if (event.getBlock().hasMetadata("pp"))
-            return; // pp as in player-placed, no other meaning.... trust me
 
         User user = UserManager.getInstance().getUser(event.getPlayer());
         event.setDropItems(false);
@@ -97,7 +99,7 @@ public class MiningListener implements Listener {
             );
     }
 
-	@EventHandler
+    @EventHandler
     public void blockForm(BlockFormEvent event) {
         MineableType mineableType = MineableType.fromMaterial(event.getBlock().getType());
 
@@ -109,10 +111,10 @@ public class MiningListener implements Listener {
 
     @EventHandler
     public void blockPlace(BlockPlaceEvent event) {
-		User user = UserManager.getInstance().getUser(event.getPlayer());
+        User user = UserManager.getInstance().getUser(event.getPlayer());
         MineableType type = MineableType.fromMaterial(event.getBlock().getType());
-		
-		if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK)
+        
+        if(user.getIslandAtPosition().getRank(user.getUUID()) < RanksManager.COOP_RANK)
             return;
         if (type == null) 
             return;

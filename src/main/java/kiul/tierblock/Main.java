@@ -75,6 +75,8 @@ public final class Main extends JavaPlugin {
 		Commands commands = new Commands();
 
         // should just put them in one command
+        getCommand("resetnetherstats").setExecutor(commands);
+        getCommand("untag").setExecutor(commands);
         getCommand("buygexp").setExecutor(new BuyGEXP());
 		getCommand("islandflight").setExecutor(commands);
 		getCommand("reloadconfig").setExecutor(commands);

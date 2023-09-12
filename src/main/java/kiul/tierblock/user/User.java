@@ -1,7 +1,9 @@
 package kiul.tierblock.user;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.function.Predicate;
@@ -47,6 +49,7 @@ public class User {
     @Setter
     private FastBoard debugBoard;
     private SkillType lastSkill;
+    private Map<String, Object> attributes = new HashMap<>();
 
     public User(Player player) {
         if (player == null)

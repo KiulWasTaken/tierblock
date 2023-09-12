@@ -124,7 +124,7 @@ mining:
   netherrack_group:
     xp_reward: 0.5
     level_up: 800.0
-  blackstone:
+  blackstone_group:
     xp_reward: 1.8
     level_up: 1000.0
   soul_group:
