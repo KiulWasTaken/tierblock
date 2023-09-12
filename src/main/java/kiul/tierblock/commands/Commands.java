@@ -59,7 +59,7 @@ public class Commands implements CommandExecutor {
                     user.sendMessage("&aDone!");
                     return true;
                 }
-
+                user.sendMessage("&cExecute command again for confirmation!");
                 user.getAttributes().put("resetNetherConfirm", true);
                 Bukkit.getScheduler().runTaskLater(Main.getInstance(), () -> {
                     if((boolean)user.getAttributes().get("resetNetherConfirm")) {
